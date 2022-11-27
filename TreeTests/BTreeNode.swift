@@ -76,8 +76,8 @@ class BTreeNode<Element: Comparable> {
     }
     
     func child(index: Int) -> BTreeNode<Element>! {
-        guard index >= 0 && index < data.count else {
-            fatalError("BTreeNode.child(index: Int) 1 index (\(index)) out of range [0..<\(data.count)]")
+        guard index >= 0 && index <= data.count else {
+            fatalError("BTreeNode.child(index: Int) 1 index (\(index)) out of range [0...\(data.count)]")
         }
         guard index >= 0 && index < data.children.count else {
             fatalError("BTreeNode.child(index: Int) 2 index (\(index)) out of range [0..<\(data.children.count)]")
@@ -142,44 +142,61 @@ class BTreeNode<Element: Comparable> {
         
         //assert(i <= count());
         guard index <= count else {
-            fatalError("BTreeNode.insert_value(index: Int, element: Element) index > count")
+            fatalError("BTreeNode.insert_value(index: Int, element: Element) index (\(index)) > count (\(count))")
+        }
+        
+        guard index >= 0 else {
+            fatalError("BTreeNode.insert_value(index: Int, element: Element) index (\(index)) < 0")
+        }
+        
+        guard order >= 1 else {
+            fatalError("BTreeNode.insert_value(index: Int, element: Element) order (\(order)) < 1")
+        }
+        
+        guard count < order else {
+            fatalError("BTreeNode.insert_value(index: Int, element: Element) count (\(count)) >= order (\(order))")
         }
         
         //value_init(count(), x);
         //for (int j = count(); j > i; --j) {
         var j = count
         while j > index {
-            j -= 1
-            
             //value_swap(j, this, j - 1);
             data.values[j] = data.values[j - 1]
+            j -= 1
         }
+        
+        data.values[index] = element
+        
+        //set_count(count() + 1);
+        count += 1
         
         //if (!leaf()) {
         if !isLeaf {
         
-            guard data.children.count == (count + 1) else {
-                fatalError("BTreeNode.insert_value(index: Int, element: Element) data.children.count (\(data.children.count)) != count (\(count))")
-            }
+            //guard data.children.count == (count + 1) else {
+            //    fatalError("BTreeNode.insert_value(index: Int, element: Element) data.children.count (\(data.children.count)) != count (\(count))")
+            //}
           
             //++i;
-            var index = index + 1
+            let index = index + 1
           
             //for (int j = count(); j > i; --j) {
             j = count
             while j > index {
-                j -= 1
+                
                 
                 //*mutable_child(j) = child(j - 1);
                 data.children[j] = data.children[j - 1]
                 
                 //  child(j)->set_position(j);
-                child(index: j).index = j
+                data.children[j]?.index = j
+                
+                j -= 1
             }
         }
         
-        //set_count(count() + 1);
-        count += 1
+        
     }
     
     /*

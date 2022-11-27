@@ -16,9 +16,9 @@ class BTreeNodeData<Element: Comparable> {
         self.parent = parent
         self.values = [Element?](repeating: nil, count: order)
         if isLeaf {
-            self.children = [BTreeNode<Element>?](repeating: nil, count: order + 1)
-        } else {
             self.children = [BTreeNode<Element>?]()
+        } else {
+            self.children = [BTreeNode<Element>?](repeating: nil, count: order + 1)
         }
     }
     
