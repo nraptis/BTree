@@ -35,6 +35,7 @@
 		0D837D3D29340155001A2AC7 /* MockMultiSearchTreeBoundsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D3C29340155001A2AC7 /* MockMultiSearchTreeBoundsTests.swift */; };
 		0D837D3F2934055A001A2AC7 /* MockMultiSearchTreeStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D3E2934055A001A2AC7 /* MockMultiSearchTreeStressTests.swift */; };
 		0D837D4129340E71001A2AC7 /* BTreeNodeInsertValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D4029340E71001A2AC7 /* BTreeNodeInsertValueTests.swift */; };
+		0D837D432934429B001A2AC7 /* BTreeIteratorSimpleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D422934429B001A2AC7 /* BTreeIteratorSimpleTests.swift */; };
 		0D87235B292EFE98002205E9 /* BinaryTreeConforming+Print.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D87235A292EFE98002205E9 /* BinaryTreeConforming+Print.swift */; };
 		0D87235D292F0340002205E9 /* SplayTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D87235C292F0340002205E9 /* SplayTree.swift */; };
 /* End PBXBuildFile section */
@@ -80,6 +81,7 @@
 		0D837D3C29340155001A2AC7 /* MockMultiSearchTreeBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMultiSearchTreeBoundsTests.swift; sourceTree = "<group>"; };
 		0D837D3E2934055A001A2AC7 /* MockMultiSearchTreeStressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMultiSearchTreeStressTests.swift; sourceTree = "<group>"; };
 		0D837D4029340E71001A2AC7 /* BTreeNodeInsertValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTreeNodeInsertValueTests.swift; sourceTree = "<group>"; };
+		0D837D422934429B001A2AC7 /* BTreeIteratorSimpleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTreeIteratorSimpleTests.swift; sourceTree = "<group>"; };
 		0D87235A292EFE98002205E9 /* BinaryTreeConforming+Print.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BinaryTreeConforming+Print.swift"; sourceTree = "<group>"; };
 		0D87235C292F0340002205E9 /* SplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplayTree.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -168,6 +170,7 @@
 				0D49602029311A800013B372 /* SplayTreeStressTests.swift */,
 				0D837D362933DCC1001A2AC7 /* BTreeNodeBoundsTests.swift */,
 				0D837D4029340E71001A2AC7 /* BTreeNodeInsertValueTests.swift */,
+				0D837D422934429B001A2AC7 /* BTreeIteratorSimpleTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				0D49601F29310DAD0013B372 /* SplayTreeCombinatoricTests.swift in Sources */,
 				0D837D392933F4B2001A2AC7 /* MockMultiSearchTree.swift in Sources */,
 				0D74CADC292D4EE800E41A5B /* MockSearchTree.swift in Sources */,
+				0D837D432934429B001A2AC7 /* BTreeIteratorSimpleTests.swift in Sources */,
 				0D74CAEF292D988C00E41A5B /* AVLTreeCombinatoricTests.swift in Sources */,
 				0D837D3D29340155001A2AC7 /* MockMultiSearchTreeBoundsTests.swift in Sources */,
 				0D837D4129340E71001A2AC7 /* BTreeNodeInsertValueTests.swift in Sources */,

@@ -7,15 +7,19 @@
 
 import Foundation
 
-class BTreeIterator<Element: Comparable> {
+class BTreeIterator<Element: Comparable>: Equatable {
+    
+    static func == (lhs: BTreeIterator<Element>, rhs: BTreeIterator<Element>) -> Bool {
+        lhs.node === rhs.node && lhs.index == rhs.index
+    }
     
     //private(set)
-    var node: BTreeNode<Element>
+    var node: BTreeNode<Element>?
     
     //private(set)
     var index: Int
     
-    init(node: BTreeNode<Element>, index: Int) {
+    init(node: BTreeNode<Element>?, index: Int) {
         self.node = node
         self.index = index
     }
@@ -30,20 +34,33 @@ class BTreeIterator<Element: Comparable> {
         self.index = iterator.index
     }
     
-    //static prefix operator ++(iterator: BTreeIterator) -> BTreeIterator {
+    func value() -> Element? {
+        return value(index: index)
+    }
     
-    //}
+    func value(index: Int) -> Element? {
+        if let node = node {
+            if index >= 0 && index < node.count {
+                if let result = node.data.values[index] {
+                    return result
+                }
+            }
+        }
+        return nil
+    }
     
     func increment() {
     
         //if (node->leaf() && ++index < node->count()) {
-        if node.isLeaf {
-            index += 1
-            if index < node.count {
-                return
+        if let node = node {
+            if node.isLeaf {
+                index += 1
+                if index < node.count {
+                    return
+                }
             }
+            incrementSlow()
         }
-        incrementSlow()
     }
     
     /*
@@ -83,130 +100,158 @@ class BTreeIterator<Element: Comparable> {
     
     func incrementSlow() {
         
-        //if (node->leaf()) {
-        if node.isLeaf {
+        if var node = node {
+            //if (node->leaf()) {
             
-            //assert(index >= node->count());
-            if index >= node.count {
-                fatalError("BTreeIterator.incrementSlow index (\(index)) >= node.count (\(node.count))")
-            }
-            
-            
-            //self_type save(*this);
-            let hold = BTreeIterator<Element>(iterator: self)
-            
-            //while (index == node->count() && !node->is_root()) {
-            while (index == node.count) && !node.isRoot {
-                
-                //assert(node->parent()->child(node->index()) == node);
-                if node.parent.child(index: node.index) === node {
-                    fatalError("BTreeIterator.incrementSlow node.parent.child(index: node.index (\(node.index))) === node")
+            //if (node->leaf()) {
+            if node.isLeaf {
+                //assert(position >= node->count());
+                guard index >= node.count else {
+                    fatalError("BTreeIterator.incrementSlow index (\(index)) >= node.count (\(node.count))")
                 }
                 
-                //index = node->index();
-                index = node.index
+                //self_type save(*this);
+                //let hold = BTreeIterator<Element>(iterator: self)
+                let holdNode = node
+                let holdIndex = index
                 
-                //node = node->parent();
-                node = node.parent
+                //while (position == node->count() && !node->is_root()) {
+                while (index == node.count) && !node.isRoot {
                 
-            }
-            
-            //if (index == node->count()) {
-            if index == node.count {
-                //*this = save;
-                set(iterator: hold)
+                    //assert(node->parent()->child(node->position()) == node);
+                    guard node.parent.child(index: node.index) === node else {
+                        fatalError("BTreeIterator.incrementSlow node.parent.child(index: node.index (\(node.index))) !== node")
+                    }
+                    
+                    //position = node->position();
+                    index = node.index
+                    
+                    //node = node->parent();
+                    node = node.parent
+                }
+                //if (position == node->count()) {
+                if index == node.count {
+                
+                    //*this = save;
+                    //set(iterator: hold)
+                    //node = hold.node
+                    node = holdNode
+                    index = holdIndex
+                }
             } else {
-                //assert(index < node->count());
-                if index < node.count {
-                    fatalError("BTreeIterator.incrementSlow index (\(index)) < node.count (\(node.count))")
+                //assert(position < node->count());
+                guard index < node.count else {
+                    fatalError("BTreeIterator.incrementSlow index (\(index)) >= node.count (\(node.count))")
                 }
                 
-                //node = node->child(index + 1);
+                //node = node->child(position + 1);
                 node = node.child(index: index + 1)
                 
                 //while (!node->leaf()) {
                 while !node.isLeaf {
-                    
                     //node = node->child(0);
                     node = node.child(index: 0)
+                    
                 }
-                
-                //index = 0;
+                //position = 0;
                 index = 0
             }
+            self.node = node
+                      
         }
     }
     
     //void decrement() {
     func decrement() {
-      
-        //if (node->leaf() && --index >= 0) {
-        if node.isLeaf {
-            //return
-            index -= 1
-            if index >= 0 {
-                return
-            }
-        }
+        
+        //if (node->leaf() && --position >= 0) {
+        //  return;
+        //}
         //decrement_slow();
-        decrementSlow()
+        
+        //if (node->leaf() && --index >= 0) {
+        if let node = node {
+            if node.isLeaf {
+                //return
+                index -= 1
+                if index >= 0 {
+                    return
+                }
+            }
+            //decrement_slow();
+            decrementSlow()
+        }
     }
     
     //void btree_iterator<N, R, P>::decrement_slow() {
     func decrementSlow() {
         
         //if (node->leaf()) {
-        if node.isLeaf {
-            
-            //assert(index <= -1);
-            if index <= -1 {
-                fatalError("BTreeIterator.decrementSlow index (\(index)) <= -1")
-            }
-            
-            //self_type save(*this);
-            let hold = BTreeIterator<Element>(iterator: self)
-            
-            //while (index < 0 && !node->is_root()) {
-            while (index < 0) && !node.isRoot {
+        if var node = node {
+            if node.isLeaf {
                 
-                //assert(node->parent()->child(node->index()) == node);
-                if node.parent.child(index: node.index) === node {
-                    fatalError("BTreeIterator.decrementSlow node.parent.child(index: node.index (\(node.index))) === node")
+                //assert(index <= -1);
+                //if index <= -1 {
+                guard index <= -1 else {
+                    fatalError("BTreeIterator.decrementSlow index (\(index)) >= 0")
                 }
                 
-                //index = node->index() - 1;
-                index = node.index - 1
+                //self_type save(*this);
+                //let hold = BTreeIterator<Element>(iterator: self)
+                let holdNode = node
+                let holdIndex = index
                 
-                //node = node->parent();
-                node = node.parent
-            }
-            
-            //if (index < 0) {
-            if index < 0 {
-                //*this = save;
-                //self = hold
-                set(iterator: hold)
-            }
-        } else {
-            
-            //assert(index >= 0);
-            if index < node.count {
-                fatalError("BTreeIterator.incrementSlow index (\(index)) >= 0")
-            }
-            
-            //node = node->child(index);
-            node = node.child(index: index)
-            
-            //while (!node->leaf()) {
-            while !node.isLeaf {
+                //while (index < 0 && !node->is_root()) {
+                while (index < 0) && !node.isRoot {
+                    
+                    //assert(node->parent()->child(node->index()) == node);
+                    guard node.parent.child(index: node.index) === node else {
+                        fatalError("BTreeIterator.decrementSlow node.parent.child(index: node.index (\(node.index))) !== node")
+                    }
+                    
+                    //index = node->index() - 1;
+                    index = node.index - 1
+                    
+                    //node = node->parent();
+                    node = node.parent
+                }
                 
-                //node = node->child(node->count());
-                node = node.child(index: node.count)
+                //if (index < 0) {
+                if index < 0 {
+                    //*this = save;
+                    //self = hold
+                    //set(iterator: hold)
+                    node = holdNode
+                    index = holdIndex
+                }
+            } else {
+                
+                //assert(index >= 0);
+                guard index >= 0 else {
+                    fatalError("BTreeIterator.incrementSlow index (\(index)) < 0")
+                }
+                
+                //if index > node.count {
+                //    print("Kludge for forward / backward... \(index) / \(node.count)")
+                //    index -= 1
+                //}
+                
+                //node = node->child(index);
+                node = node.child(index: index)
+                
+                //while (!node->leaf()) {
+                while !node.isLeaf {
+                    
+                    //node = node->child(node->count());
+                    node = node.child(index: node.count)
+                }
+                
+                //index = node->count() - 1;
+                index = node.count - 1
             }
-            
-            //index = node->count() - 1;
-            index = node.count - 1
+            self.node = node
         }
+        
     }
 }
 

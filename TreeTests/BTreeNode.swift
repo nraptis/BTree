@@ -7,7 +7,14 @@
 
 import Foundation
 
-class BTreeNode<Element: Comparable> {
+class BTreeNode<Element: Comparable>: Hashable {
+    static func == (lhs: BTreeNode<Element>, rhs: BTreeNode<Element>) -> Bool {
+        lhs === rhs
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self).hashValue)
+    }
     
     required init(data: BTreeNodeData<Element>) {
         self.data = data
@@ -50,6 +57,16 @@ class BTreeNode<Element: Comparable> {
         set { data.isRoot = newValue }
     }
     
+    var rightmost: BTreeNode<Element>? {
+        get { data.rightmost }
+        set { data.rightmost = newValue }
+    }
+    
+    var leftmost: BTreeNode<Element>? {
+        get { data.leftmost }
+        set { data.leftmost = newValue }
+    }
+    
     var parent: BTreeNode<Element>! {
         get {
             guard let result = data.parent else {
@@ -88,22 +105,33 @@ class BTreeNode<Element: Comparable> {
         return result
     }
     
+    func setChildren(array: [BTreeNode]) {
+        if order > 0 {
+            var ceiling = min(order + 1, array.count)
+            for index in 0..<ceiling {
+                set_child(i: index, node: array[index])
+            }
+        }
+    }
+    
     func swap(node: BTreeNode<Element>) {
         
-        //var hold = node.data
-        //node.data = data
-        //data = hold
-        Swift.swap(&data, &node.data)
+        var hold = node.data
+        node.data = data
+        data = hold
+        //Swift.swap(&data, &node.data)
         
         if !isLeaf {
             for index in 0...count {
-                child(index: index).parent = self
+                data.children[index]?.parent = self
+                //child(index: index).parent = self
             }
         }
         
         if !node.isLeaf {
             for index in 0...node.count {
-                node.child(index: index).parent = node
+                //node.child(index: index).parent = node
+                node.data.children[index]?.parent = node
             }
         }
     }
@@ -195,106 +223,247 @@ class BTreeNode<Element: Comparable> {
                 j -= 1
             }
         }
-        
-        
     }
     
-    /*
-    static int lower_bound(const K &k, const N &n, Compare comp)  {
-      return n.binary_search_plain_compare(k, 0, n.count(), comp);
+    //void value_swap(int i, btree_node *x, int j) {
+        //params_type::swap(mutable_value(i), x->mutable_value(j));
+    //}
+    func value_swap(i: Int, x: BTreeNode<Element>, j: Int) {
+        var hold = data.values[i]
+        data.values[i] = x.data.values[j]
+        x.data.values[j] = hold
     }
-    static int upper_bound(const K &k, const N &n, Compare comp)  {
-      typedef btree_upper_bound_adapter<K, Compare> upper_compare;
-      return n.binary_search_plain_compare(k, 0, n.count(), upper_compare(comp));
+    
+    func value_destroy(i: Int) {
+        data.values[i] = nil
     }
-    */
+    
+    //void set_child(int i, btree_node *c) {
+    func set_child(i: Int, node: BTreeNode<Element>) {
+        //*mutable_child(i) = c;
+        data.children[i] = node
+        //c->fields_.parent = this;
+        node.data.parent = self
+        
+        //c->fields_.position = i;
+        node.data.index = i
+    }
+    
+    //void btree_node<P>::rebalance_right_to_left(btree_node *src, int to_move) {
+    func rebalance_right_to_left(src: BTreeNode<Element>, to_move: Int) {
+        
+        //assert(parent() == src->parent());
+        guard parent === src.parent else {
+            fatalError("BTreeNode.rebalance_right_to_left parent != src.parent")
+        }
+        
+        //assert(position() + 1 == src->position());
+        guard (index + 1) == src.index else {
+            fatalError("BTreeNode.rebalance_right_to_left (index + 1) (\(index) + \(1)) != src.index (\(src.index))")
+        }
+        
+        //assert(src->count() >= count());
+        guard src.count >= count else {
+            fatalError("BTreeNode.rebalance_right_to_left src.count (\(src.count)) < count (\(count))")
+        }
+        
+        //assert(to_move >= 1);
+        guard to_move >= 1 else {
+            fatalError("BTreeNode.rebalance_right_to_left to_move (\(to_move)) < 1")
+        }
+        
+        //assert(to_move <= src->count());
+        guard to_move <= src.count else {
+            fatalError("BTreeNode.rebalance_right_to_left to_move (\(to_move)) > src.count (\(src.count))")
+        }
 
-    
-    // Returns the position of the first value whose key is not less than k using
-    // binary search performed using plain compare.
-    
-    //int binary_search_plain_compare(const key_type &k, int s, int e, const Compare &comp) const {
-    func binary_search_plain_compare(element: Element, start: Int, end: Int) -> Int {
-        var start = start
-        var end = end
+        // Make room in the left node for the new values.
+        //for (int i = 0; i < to_move; ++i) {
+        //    value_init(i + count());
+        //}
         
-        //while (s != e) {
-        while start != end {
+        // Move the delimiting value to the left node and the new delimiting value
+        // from the right node.
         
-            //int mid = (s + e) / 2;
-            let mid = (start + end) >> 1
+        //void value_swap(int i, btree_node *x, int j) {
+            //params_type::swap(mutable_value(i), x->mutable_value(j));
+        //}
+        
+        //value_swap(count(), parent(), position());
+        //TODO: This will crash, undoubtedly...
+        //value_swap(i: count, x: parent, j: index)
+        
+        //parent()->value_swap(position(), src, to_move - 1);
+        parent.value_swap(i: index, x: src, j: to_move - 1)
+        
+        // Move the values from the right to the left node.
+        //for (int i = 1; i < to_move; ++i) {
+        var i = 1
+        while i < to_move {
+            //value_swap(count() + i, src, i - 1);
+            value_swap(i: count + 1, x: src, j: i - 1)
+            i += 1
+        }
+        // Shift the values in the right node to their correct position.
+        //for (int i = to_move; i < src->count(); ++i) {
+        i = to_move
+        while i < src.count {
+            //src->value_swap(i - to_move, src, i);
+            src.value_swap(i: i - to_move, x: src, j: i)
+            i += 1
+        }
+        
+        //for (int i = 1; i <= to_move; ++i) {
+        i = 1
+        while i <= to_move {
+            //src->value_destroy(src->count() - i);
+            src.value_destroy(i: src.count - i)
+        }
+
+        //if (!leaf()) {
+        if !isLeaf {
+            // Move the child pointers from the right to the left node.
+            //for (int i = 0; i < to_move; ++i) {
+            i = 0
+            while i < to_move {
+                //set_child(1 + count() + i, src->child(i));
+                set_child(i: 1 + count, node: src.child(index: i))
+                i += 1
+            }
             
-            //comp(x, y) < 0;
-            //if (btree_compare_keys(comp, key(mid), k)) {
-            if element > value(index: mid) {
-            
-                //s = mid + 1;
-                start = mid + 1
-            } else {
-                //e = mid;
-                end = mid
+            //for (int i = 0; i <= src->count() - to_move; ++i) {
+            i = 0
+            while i <= (src.count - to_move) {
+                //assert(i + to_move <= src->max_count());
+                guard i + to_move <= src.order else {
+                    fatalError("BTreeNode.rebalance_right_to_left i (\(i)) + to_move (\(to_move)) > src.order (\(src.order))")
+                }
+                
+                //src->set_child(i, src->child(i + to_move));
+                src.set_child(i: i, node: src.child(index: i + to_move))
+                
+                //*src->mutable_child(i + to_move) = NULL;
+                src.data.children[i + to_move] = nil
+                
+                i += 1
             }
         }
-        //return s;
-        return start
+
+        // Fixup the counts on the src and dest nodes.
+        //set_count(count() + to_move);
+        count += to_move
+        
+        //src->set_count(src->count() - to_move);
+        src.count -= to_move
     }
     
-    func binary_search_plain_compare_upper(element: Element, start: Int, end: Int) -> Int {
-        var start = start
-        var end = end
+    //void btree_node<P>::rebalance_left_to_right(btree_node *dest, int to_move) {
+    func rebalance_left_to_right(dest: BTreeNode<Element>, to_move: Int) {
+     
+        //assert(parent() == dest->parent());
+        guard parent === dest.parent else {
+            fatalError("BTreeNode.rebalance_left_to_right parent != dest.parent")
+        }
         
-        //while (s != e) {
-        while start != end {
+        //assert(position() + 1 == dest->position());
+        guard (index + 1) == dest.index else {
+            fatalError("BTreeNode.rebalance_left_to_right (index + 1) (\(index) + \(1)) != dest.index (\(dest.index))")
+        }
         
-            //int mid = (s + e) / 2;
-            let mid = (start + end) >> 1
+        //assert(count() >= dest->count());
+        guard count >= dest.count else {
+            fatalError("BTreeNode.rebalance_left_to_right count (\(count)) < dest.count (\(dest.count))")
+        }
+        
+        
+        //assert(to_move >= 1);
+        guard to_move >= 1 else {
+            fatalError("BTreeNode.rebalance_left_to_right to_move (\(to_move)) < 1")
+        }
+        
+        //assert(to_move <= count());
+        guard to_move <= count else {
+            fatalError("BTreeNode.rebalance_left_to_right to_move (\(to_move)) > count (\(count))")
+        }
+        
+
+        // Make room in the right node for the new values.
+        //for (int i = 0; i < to_move; ++i) {
+        //    dest->value_init(i + dest->count());
+        //}
+        
+        //for (int i = dest->count() - 1; i >= 0; --i) {
+        var i = dest.count - 1
+        while i >= 0 {
+        
+            //dest->value_swap(i, dest, i + to_move);
+            dest.value_swap(i: i, x: dest, j: i + to_move)
             
-            //comp(x, y) < 0;
-            //if (btree_compare_keys(comp, key(mid), k)) {
-            if element >= value(index: mid) {
+            i -= 1
+        }
+
+        // Move the delimiting value to the right node and the new delimiting value
+        // from the left node.
+        //dest->value_swap(to_move - 1, parent(), position());
+        //TODO: Is this required?
+        //dest.value_swap(i: to_move - 1, x: parent, j: index)
+        
+        //parent()->value_swap(position(), this, count() - to_move);
+        parent.value_swap(i: index, x: self, j: count - to_move)
+        
+        //value_destroy(count() - to_move);
+        value_destroy(i: count - to_move)
+
+        // Move the values from the left to the right node.
+        //for (int i = 1; i < to_move; ++i) {
+        i = 1
+        while i < to_move {
             
-                //s = mid + 1;
-                start = mid + 1
-            } else {
-                //e = mid;
-                end = mid
+            //value_swap(count() - to_move + i, dest, i - 1);
+            value_swap(i: count - to_move, x: dest, j: i - 1)
+            //value_destroy(count() - to_move + i);
+            value_destroy(i: count - to_move + i)
+            
+            i += 1
+        }
+
+        //if (!leaf()) {
+        if !isLeaf {
+            // Move the child pointers from the left to the right node.
+            //for (int i = dest->count(); i >= 0; --i) {
+            i = dest.count
+            while i >= 0 {
+                
+                //dest->set_child(i + to_move, dest->child(i));
+                dest.set_child(i: i + to_move, node: dest.child(index: i))
+                
+                //*dest->mutable_child(i) = NULL;
+                dest.data.children[i] = nil
+                
+                i -= 1
+            }
+            
+            //for (int i = 1; i <= to_move; ++i) {
+            i = 1
+            while i <= to_move {
+                //dest->set_child(i - 1, child(count() - to_move + i));
+                dest.set_child(i: i - 1, node: child(index: count - to_move + i))
+                
+                //*mutable_child(count() - to_move + i) = NULL;
+                data.children[count - to_move + i] = nil
+                
+                i += 1
             }
         }
-        //return s;
-        return start
+
+        // Fixup the counts on the src and dest nodes.
+        //set_count(count() - to_move);
+        count -= to_move
+        
+        //dest->set_count(dest->count() + to_move);
+        dest.count += to_move
     }
     
-    /*
-    // Returns the position of the first value whose key is not less than k using
-    // binary search performed using plain compare.
-    template <typename Compare>
-    int binary_search_plain_compare(const key_type &k, int s, int e, const Compare &comp) const {
-      
-    }
-
-    // Returns the position of the first value whose key is not less than k using
-    // binary search performed using compare-to.
-    template <typename CompareTo>
-    int binary_search_compare_to(const key_type &k, int s, int e, const CompareTo &comp) const {
-      while (s != e) {
-        int mid = (s + e) / 2;
-        int c = comp(key(mid), k);
-        if (c < 0) {
-          s = mid + 1;
-        } else if (c > 0) {
-          e = mid;
-        } else {
-          // Need to return the first value whose key is not less than k, which
-          // requires continuing the binary search. Note that we are guaranteed
-          // that the result is an exact match because if "key(mid-1) < k" the
-          // call to binary_search_compare_to() will return "mid".
-          s = binary_search_compare_to(k, s, mid, comp);
-          return s | kExactMatch;
-        }
-      }
-      return s;
-    }
-    */
 }
 
 //class BTreeLeafNode<Element: Comparable>: BTreeNode<Element> {

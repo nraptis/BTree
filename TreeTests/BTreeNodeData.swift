@@ -41,7 +41,9 @@ class BTreeNodeData<Element: Comparable> {
     var isLeaf: Bool
     var isRoot: Bool
     var parent: BTreeNode<Element>?
-    var right: BTreeNode<Element>?
     var values: [Element?]
     var children: [BTreeNode<Element>?]
+    
+    weak var rightmost: BTreeNode<Element>?
+    weak var leftmost: BTreeNode<Element>?
 }

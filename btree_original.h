@@ -1299,6 +1299,12 @@ template <typename P>
 inline void btree_node<P>::insert_value(int i, const value_type &x) {
   assert(i <= count());
   value_init(count(), x);
+    
+    //void value_init(int i, const value_type &x) {
+    //  new (&fields_.values[i]) mutable_value_type(x);
+    //}
+    
+    
   for (int j = count(); j > i; --j) {
     value_swap(j, this, j - 1);
   }

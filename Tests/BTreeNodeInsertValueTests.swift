@@ -65,29 +65,12 @@ final class BTreeNodeInsertValueTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let rand = Int.random(in: 0...2)
-        if rand == 0 {
-            let data = BTreeNodeData<Int>.createLeaf(order: order, parent: nil)
-            for (index, value) in array.enumerated() {
-                data.values[index] = value
-                data.count += 1
-            }
-            return BTreeNode<Int>(data: data)
-        } else if rand == 1 {
-            let data = BTreeNodeData<Int>.createInternal(order: order, parent: nil)
-            for (index, value) in array.enumerated() {
-                data.values[index] = value
-                data.count += 1
-            }
-            return BTreeNode<Int>(data: data)
-        } else {
-            let data = BTreeNodeData<Int>.createRoot(order: order, parent: nil)
-            for (index, value) in array.enumerated() {
-                data.values[index] = value
-                data.count += 1
-            }
-            return BTreeNode<Int>(data: data)
+        let data = BTreeNodeData<Int>.createInternal(order: order, parent: nil)
+        for (index, value) in array.enumerated() {
+            data.values[index] = value
+            data.count += 1
         }
+        return BTreeNode<Int>(data: data)
     }
     
     func testInsertOneAtZeroFromZero() {

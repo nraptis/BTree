@@ -1316,6 +1316,7 @@ btree<P>::internal_insert(iterator iter, const value_type &v) {
       ++*mutable_size();
     }
   } else if (!root()->leaf()) {
+      
     ++*mutable_size();
   }
   iter.node->insert_value(iter.position, v);
