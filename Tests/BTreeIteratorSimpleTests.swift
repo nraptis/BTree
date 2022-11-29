@@ -68,13 +68,13 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let data = BTreeNodeData<Int>.createRoot(order: order, parent: nil)
+        let data = BTreeNodeData<Int>.createRootLeaf(order: order)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1
         }
         let result = BTreeNode<Int>(data: data)
-        //result.parent = result
+        result.parent = result
         return result
     }
     
@@ -84,14 +84,14 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let data = BTreeNodeData<Int>.createInternal(order: order, parent: nil)
+        let data = BTreeNodeData<Int>.createRootInternal(order: order, parent: nil)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1
         }
         let result = BTreeNode<Int>(data: data)
         result.isRoot = true
-        //result.parent = result
+        result.parent = result
         return result
     }
     
@@ -372,8 +372,6 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = demoTree2()
         let array = demoArray2()
         
-        tree.printLevels()
-        
         if !checkForwardsIterator(tree: tree, array: array) {
             XCTFail("BTreeIteratorSimpleTests.testDemoTree2() forwards iterator array: \(array)")
             return
@@ -410,8 +408,6 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = demoTree3()
         let array = demoArray3()
         
-        tree.printLevels()
-        
         if !checkForwardsIterator(tree: tree, array: array) {
             XCTFail("BTreeIteratorSimpleTests.testDemoTree3() forwards iterator array: \(array)")
             return
@@ -447,8 +443,6 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         
         let tree = demoTree4()
         let array = demoArray4()
-        
-        tree.printLevels()
         
         if !checkForwardsIterator(tree: tree, array: array) {
             XCTFail("BTreeIteratorSimpleTests.testDemoTree3() forwards iterator array: \(array)")
@@ -496,8 +490,6 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = demoTree5()
         let array = demoArray5()
         
-        tree.printLevels()
-        
         if !checkForwardsIterator(tree: tree, array: array) {
             XCTFail("BTreeIteratorSimpleTests.testDemoTree5() forwards iterator array: \(array)")
             return
@@ -537,8 +529,6 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         
         let tree = demoTree6()
         let array = demoArray6()
-        
-        tree.printLevels()
         
         if !checkForwardsIterator(tree: tree, array: array) {
             XCTFail("BTreeIteratorSimpleTests.testDemoTree6() forwards iterator array: \(array)")

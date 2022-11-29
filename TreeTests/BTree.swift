@@ -9,9 +9,8 @@ import Foundation
 
 class BTree<Element: Comparable> {
     
-    
-    
-    
+    //var rightmost: BTreeNode<Element>?
+    //var leftmost: BTreeNode<Element>?
     
     
     let order: Int
@@ -30,17 +29,24 @@ class BTree<Element: Comparable> {
     }
     
     func begin() -> BTreeIterator<Element> {
-        BTreeIterator<Element>(node: leftMost(), index: 0)
+        let result = BTreeIterator<Element>(node: root?.parent, index: 0)
+        /*
+        while let node = result.node, node.count == 0, !node.isRoot {
+            result.node = node.parent
+        }
+        */
+        return result
     }
     
     func end() -> BTreeIterator<Element> {
-        if let node = rightmost() {
+        if let node = root?.rightmost {
             return BTreeIterator<Element>(node: node, index: node.count)
         } else {
             return BTreeIterator<Element>(node: nil, index: 0)
         }
     }
     
+    /*
     func rightmost() -> BTreeNode<Element>? {
         guard let root = root else {
             return nil
@@ -60,6 +66,7 @@ class BTree<Element: Comparable> {
         }
         return root.data.leftmost
     }
+    */
     
     func delete_leaf_node(node: BTreeNode<Element>) {
         
@@ -254,12 +261,8 @@ class BTree<Element: Comparable> {
                 // The root node is currently a leaf node: create a new root node and set
                 // the current root node as the child of the new root.
                 //parent = new_internal_root_node();
-                
-                parent = BTreeNode<Element>.createInternal(order: order, parent: nil)
-                parent.leftmost = root.leftmost
-                parent.rightmost = root.rightmost
-                parent.isRoot = true
-                //new_internal_root_node
+                parent = new_internal_root_node()
+                root.isRoot = false
                 
                 //parent->set_child(0, root());
                 parent.set_child(i: 0, node: root)
@@ -268,7 +271,7 @@ class BTree<Element: Comparable> {
                 self.root = parent
                 
                 //assert(*mutable_rightmost() == parent->child(0));
-                guard rightmost() == parent.child(index: 0) else {
+                guard parent.rightmost == parent.child(index: 0) else {
                     fatalError("BTree.rebalance_or_split() rightmost() != parent.child(index: 0)")
                 }
                 
@@ -277,10 +280,12 @@ class BTree<Element: Comparable> {
                 // node because the root node is special and holds the size of the tree
                 // and a pointer to the rightmost node. So we create a new internal node
                 // and move all of the items on the current root into the new node.
+                
                 //parent = new_internal_node(parent);
                 parent = BTreeNode<Element>.createInternal(order: order, parent: parent)
-                parent.leftmost = root.leftmost
-                parent.rightmost = root.rightmost
+                //parent.leftmost = root.leftmost
+                //parent.rightmost = root.rightmost
+                
                 
                 //parent->set_child(0, parent);
                 parent.set_child(i: 0, node: parent)
@@ -295,38 +300,56 @@ class BTree<Element: Comparable> {
         }
 
         
-        
-        /*
         // Split the node.
-        node_type *split_node;
-        if (node->leaf()) {
-            split_node = new_leaf_node(parent);
-            node->split(split_node, insert_position);
-            if (rightmost() == node) {
-                *mutable_rightmost() = split_node;
+        //node_type *split_node;
+        
+        //if (node->leaf()) {
+        if node.isLeaf {
+        
+            //split_node = new_leaf_node(parent);
+            let split_node = new_leaf_node(parent: parent)
+            
+            //node->split(split_node, insert_position);
+            node.split(dest: split_node, insert_position: insert_position)
+            
+            //if (rightmost() == node) {
+            //    *mutable_rightmost() = split_node;
+            //}
+            if root?.rightmost === node {
+                //rightmost = split_node
+                root?.rightmost = split_node
+            }
+            
+            if insert_position > node.count {
+                insert_position = insert_position - node.count - 1
+                node = split_node
             }
         } else {
-            split_node = new_internal_node(parent);
-            node->split(split_node, insert_position);
+            //split_node = new_internal_node(parent);
+            let split_node = BTreeNode<Element>.createInternal(order: order, parent: parent)
+            
+            //node->split(split_node, insert_position);
+            node.split(dest: split_node, insert_position: insert_position)
+            
+            if insert_position > node.count {
+                insert_position = insert_position - node.count - 1
+                node = split_node
+            }
         }
 
-        if (insert_position > node->count()) {
-            insert_position = insert_position - node->count() - 1;
-            node = split_node;
-        }
-        */
+        //Update the iterator
+        iterator.node = node
+        iterator.index = insert_position
     }
     
+    @discardableResult
     func insert(_ element: Element) -> BTreeIterator<Element> {
         
         //if (empty()) {
         //  *mutable_root() = new_leaf_root_node(1);
         //}
         if isEmpty() {
-            let node = BTreeNode<Element>.createLeaf(order: order, parent: nil)
-            node.isRoot = true
-            node.parent = node
-            root = node
+            self.root = new_leaf_root_node()
         }
         
         guard let root = root else {
@@ -347,7 +370,7 @@ class BTree<Element: Comparable> {
         }
         
         //return internal_insert(iter, *value);
-        return insert(iterator: rootIterator, element: element)
+        return insert(iterator: iterator, element: element)
     }
     
     
@@ -355,7 +378,43 @@ class BTree<Element: Comparable> {
     // tree::delete_leaf_node
     // tree::rebalance_or_split
     
-    
+    /*
+    //inline typename btree<P>::iterator btree<P>::internal_insert(iterator iter, const value_type &v) {
+    private func insert(iterator: BTreeIterator<Element>, element: Element) -> BTreeIterator<Element> {
+        
+        guard let node = iterator.node else {
+            
+        }
+        
+        if (!iter.node->leaf()) {
+            // We can't insert on an internal node. Instead, we'll insert after the
+            // previous value which is guaranteed to be on a leaf node.
+            --iter;
+            ++iter.position;
+        }
+        if (iter.node->count() == iter.node->max_count()) {
+            // Make room in the leaf for the new item.
+            if (iter.node->max_count() < kNodeValues) {
+                // Insertion into the root where the root is smaller that the full node
+                // size. Simply grow the size of the root node.
+                assert(iter.node == root());
+                iter.node = new_leaf_root_node(
+                    std::min<int>(kNodeValues, 2 * iter.node->max_count()));
+                iter.node->swap(root());
+                delete_leaf_node(root());
+                *mutable_root() = iter.node;
+            } else {
+                rebalance_or_split(&iter);
+                ++*mutable_size();
+            }
+            
+        } else if (!root()->leaf()) {
+            ++*mutable_size();
+        }
+        iter.node->insert_value(iter.position, v);
+        return iter;
+    }
+    */
     
     //btree<P>::internal_insert(iterator iter, const value_type &v) {
     @discardableResult
@@ -391,12 +450,30 @@ class BTree<Element: Comparable> {
             //++*mutable_size();
             count += 1
         }
+        
+        guard var node = iterator.node else {
+            fatalError("insert(iterator: BTreeIterator<Element>, element: Element) iterator.node is null (II)")
+        }
+        
         //iter.node->insert_value(iter.position, v);
         node.insert_value(index: iterator.index, element: element)
         
         //return iter;
         return iterator
     }
+    
+    /*
+    inline IterType btree<P>::internal_last(IterType iter) {
+        while (iter.node && iter.position == iter.node->count()) {
+            iter.position = iter.node->position();
+            iter.node = iter.node->parent();
+            if (iter.node->leaf()) {
+                iter.node = NULL;
+            }
+        }
+        return iter;
+    }
+    */
     
     //inline IterType btree<P>::internal_last(IterType iter) {
     func internal_last(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
@@ -408,9 +485,11 @@ class BTree<Element: Comparable> {
             //iter.node = iter.node->parent();
             iterator.node = node.parent
             //if (iter.node->leaf()) {
-            if node.isLeaf {
-                //iter.node = NULL;
-                iterator.node = nil
+            if let node = iterator.node {
+                if node.isLeaf {
+                    //iter.node = NULL;
+                    iterator.node = nil
+                }
             }
         }
         //return iter;
@@ -439,6 +518,61 @@ class BTree<Element: Comparable> {
         //return iter;
         return internal_last(iterator: iterator)
     }
+    
+    
+    /*
+    / Node creation/deletion routines.
+    node_type* new_internal_node(node_type *parent) {
+      internal_fields *p = reinterpret_cast<internal_fields*>(
+          mutable_internal_allocator()->allocate(sizeof(internal_fields)));
+      return node_type::init_internal(p, parent);
+    }
+    */
+    func new_internal_node(parent: BTreeNode<Element>) -> BTreeNode<Element> {
+        let result = BTreeNode<Element>.createInternal(order: order, parent: parent)
+        return result
+    }
+    
+    /*
+    node_type* new_internal_root_node() {
+      root_fields *p = reinterpret_cast<root_fields*>(
+          mutable_internal_allocator()->allocate(sizeof(root_fields)));
+      return node_type::init_root(p, root()->parent());
+    }
+    */
+    func new_internal_root_node() -> BTreeNode<Element> {
+        guard let parent = root?.parent else {
+            fatalError("BTree.new_internal_root_node root?.parent is null")
+        }
+        let result = BTreeNode<Element>.createRootInternal(order: order, parent: parent)
+        return result
+    }
+    
+    /*
+    node_type* new_leaf_node(node_type *parent) {
+      leaf_fields *p = reinterpret_cast<leaf_fields*>(
+          mutable_internal_allocator()->allocate(sizeof(leaf_fields)));
+      return node_type::init_leaf(p, parent, kNodeValues);
+    }
+    */
+    func new_leaf_node(parent: BTreeNode<Element>) -> BTreeNode<Element> {
+        let result = BTreeNode<Element>.createLeaf(order: order, parent: parent)
+        return result
+    }
+    
+    /*
+    node_type* new_leaf_root_node(int max_count) {
+      leaf_fields *p = reinterpret_cast<leaf_fields*>(
+          mutable_internal_allocator()->allocate(
+              sizeof(base_fields) + max_count * sizeof(value_type)));
+      return node_type::init_leaf(p, reinterpret_cast<node_type*>(p), max_count);
+    }
+    */
+    func new_leaf_root_node() -> BTreeNode<Element> {
+        let result = BTreeNode<Element>.createRootLeaf(order: order)
+        return result
+    }
+    
     
     /*
      template <typename P> template <typename ValuePointer>
@@ -513,7 +647,7 @@ class BTree<Element: Comparable> {
             return
         }
         
-        node.leftmost = findLeftMost(node)
+        node.parent = findLeftMost(node)
         node.rightmost = findRightMost(node)
     }
     
@@ -585,17 +719,19 @@ class BTree<Element: Comparable> {
             return 0
         }
         var maxChildDepth = 0
-        for index in 0...node.count {
-            if let child = node.data.children[index] {
-                if child.isLeaf {
-                    let childDepth = 1
-                    if childDepth > maxChildDepth {
-                        maxChildDepth = childDepth
-                    }
-                } else {
-                    let childDepth = maxDepth(child)
-                    if childDepth > maxChildDepth {
-                        maxChildDepth = childDepth
+        if !node.isLeaf {
+            for index in 0...node.count {
+                if let child = node.data.children[index] {
+                    if child.isLeaf {
+                        let childDepth = 1
+                        if childDepth > maxChildDepth {
+                            maxChildDepth = childDepth
+                        }
+                    } else {
+                        let childDepth = maxDepth(child)
+                        if childDepth > maxChildDepth {
+                            maxChildDepth = childDepth
+                        }
                     }
                 }
             }
@@ -689,7 +825,7 @@ class BTree<Element: Comparable> {
                     
                     var parentName = "nil"
                     if let parent = node.parent {
-                        let parentName = nameOfNode(parent, level: level - 1, nodes: nodes)
+                        parentName = nameOfNode(parent, level: level - 1, nodes: nodes)
                     }
                     
                     names[node] = name
@@ -704,13 +840,11 @@ class BTree<Element: Comparable> {
             print("___\n")
         }
         
-        if let root = root {
-            if let lm = root.leftmost {
-                print("left most: \(names[lm] ?? "?")")
-            }
-            if let rm = root.rightmost {
-                print("right most: \(names[rm] ?? "?")")
-            }
+        if let lm = root?.parent {
+            print("left most: \(names[lm] ?? "?")")
+        }
+        if let rm = root?.rightmost {
+            print("right most: \(names[rm] ?? "?")")
         }
         
         print("___End: Printing Tree")

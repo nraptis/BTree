@@ -53,6 +53,17 @@ class BTreeIterator<Element: Comparable>: Equatable {
     
         //if (node->leaf() && ++index < node->count()) {
         if let node = node {
+            
+            if node.count <= 0 {
+                if let parent = node.parent, node.isRoot == false, node.index <= parent.count {
+                    self.node = parent
+                    self.index = node.index
+                    return
+                } else {
+                    fatalError("BTreeIterator.increment() illegal node, node.count = \(node.count)")
+                }
+            }
+            
             if node.isLeaf {
                 index += 1
                 if index < node.count {
@@ -116,7 +127,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 let holdIndex = index
                 
                 //while (position == node->count() && !node->is_root()) {
-                while (index == node.count) && !node.isRoot {
+                while (index >= node.count) && !node.isRoot {
                 
                     guard let parent = node.parent else {
                         fatalError("BTreeIterator.incrementSlow node.parent is null")
@@ -135,7 +146,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                     node = parent
                 }
                 //if (position == node->count()) {
-                if index == node.count {
+                if index >= node.count {
                 
                     //*this = save;
                     //set(iterator: hold)
@@ -186,6 +197,17 @@ class BTreeIterator<Element: Comparable>: Equatable {
         
         //if (node->leaf() && --index >= 0) {
         if let node = node {
+            
+            if node.count <= 0 {
+                if let parent = node.parent, node.isRoot == false, node.index >= 0 {
+                    self.node = parent
+                    self.index = node.index
+                    return
+                } else {
+                    fatalError("BTreeIterator.decrement() illegal node, node.count = \(node.count)")
+                }
+            }
+            
             if node.isLeaf {
                 //return
                 index -= 1
