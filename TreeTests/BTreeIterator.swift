@@ -118,8 +118,12 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 //while (position == node->count() && !node->is_root()) {
                 while (index == node.count) && !node.isRoot {
                 
+                    guard let parent = node.parent else {
+                        fatalError("BTreeIterator.incrementSlow node.parent is null")
+                    }
+                    
                     //assert(node->parent()->child(node->position()) == node);
-                    guard node.parent.child(index: node.index) === node else {
+                    guard parent.child(index: node.index) === node else {
                         fatalError("BTreeIterator.incrementSlow node.parent.child(index: node.index (\(node.index))) !== node")
                     }
                     
@@ -127,7 +131,8 @@ class BTreeIterator<Element: Comparable>: Equatable {
                     index = node.index
                     
                     //node = node->parent();
-                    node = node.parent
+                    
+                    node = parent
                 }
                 //if (position == node->count()) {
                 if index == node.count {
@@ -145,12 +150,22 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 }
                 
                 //node = node->child(position + 1);
-                node = node.child(index: index + 1)
+                
+                guard let child = node.child(index: index + 1) else {
+                    fatalError("BTreeIterator.incrementSlow missing child index (\(index)) + 1")
+                }
+                
+                node = child
                 
                 //while (!node->leaf()) {
                 while !node.isLeaf {
                     //node = node->child(0);
-                    node = node.child(index: 0)
+                    
+                    guard let child = node.child(index: 0) else {
+                        fatalError("BTreeIterator.incrementSlow missing child index 0")
+                    }
+                    
+                    node = child
                     
                 }
                 //position = 0;
@@ -204,8 +219,12 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 //while (index < 0 && !node->is_root()) {
                 while (index < 0) && !node.isRoot {
                     
+                    guard let parent = node.parent else {
+                        fatalError("BTreeIterator.incrementSlow node.parent is null")
+                    }
+                    
                     //assert(node->parent()->child(node->index()) == node);
-                    guard node.parent.child(index: node.index) === node else {
+                    guard parent.child(index: node.index) === node else {
                         fatalError("BTreeIterator.decrementSlow node.parent.child(index: node.index (\(node.index))) !== node")
                     }
                     
@@ -213,7 +232,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                     index = node.index - 1
                     
                     //node = node->parent();
-                    node = node.parent
+                    node = parent
                 }
                 
                 //if (index < 0) {
@@ -228,22 +247,26 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 
                 //assert(index >= 0);
                 guard index >= 0 else {
-                    fatalError("BTreeIterator.incrementSlow index (\(index)) < 0")
+                    fatalError("BTreeIterator.decrementSlow index (\(index)) < 0")
                 }
                 
-                //if index > node.count {
-                //    print("Kludge for forward / backward... \(index) / \(node.count)")
-                //    index -= 1
-                //}
                 
                 //node = node->child(index);
-                node = node.child(index: index)
+                
+                guard let child = node.child(index: index) else {
+                    fatalError("BTreeIterator.decrementSlow missing child index (\(index))")
+                }
+                node = child
                 
                 //while (!node->leaf()) {
                 while !node.isLeaf {
                     
+                    guard let child = node.child(index: node.count) else {
+                        fatalError("BTreeIterator.decrementSlow missing child node.count (\(node.count))")
+                    }
+                    
                     //node = node->child(node->count());
-                    node = node.child(index: node.count)
+                    node = child
                 }
                 
                 //index = node->count() - 1;

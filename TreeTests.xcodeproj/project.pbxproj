@@ -27,6 +27,7 @@
 		0D74CAF3292D9F4000E41A5B /* Array+Subsets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D74CAF2292D9F4000E41A5B /* Array+Subsets.swift */; };
 		0D74CAF5292DBB2800E41A5B /* AVLTreeStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D74CAF4292DBB2800E41A5B /* AVLTreeStressTests.swift */; };
 		0D7953C82931007A008BE3CA /* SplayTreeSimpleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D7953C72931007A008BE3CA /* SplayTreeSimpleTests.swift */; };
+		0D7AAA2329358D7D003F98A7 /* TeztClazz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D7AAA2229358D7D003F98A7 /* TeztClazz.swift */; };
 		0D837D332933BBCC001A2AC7 /* BTreeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D322933BBCC001A2AC7 /* BTreeIterator.swift */; };
 		0D837D352933D4C9001A2AC7 /* BTreeNodeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D342933D4C9001A2AC7 /* BTreeNodeData.swift */; };
 		0D837D372933DCC1001A2AC7 /* BTreeNodeBoundsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D837D362933DCC1001A2AC7 /* BTreeNodeBoundsTests.swift */; };
@@ -73,6 +74,7 @@
 		0D74CAF2292D9F4000E41A5B /* Array+Subsets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Subsets.swift"; sourceTree = "<group>"; };
 		0D74CAF4292DBB2800E41A5B /* AVLTreeStressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVLTreeStressTests.swift; sourceTree = "<group>"; };
 		0D7953C72931007A008BE3CA /* SplayTreeSimpleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplayTreeSimpleTests.swift; sourceTree = "<group>"; };
+		0D7AAA2229358D7D003F98A7 /* TeztClazz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeztClazz.swift; sourceTree = "<group>"; };
 		0D837D322933BBCC001A2AC7 /* BTreeIterator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTreeIterator.swift; sourceTree = "<group>"; };
 		0D837D342933D4C9001A2AC7 /* BTreeNodeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTreeNodeData.swift; sourceTree = "<group>"; };
 		0D837D362933DCC1001A2AC7 /* BTreeNodeBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTreeNodeBoundsTests.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				0D67EC4F2932CD1D005DE900 /* BTreeNode.swift */,
 				0D837D342933D4C9001A2AC7 /* BTreeNodeData.swift */,
 				0D837D322933BBCC001A2AC7 /* BTreeIterator.swift */,
+				0D7AAA2229358D7D003F98A7 /* TeztClazz.swift */,
 			);
 			path = TreeTests;
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				0D87235D292F0340002205E9 /* SplayTree.swift in Sources */,
 				0D74CAB7292C299600E41A5B /* TreeTestsApp.swift in Sources */,
 				0D837D332933BBCC001A2AC7 /* BTreeIterator.swift in Sources */,
+				0D7AAA2329358D7D003F98A7 /* TeztClazz.swift in Sources */,
 				0D74CAD8292C31DB00E41A5B /* AVLTree.swift in Sources */,
 				0D74CAD5292C30A800E41A5B /* MinHeap.swift in Sources */,
 				0D74CAC5292C2AD200E41A5B /* BinaryTreeConforming.swift in Sources */,

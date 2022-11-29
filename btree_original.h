@@ -466,38 +466,7 @@ class btree_node {
   int upper_bound(const key_type &k, const Compare &comp) const {
     return search_type::upper_bound(k, *this, comp);
   }
-
-  // Returns the position of the first value whose key is not less than k using
-  // linear search performed using plain compare.
-  template <typename Compare>
-  int DO_NOT_USE_DO_NOT_USE_plain_compare(
-      const key_type &k, int s, int e, const Compare &comp) const {
-    while (s < e) {
-      if (!btree_compare_keys(comp, key(s), k)) {
-        break;
-      }
-      ++s;
-    }
-    return s;
-  }
-
-  // Returns the position of the first value whose key is not less than k using
-  // linear search performed using compare-to.
-  template <typename Compare>
-  int DO_NOT_USE_DO_NOT_USE_compare_to(
-      const key_type &k, int s, int e, const Compare &comp) const {
-    while (s < e) {
-      int c = comp(key(s), k);
-      if (c == 0) {
-        return s | kExactMatch;
-      } else if (c > 0) {
-        break;
-      }
-      ++s;
-    }
-    return s;
-  }
-
+    
   // Returns the position of the first value whose key is not less than k using
   // binary search performed using plain compare.
   template <typename Compare>
