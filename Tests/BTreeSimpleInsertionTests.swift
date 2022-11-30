@@ -31,18 +31,40 @@ final class BTreeSimpleInsertionTests: XCTestCase {
             return false
         }
         
+        if array.count == 0 {
+            guard tree.begin() == tree.end() else {
+                XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() tree.begin() != tree.end() at count 0")
+                return false
+            }
+        }
+        
+        let array = array.sorted()
+        
         let iterator = tree.begin()
         let end = tree.end()
         var index = 0
         
+        /*
         while let node = iterator.node, iterator != end, node.count <= 0 {
             iterator.increment()
+        }
+        */
+        
+        if let node = iterator.node, node.count <= 0 {
+            XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() node.count (\(node.count)) <= 0 (I)")
+            return false
         }
         
         while iterator != end {
             
+            /*
             if iterator.value() != array[index] {
                 XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() iterator.value() (\(iterator.value() ?? -1)) != array[index] (\(array[index]))")
+                return false
+            }
+            */
+            if let node = iterator.node, node.count <= 0 {
+                XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() node.count (\(node.count)) <= 0 (II)")
                 return false
             }
             
@@ -69,6 +91,15 @@ final class BTreeSimpleInsertionTests: XCTestCase {
             return false
         }
         
+        if array.count == 0 {
+            guard tree.begin() == tree.end() else {
+                XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() tree.begin() != tree.end() at count 0")
+                return false
+            }
+        }
+        
+        let array = array.sorted()
+        
         let iterator = tree.end()
         let begin = tree.begin()
         var index = array.count
@@ -76,8 +107,14 @@ final class BTreeSimpleInsertionTests: XCTestCase {
         while iterator != begin {
             iterator.decrement()
             
+            /*
             while let node = iterator.node, iterator != begin, node.count <= 0 {
                 iterator.decrement()
+            }
+            */
+            if let node = iterator.node, node.count <= 0 {
+                XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() node.count (\(node.count)) <= 0 (I)")
+                return false
             }
             
             index -= 1
@@ -130,22 +167,8 @@ final class BTreeSimpleInsertionTests: XCTestCase {
         }
     }
     
-    func testInsertThreeValuesAndIterateOrder2() {
-        let tree = BTree<Int>(order: 2)
-        tree.insert(1); tree.insert(2); tree.insert(3)
-        let array = [1, 2, 3]
-        if !checkForwardsIterator(tree: tree, array: array) {
-            XCTFail("BTreeIteratorSimpleTests.testIteratorForwardAndBackward_10() forwards iterator array: \(array)")
-            return
-        }
-        if !checkBackwardsIterator(tree: tree, array: array) {
-            XCTFail("BTreeIteratorSimpleTests.testIteratorForwardAndBackward_10() backwards iterator array: \(array)")
-            return
-        }
-    }
-    
-    func testInsert_0_10_ValuesAndIterateOrder_2_10() {
-        for order in 2...10 {
+    func testInsert_0_10_ValuesAndIterateOrder_3_10() {
+        for order in 3...10 {
             for count in 0...10 {
                 let tree = BTree<Int>(order: order)
                 var array = [Int]()
@@ -157,25 +180,23 @@ final class BTreeSimpleInsertionTests: XCTestCase {
                 }
                 
                 if !checkForwardsIterator(tree: tree, array: array) {
-                    XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_2_10() forwards iterator array: \(array)")
+                    XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_3_10() forwards iterator array: \(array)")
                     return
                 }
                 if !checkBackwardsIterator(tree: tree, array: array) {
-                    XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_2_10() backwards iterator array: \(array)")
+                    XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_3_10() backwards iterator array: \(array)")
                     return
                 }
             }
         }
     }
     
-    func testInsert_0_10_ValuesAndIterateOrder_2_10_AllPermutations() {
-        for order in 2...10 {
-            for count in 0...10 {
-                
+    func testInsert_0_8_ValuesAndIterateOrder_3_8_AllPermutations() {
+        for order in 3...8 {
+            for count in 0...8 {
                 var arrayBase = [Int]()
                 var index = 0
                 while index < count {
-                    
                     arrayBase.append(index)
                     index += 1
                 }
@@ -189,20 +210,17 @@ final class BTreeSimpleInsertionTests: XCTestCase {
                         index += 1
                     }
                     
-                    print("permutation = \(permutation)")
-                    
                     if !checkForwardsIterator(tree: tree, array: arrayBase) {
                         tree.printLevels()
-                        XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_2_10() forwards iterator permutation: \(permutation)")
+                        XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_3_10_AllPermutations() forwards iterator permutation: \(permutation)")
                         return
                     }
-                    /*
+                    
                     if !checkBackwardsIterator(tree: tree, array: arrayBase) {
                         tree.printLevels()
-                        XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_2_10() backwards iterator permutation: \(permutation)")
+                        XCTFail("BTreeIteratorSimpleTests.testInsert_0_10_ValuesAndIterateOrder_3_10_AllPermutations() backwards iterator permutation: \(permutation)")
                         return
                     }
-                    */
                 }
             }
         }
@@ -210,13 +228,12 @@ final class BTreeSimpleInsertionTests: XCTestCase {
     
     func testKnownFailureCase01() {
         
-        let order = 2
+        let order = 3
         let array = [0, 1, 2, 3, 4]
         let tree = BTree<Int>(order: order)
         
-        tree.insert(0); tree.insert(1)
-        tree.insert(2); tree.insert(3)
-        tree.insert(4)
+        tree.insert(0); tree.insert(1); tree.insert(2);
+        tree.insert(3); tree.insert(4)
         
         if !checkForwardsIterator(tree: tree, array: array) {
             XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
@@ -230,159 +247,175 @@ final class BTreeSimpleInsertionTests: XCTestCase {
     
     func testKnownFailureCase02() {
         
-        let order = 2
+        let order = 3
         let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         let tree = BTree<Int>(order: order)
         
-        tree.insert(0); tree.insert(1)
-        tree.insert(2); tree.insert(3)
-        tree.insert(4); tree.insert(5)
-        tree.insert(6); tree.insert(7)
+        tree.insert(0); tree.insert(1); tree.insert(2); tree.insert(3)
+        tree.insert(4); tree.insert(5); tree.insert(6); tree.insert(7)
         tree.insert(8); tree.insert(9)
         
         if !checkForwardsIterator(tree: tree, array: array) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase02() forwards iterator array: \(array)")
             return
         }
         if !checkBackwardsIterator(tree: tree, array: array) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase02() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase03() {
         
-        let order = 2
+        let order = 3
         let array = [1, 0]
         let tree = BTree<Int>(order: order)
+        tree.insert(1); tree.insert(0)
         
-        tree.insert(1)
-        tree.insert(0)
-        
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase03() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase03() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase04() {
-        
-        let order = 2
+        let order = 3
         let array = [0, 2, 1]
         let tree = BTree<Int>(order: order)
+        tree.insert(0); tree.insert(2); tree.insert(1)
         
-        tree.insert(0)
-        tree.insert(2)
-        tree.insert(1)
-        
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase04() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase04() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase05() {
-        
-        let order = 2
+        let order = 3
         let array = [1, 0, 2]
         let tree = BTree<Int>(order: order)
         
         tree.insert(1); tree.insert(0)
         tree.insert(2)
         
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase05() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase05() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase06() {
         
-        let order = 2
+        let order = 3
         let array = [1, 2, 0]
         let tree = BTree<Int>(order: order)
         
         tree.insert(1); tree.insert(2)
         tree.insert(0)
         
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase06() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase06() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase07() {
-        
-        let order = 2
+        let order = 3
         let array = [0, 2, 3, 1]
         let tree = BTree<Int>(order: order)
         tree.insert(0); tree.insert(2); tree.insert(3)
         tree.insert(1)
         
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase07() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase07() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase08() {
-        let order = 2
+        let order = 3
         let array = [2, 3, 1, 0]
         let tree = BTree<Int>(order: order)
         tree.insert(2); tree.insert(3); tree.insert(1); tree.insert(0)
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase08() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase08() backwards iterator array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase09() {
-        let order = 2
+        let order = 3
         let array = [0, 1, 2, 3, 5, 4]
         let tree = BTree<Int>(order: order)
-        tree.insert(0); tree.insert(1); tree.insert(2); tree.insert(3); tree.insert(5)
-        
-        tree.printLevels()
-        tree.insert(4)
-        
-        tree.printLevels()
-        
-        if !checkForwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() forwards iterator array: \(array)")
+        tree.insert(0); tree.insert(1); tree.insert(2)
+        tree.insert(3); tree.insert(5); tree.insert(4)
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase09() forwards iterator array: \(array)")
             return
         }
-        if !checkBackwardsIterator(tree: tree, array: array.sorted()) {
-            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase01() backwards iterator array: \(array)")
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase09() backwards iterator array: \(array)")
             return
         }
     }
     
+    func testKnownFailureCase10() {
+        let order = 3
+        let array = [0, 1, 3, 6, 7, 4, 5, 2]
+        let tree = BTree<Int>(order: order)
+        tree.insert(0); tree.insert(1); tree.insert(3); tree.insert(6)
+        tree.insert(7); tree.insert(4); tree.insert(5); tree.insert(2)
+        
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase10() forwards iterator array: \(array)")
+            return
+        }
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase10() backwards iterator array: \(array)")
+            return
+        }
+    }
     
-    
-    
-    
+    func testKnownFailureCase11() {
+        let order = 4
+        let array = [0, 1, 2, 4, 3, 5, 6]
+        let tree = BTree<Int>(order: order)
+        
+        tree.insert(0); tree.insert(1); tree.insert(2)
+        tree.insert(4); tree.insert(3); tree.insert(5)
+        tree.insert(6)
+        
+        if !checkForwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase11() forwards iterator array: \(array)")
+            return
+        }
+        if !checkBackwardsIterator(tree: tree, array: array) {
+            XCTFail("BTreeIteratorSimpleTests.testKnownFailureCase11() backwards iterator array: \(array)")
+            return
+        }
+    }
 }

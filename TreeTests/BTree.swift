@@ -21,6 +21,9 @@ class BTree<Element: Comparable> {
     private(set) var count = 0
     
     required init(order: Int) {
+        guard order >= 3 else {
+            fatalError("BTree.init(order:) order (\(order)) must be >= 3")
+        }
         self.order = order
     }
     
@@ -258,6 +261,16 @@ class BTree<Element: Comparable> {
             // Rebalancing not possible because this is the root node.
             //if (root()->leaf()) {
             if root.isLeaf {
+                
+                /*
+                // The root node is currently a leaf node: create a new root node and set
+                // the current root node as the child of the new root.
+                parent = new_internal_root_node();
+                parent->set_child(0, root());
+                *mutable_root() = parent;
+                assert(*mutable_rightmost() == parent->child(0));
+                */
+                
                 // The root node is currently a leaf node: create a new root node and set
                 // the current root node as the child of the new root.
                 //parent = new_internal_root_node();
@@ -816,9 +829,9 @@ class BTree<Element: Comparable> {
                     let name = nameOfNode(node, level: level, nodes: nodes)
                     names[node] = name
                     if node.isLeaf {
-                        print("R|L {\(name)} \(values)")
+                        print("R|L {\(name)} (\(node.count) / \(node.order)) \(values)")
                     } else {
-                        print("R|I {\(name)} \(values)")
+                        print("R|I {\(name)} (\(node.count) / \(node.order)) \(values)")
                     }
                 } else {
                     let name = nameOfNode(node, level: level, nodes: nodes)
@@ -831,9 +844,9 @@ class BTree<Element: Comparable> {
                     names[node] = name
                     
                     if node.isLeaf {
-                        print("N|L {\(name)} \(values) in {\(parentName)}[\(node.index)]")
+                        print("N|L {\(name)} (\(node.count) / \(node.order)) \(values) in {\(parentName)}[\(node.index)]")
                     } else {
-                        print("N|I {\(name)} \(values) in {\(parentName)}[\(node.index)]")
+                        print("N|I {\(name)} (\(node.count) / \(node.order)) \(values) in {\(parentName)}[\(node.index)]")
                     }
                 }
             }

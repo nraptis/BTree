@@ -271,9 +271,10 @@ class BTreeNode<Element: Comparable>: Hashable {
         if insert_position == 0 {
             //dest->set_count(count() - 1);
             //dest.count -= 1
-            if dest.count > 0 {
-                dest.count -= 1
-            }
+            //if dest.count > 0 {
+            //dest.count -= 1
+            dest.count = count - 1
+            //}
             
         //} else if (insert_position == max_count()) {
         } else if insert_position == order {
@@ -496,7 +497,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         var i = 1
         while i < to_move {
             //value_swap(count() + i, src, i - 1);
-            value_swap(i: count + 1, x: src, j: i - 1)
+            value_swap(i: count + i, x: src, j: i - 1)
             i += 1
         }
         // Shift the values in the right node to their correct position.

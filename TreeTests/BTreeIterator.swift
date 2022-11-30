@@ -54,6 +54,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
         //if (node->leaf() && ++index < node->count()) {
         if let node = node {
             
+            /*
             if node.count <= 0 {
                 if let parent = node.parent, node.isRoot == false, node.index <= parent.count {
                     self.node = parent
@@ -63,6 +64,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                     fatalError("BTreeIterator.increment() illegal node, node.count = \(node.count)")
                 }
             }
+            */
             
             if node.isLeaf {
                 index += 1
@@ -198,6 +200,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
         //if (node->leaf() && --index >= 0) {
         if let node = node {
             
+            /*
             if node.count <= 0 {
                 if let parent = node.parent, node.isRoot == false, node.index >= 0 {
                     self.node = parent
@@ -207,6 +210,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                     fatalError("BTreeIterator.decrement() illegal node, node.count = \(node.count)")
                 }
             }
+            */
             
             if node.isLeaf {
                 //return
