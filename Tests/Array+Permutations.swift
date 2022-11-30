@@ -43,3 +43,22 @@ extension Array where Element: Comparable {
         return result
     }
 }
+
+extension Array where Element: Comparable & Hashable {
+    func permutations(maxCount: Int = 100, maxTries: Int = 200) -> [[Element]] {
+        var result = [[Element]]()
+        var set = Set<[Element]>()
+        var loop = 0
+        while loop < maxTries && result.count < maxCount {
+            var permutation = self
+            permutation.shuffle()
+            if !set.contains(permutation) {
+                set.insert(permutation)
+                result.append(permutation)
+            }
+            loop += 1
+        }
+        return result
+    }
+}
+

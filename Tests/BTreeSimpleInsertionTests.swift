@@ -30,57 +30,36 @@ final class BTreeSimpleInsertionTests: XCTestCase {
             XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() tree.count (\(tree.count)) != array.count (\(array.count))")
             return false
         }
-        
         if array.count == 0 {
             guard tree.begin() == tree.end() else {
                 XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() tree.begin() != tree.end() at count 0")
                 return false
             }
         }
-        
         let array = array.sorted()
-        
         let iterator = tree.begin()
         let end = tree.end()
         var index = 0
-        
-        /*
-        while let node = iterator.node, iterator != end, node.count <= 0 {
-            iterator.increment()
-        }
-        */
-        
         if let node = iterator.node, node.count <= 0 {
             XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() node.count (\(node.count)) <= 0 (I)")
             return false
         }
-        
-        while iterator != end {
-            
-            /*
-            if iterator.value() != array[index] {
-                XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() iterator.value() (\(iterator.value() ?? -1)) != array[index] (\(array[index]))")
-                return false
-            }
-            */
+        while iterator != end && index < array.count {
             if let node = iterator.node, node.count <= 0 {
                 XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() node.count (\(node.count)) <= 0 (II)")
                 return false
             }
-            
             iterator.increment()
-            
-            while let node = iterator.node, iterator != end, node.count <= 0 {
-                iterator.increment()
-            }
-            
             index += 1
+        }
+        guard iterator == end else {
+            XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() iterator != end")
+            return false
         }
         if index != array.count {
             XCTFail("BTreeSimpleInsertionTests.checkForwardsIterator() index (\(index)) != array.count (\(array.count))")
             return false
         }
-        
         return true
     }
     
@@ -99,41 +78,30 @@ final class BTreeSimpleInsertionTests: XCTestCase {
         }
         
         let array = array.sorted()
-        
         let iterator = tree.end()
         let begin = tree.begin()
         var index = array.count
         
-        while iterator != begin {
+        while iterator != begin && index > 0 {
             iterator.decrement()
-            
-            /*
-            while let node = iterator.node, iterator != begin, node.count <= 0 {
-                iterator.decrement()
-            }
-            */
             if let node = iterator.node, node.count <= 0 {
                 XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() node.count (\(node.count)) <= 0 (I)")
                 return false
             }
-            
             index -= 1
-            
-            if index >= 0 {
-                if iterator.value() != array[index] {
-                    XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() iterator.value() (\(iterator.value() ?? -1)) != array[index] (\(array[index]))")
-                    return false
-                }
-            } else {
-                print("checkBackwardsIterator, below range... \(index)")
-                break
+            if iterator.value() != array[index] {
+                XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() iterator.value() (\(iterator.value() ?? -1)) != array[index] (\(array[index]))")
+                return false
             }
+        }
+        guard iterator == begin else {
+            XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() iterator != begin")
+            return false
         }
         if index > 0 {
             XCTFail("BTreeSimpleInsertionTests.checkBackwardsIterator() index (\(index)) != 0")
             return false
         }
-        
         return true
     }
     
