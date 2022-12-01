@@ -16,9 +16,14 @@ final class BTreeInsertAndCountTests: XCTestCase {
             return false
         }
         
+        if mockTree.count <= 0 {
+            return true
+        }
+        
         let uniqueNumbers = Set<Int>(mockTree.data)
         let uniqueArray = Array(uniqueNumbers)
         
+        // check all the elements that di exist...
         for number in uniqueArray {
             if realTree.contains(number) != mockTree.contains(number) {
                 realTree.printLevels()
@@ -34,6 +39,34 @@ final class BTreeInsertAndCountTests: XCTestCase {
                 return false
             }
         }
+        
+        // check elements that don't exist too...
+        if let minNumber = uniqueArray.min(), let maxNumber = uniqueArray.max() {
+            let start = minNumber - 10
+            let end = maxNumber + 10
+            if start < end {
+                for check in start...end {
+                    
+                    if realTree.contains(check) != mockTree.contains(check) {
+                        realTree.printLevels()
+                        print("Mock: \(mockTree.data)")
+                        XCTFail("BTreeInsertAndCountTests.compareTrees() number (\(check)) exists in btree: \(realTree.contains(check))) exists in mock tree: \(mockTree.contains(check))")
+                        return false
+                    }
+                    
+                    if realTree.countElement(check) != mockTree.countElement(check) {
+                        realTree.printLevels()
+                        print("Mock: \(mockTree.data)")
+                        XCTFail("BTreeInsertAndCountTests.compareTrees() realTree.countElement(number (\(check))) (\(realTree.countElement(check))) != mockTree.countElement(number (\(check)) (\(mockTree.countElement(check)))")
+                        return false
+                    }
+                    
+                }
+            }
+        }
+        
+        
+        
         return true
     }
     //
@@ -112,8 +145,6 @@ final class BTreeInsertAndCountTests: XCTestCase {
             let mockTree = MockMultiSearchTree<Int>()
             for value in subset {
                 realTree.insert(value)
-                realTree.insert(value)
-                mockTree.insert(value)
                 mockTree.insert(value)
             }
             if !compareTrees(realTree: realTree, mockTree: mockTree) {
@@ -134,8 +165,6 @@ final class BTreeInsertAndCountTests: XCTestCase {
                 let mockTree = MockMultiSearchTree<Int>()
                 for value in permutation {
                     realTree.insert(value)
-                    realTree.insert(value)
-                    mockTree.insert(value)
                     mockTree.insert(value)
                 }
                 if !compareTrees(realTree: realTree, mockTree: mockTree) {
@@ -175,16 +204,16 @@ final class BTreeInsertAndCountTests: XCTestCase {
         }
     }
     
-    func test4RandomArraysWithManyDupes50Permutations() {
-        for _ in 0..<10000 {
+    func test100RandomSmallArraysWithManyDupes50Permutations() {
+        for _ in 0..<100 {
             var count1 = 0
-            if Bool.random() { count1 = Int.random(in: 5...7) }
+            if Bool.random() { count1 = Int.random(in: 0...12) }
             
             var count2 = 0
-            if Bool.random() { count2 = Int.random(in: 5...7) }
+            if Bool.random() { count2 = Int.random(in: 0...12) }
             
             var count3 = 0
-            if Bool.random() { count3 = Int.random(in: 5...7) }
+            if Bool.random() { count3 = Int.random(in: 0...12) }
             
             var array = [Int]()
             for _ in 0..<count1 { array.append(0) }
@@ -192,7 +221,6 @@ final class BTreeInsertAndCountTests: XCTestCase {
             for _ in 0..<count3 { array.append(2) }
             
             let permutations = array.permutations(maxCount: 50, maxTries: 75)
-            
             for permutation in permutations {
                 
                 let realTree = BTree<Int>(order: 3)
@@ -202,15 +230,15 @@ final class BTreeInsertAndCountTests: XCTestCase {
                     mockTree.insert(value)
                 }
                 if !compareTrees(realTree: realTree, mockTree: mockTree) {
-                    XCTFail("BTreeInsertAndCountTests.test100RandomArraysWithManyDupes50Permutations() permutation: \(permutation)")
+                    XCTFail("BTreeInsertAndCountTests.test100RandomSmallArraysWithManyDupes50Permutations() permutation: \(permutation)")
                     return
                 }
             }
         }
     }
     
-    func test100RandomArraysWithManyDupes50Permutations() {
-        for test in 0..<100 {
+    func test100RandomLargerArraysWithManyDupes50Permutations() {
+        for _ in 0..<100 {
             var count1 = 0
             if Bool.random() { count1 = Int.random(in: 0...100) }
             
@@ -221,12 +249,11 @@ final class BTreeInsertAndCountTests: XCTestCase {
             if Bool.random() { count3 = Int.random(in: 0...100) }
             
             var array = [Int]()
-            for i in 0..<count1 { array.append(0) }
-            for i in 0..<count2 { array.append(1) }
-            for i in 0..<count3 { array.append(2) }
+            for _ in 0..<count1 { array.append(0) }
+            for _ in 0..<count2 { array.append(1) }
+            for _ in 0..<count3 { array.append(2) }
             
             let permutations = array.permutations(maxCount: 50, maxTries: 75)
-            
             for permutation in permutations {
                 
                 let realTree = BTree<Int>(order: 3)
@@ -236,117 +263,356 @@ final class BTreeInsertAndCountTests: XCTestCase {
                     mockTree.insert(value)
                 }
                 if !compareTrees(realTree: realTree, mockTree: mockTree) {
-                    XCTFail("BTreeInsertAndCountTests.test100RandomArraysWithManyDupes50Permutations() permutation: \(permutation)")
+                    XCTFail("BTreeInsertAndCountTests.test100RandomLargerArraysWithManyDupes50Permutations() permutation: \(permutation)")
                     return
                 }
             }
         }
     }
     
+    func test20RandomLargerArraysWithManyDupes50PermutationsOrders3to10() {
+        for order in 3...10 {
+            for _ in 0..<20 {
+                var count1 = 0
+                if Bool.random() { count1 = Int.random(in: 0...100) }
+                
+                var count2 = 0
+                if Bool.random() { count2 = Int.random(in: 0...100) }
+                
+                var count3 = 0
+                if Bool.random() { count3 = Int.random(in: 0...100) }
+                
+                var array = [Int]()
+                for _ in 0..<count1 { array.append(0) }
+                for _ in 0..<count2 { array.append(1) }
+                for _ in 0..<count3 { array.append(2) }
+                
+                let permutations = array.permutations(maxCount: 50, maxTries: 75)
+                for permutation in permutations {
+                    
+                    let realTree = BTree<Int>(order: order)
+                    let mockTree = MockMultiSearchTree<Int>()
+                    for value in permutation {
+                        realTree.insert(value)
+                        mockTree.insert(value)
+                    }
+                    if !compareTrees(realTree: realTree, mockTree: mockTree) {
+                        XCTFail("BTreeInsertAndCountTests.test100RandomLargerArraysWithManyDupes50Permutations() permutation: \(permutation)")
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
+    func test20RandomHugeArraysWithManyDupes25Permutations() {
+        
+        for _ in 0..<20 {
+            var count1 = 0
+            if Bool.random() { count1 = Int.random(in: 0...300) }
+            
+            var count2 = 0
+            if Bool.random() { count2 = Int.random(in: 0...300) }
+            
+            var count3 = 0
+            if Bool.random() { count3 = Int.random(in: 0...300) }
+            
+            var array = [Int]()
+            for _ in 0..<count1 { array.append(0) }
+            for _ in 0..<count2 { array.append(1) }
+            for _ in 0..<count3 { array.append(2) }
+            
+            let permutations = array.permutations(maxCount: 25, maxTries: 50)
+            for permutation in permutations {
+                
+                let realTree = BTree<Int>(order: 3)
+                let mockTree = MockMultiSearchTree<Int>()
+                for value in permutation {
+                    realTree.insert(value)
+                    mockTree.insert(value)
+                }
+                if !compareTrees(realTree: realTree, mockTree: mockTree) {
+                    XCTFail("BTreeInsertAndCountTests.test100RandomLargerArraysWithManyDupes50Permutations() permutation: \(permutation)")
+                    return
+                }
+            }
+        }
+    }
+    
+    func test20RandomHugeArraysWithManyDupes10PermutationsOrders3to10() {
+        for _ in 0..<20 {
+            var count1 = 0
+            if Bool.random() { count1 = Int.random(in: 0...300) }
+            
+            var count2 = 0
+            if Bool.random() { count2 = Int.random(in: 0...300) }
+            
+            var count3 = 0
+            if Bool.random() { count3 = Int.random(in: 0...300) }
+            
+            var array = [Int]()
+            for _ in 0..<count1 { array.append(0) }
+            for _ in 0..<count2 { array.append(1) }
+            for _ in 0..<count3 { array.append(2) }
+            
+            let permutations = array.permutations(maxCount: 10, maxTries: 20)
+            for permutation in permutations {
+                
+                let realTree = BTree<Int>(order: 3)
+                let mockTree = MockMultiSearchTree<Int>()
+                for value in permutation {
+                    realTree.insert(value)
+                    mockTree.insert(value)
+                }
+                if !compareTrees(realTree: realTree, mockTree: mockTree) {
+                    XCTFail("BTreeInsertAndCountTests.test20RandomHugeArraysWithManyDupes10PermutationsOrders3to10() permutation: \(permutation)")
+                    return
+                }
+            }
+        }
+    }
+    
+    func test1000LargeRandomArrays() {
+        for loop in 0...1000 {
+            if (loop % 100) == 0 {
+                print("test1000LargeRandomArrays \(loop) / 10000")
+            }
+            
+            let count = Int.random(in: 0...512)
+            var array = [Int]()
+            for _ in 0..<count {
+                array.append(Int.random(in: 0...512))
+            }
+            
+            let realTree = BTree<Int>(order: 3)
+            let mockTree = MockMultiSearchTree<Int>()
+            for value in array {
+                realTree.insert(value)
+                mockTree.insert(value)
+            }
+            if !compareTrees(realTree: realTree, mockTree: mockTree) {
+                XCTFail("BTreeInsertAndCountTests.test1000LargeRandomArrays() array: \(array)")
+                return
+            }
+        }
+    }
+    
+    func test1000LargeRandomArraysOrder3to50() {
+        for order in 3...50 {
+            for loop in 0...1000 {
+                if (loop % 100) == 0 {
+                    print("test1000LargeRandomArraysOrder3to50 order \(order) / 50, loop \(loop) / 500")
+                }
+                
+                let count = Int.random(in: 0...128)
+                var array = [Int]()
+                for _ in 0..<count {
+                    array.append(Int.random(in: 0...128))
+                }
+                
+                let realTree = BTree<Int>(order: 3)
+                let mockTree = MockMultiSearchTree<Int>()
+                for value in array {
+                    realTree.insert(value)
+                    mockTree.insert(value)
+                }
+                if !compareTrees(realTree: realTree, mockTree: mockTree) {
+                    XCTFail("BTreeInsertAndCountTests.test1000LargeRandomArraysOrder3to50() array: \(array)")
+                    return
+                }
+            }
+        }
+    }
+    
+    func testExtremelyHardcore() {
+        for order in 3...100 {
+            for loop in 0...100 {
+                if (loop % 100) == 0 {
+                    print("testExtremelyHardcore order \(order) / 100, loop \(loop) / 1000")
+                }
+                
+                var array = [Int]()
+                if Bool.random() {
+                    let count = Int.random(in: 0...512)
+                    for _ in 0..<count {
+                        array.append(Int.random(in: 0...512))
+                    }
+                }
+                if Bool.random() {
+                    var count1 = 0
+                    if Bool.random() { count1 = Int.random(in: 0...300) }
+                    var count2 = 0
+                    if Bool.random() { count2 = Int.random(in: 0...300) }
+                    var count3 = 0
+                    if Bool.random() { count3 = Int.random(in: 0...300) }
+                    for _ in 0..<count1 { array.append(0) }
+                    for _ in 0..<count2 { array.append(1) }
+                    for _ in 0..<count3 { array.append(2) }
+                }
+                if Bool.random() {
+                    let count = Int.random(in: 0...512)
+                    for _ in 0..<count {
+                        array.append(Int.random(in: 0...512))
+                    }
+                }
+                if Bool.random() {
+                    var count1 = 0
+                    if Bool.random() { count1 = Int.random(in: 0...300) }
+                    var count2 = 0
+                    if Bool.random() { count2 = Int.random(in: 0...300) }
+                    var count3 = 0
+                    if Bool.random() { count3 = Int.random(in: 0...300) }
+                    for _ in 0..<count1 { array.append(3) }
+                    for _ in 0..<count2 { array.append(4) }
+                    for _ in 0..<count3 { array.append(5) }
+                }
+                if Bool.random() {
+                    let count = Int.random(in: 0...512)
+                    for _ in 0..<count {
+                        array.append(Int.random(in: 0...512))
+                    }
+                }
+                
+                let permutations = array.permutations(maxCount: 50, maxTries: 75)
+                for permutation in permutations {
+                    
+                    let realTree = BTree<Int>(order: 3)
+                    let mockTree = MockMultiSearchTree<Int>()
+                    for value in permutation {
+                        realTree.insert(value)
+                        mockTree.insert(value)
+                    }
+                    if !compareTrees(realTree: realTree, mockTree: mockTree) {
+                        XCTFail("BTreeInsertAndCountTests.testExtremelyHardcore() permutation: \(permutation)")
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
+    // No Issue
     func testKnownFailureCase01() {
         let order = 3
         let array = [2, 0, 2, 1, 2, 2, 1, 1, 0, 1]
         let realTree = BTree<Int>(order: order)
-
         let mockTree = MockMultiSearchTree<Int>()
-        
-        for (index, value) in array.enumerated() {
-            
+        for value in array {
             realTree.insert(value)
             mockTree.insert(value)
-            
-            realTree.printLevels()
-            print("Index[\(index)] = \(value)")
-            
         }
         
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
-            XCTFail("BTreeInsertAndCountTests.test1000RandomArraysWithManyDupes() array: \(array)")
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase01() array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase02() {
         let order = 3
-        let array = [2, 1, 1, 0, 0, 0, 1, 2, 2, 0, 1, 0, 2, 2, 0, 0, 1, 0]
+        let array = [2, 1, 1, 0, 2, 1, 2, 2, 2, 0, 0, 1, 2, 0, 0, 2, 1, 0]
         let realTree = BTree<Int>(order: order)
-
         let mockTree = MockMultiSearchTree<Int>()
-        
-        for (index, value) in array.enumerated() {
-            
+        for value in array {
             realTree.insert(value)
             mockTree.insert(value)
-            
         }
         
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
-            XCTFail("BTreeInsertAndCountTests.test1000RandomArraysWithManyDupes() array: \(array)")
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase02() array: \(array)")
+            return
+        }
+        
+        //                                    [2]
+        //
+        //        [0,        1,        2]               [2]
+        //
+        //[0, 0, 0] [0, 0, 1] [1, 1, 1] [2]       [2, 2]   [2]
+        
+        realTree.insert(0)
+        mockTree.insert(0)
+        
+        if !compareTrees(realTree: realTree, mockTree: mockTree) {
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase02() array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase03() {
         let order = 3
-        let array = [2, 1, 1, 0, 0, 0, 1, 2, 2, 0, 1, 0, 2, 2, 0, 0, 1, 0]
+        let array = [0, 2, 2, 2, 1, 0, 1, 0, 2, 1, 2, 2, 2, 2, 2, 0, 1]
         let realTree = BTree<Int>(order: order)
-
         let mockTree = MockMultiSearchTree<Int>()
-        
-        for (index, value) in array.enumerated() {
-            
+        for value in array {
             realTree.insert(value)
             mockTree.insert(value)
-            
-            realTree.printLevels()
-            print("Index[\(index)] = \(value)")
-            
         }
         
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
-            XCTFail("BTreeInsertAndCountTests.test1000RandomArraysWithManyDupes() array: \(array)")
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase01() array: \(array)")
+            return
+        }
+        
+        //                 [1]
+        //       [0]               [1,     2,        2]
+        //  [0, 0] [0]           [1] [1, 2] [2, 2, 2] [2, 2, 2]
+        
+        realTree.insert(2)
+        mockTree.insert(2)
+        
+        if !compareTrees(realTree: realTree, mockTree: mockTree) {
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase01() array: \(array)")
             return
         }
     }
     
     func testKnownFailureCase04() {
         let order = 3
-        let array = [2, 2, 1, 1, 0, 2, 1, 1, 0, 1, 2, 0, 1, 0, 2, 0, 2, 1, 0, 2, 0]
+        let array = [2, 1, 1, 0, 0, 0, 1, 2, 2, 0, 1, 0, 2, 2, 0, 0, 1, 0]
         let realTree = BTree<Int>(order: order)
-
         let mockTree = MockMultiSearchTree<Int>()
-        
-        for (index, value) in array.enumerated() {
-            
+        for value in array {
             realTree.insert(value)
             mockTree.insert(value)
-            
-            realTree.printLevels()
-            print("Index[\(index)] = \(value)")
-            
         }
         
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
-            XCTFail("BTreeInsertAndCountTests.test1000RandomArraysWithManyDupes() array: \(array)")
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase04() array: \(array)")
             return
         }
     }
     
+    func testKnownFailureCase05() {
+        let order = 3
+        let array = [2, 2, 1, 1, 0, 2, 1, 1, 0, 1, 2, 0, 1, 0, 2, 0, 2, 1, 0, 2, 0]
+        let realTree = BTree<Int>(order: order)
+        let mockTree = MockMultiSearchTree<Int>()
+        
+        for value in array {
+            realTree.insert(value)
+            mockTree.insert(value)
+        }
+        
+        if !compareTrees(realTree: realTree, mockTree: mockTree) {
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase05() array: \(array)")
+            return
+        }
+    }
     
-    
-    
-    func testKnownFailureCase100000() {
+    func testKnownFailureCase06() {
         let order = 4
         let array = [2, 2, 0, 0, 2, 2, 0, 2, 0, 0, 2, 0, 2, 0, 2, 2, 0, 0, 0, 2, 2, 2, 2, 0, 2, 2, 0, 0, 2, 0, 0, 0, 2, 2, 2, 0, 2, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0]
         let realTree = BTree<Int>(order: order)
         let mockTree = MockMultiSearchTree<Int>()
 
-        for (index, value) in array.enumerated() {
-            print("Index[\(index)] = \(value)")
-            if index == 38 {
-                realTree.printLevels()
-            }
+        for value in array {
             realTree.insert(value)
+            mockTree.insert(value)
+        }
+        
+        if !compareTrees(realTree: realTree, mockTree: mockTree) {
+            XCTFail("BTreeInsertAndCountTests.testKnownFailureCase06() array: \(array)")
+            return
         }
     }
     

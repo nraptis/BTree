@@ -8,6 +8,9 @@
 import Foundation
 
 class BTreeNode<Element: Comparable>: Hashable {
+    
+    var name = "unknown"
+    
     static func == (lhs: BTreeNode<Element>, rhs: BTreeNode<Element>) -> Bool {
         lhs === rhs
     }
@@ -425,6 +428,30 @@ class BTreeNode<Element: Comparable>: Hashable {
         data.values[i] = nil
     }
     
+    //void make_root() {
+    func make_root() {
+        //assert(parent()->is_root());
+        guard let parent = parent else {
+            fatalError("BTreeNode.make_root() parent is nul")
+        }
+        
+        guard parent.isRoot else {
+            fatalError("BTreeNode.make_root() parent.isRoot (\(parent.isRoot)) should be true")
+        }
+        
+        //fields_.parent = fields_.parent->parent();
+        self.parent = parent.parent
+    }
+    
+    //void destroy() {
+    func destroy() {
+        //for (int i = 0; i < count(); ++i) {
+        for index in 0..<count {
+            //value_destroy(i);
+            value_destroy(i: index)
+        }
+    }
+    
     //void set_child(int i, btree_node *c) {
     func set_child(i: Int, node: BTreeNode<Element>) {
         //*mutable_child(i) = c;
@@ -519,46 +546,37 @@ class BTreeNode<Element: Comparable>: Hashable {
 
         //if (!leaf()) {
         if !isLeaf {
-            // Move the child pointers from the right to the left node.
-            //for (int i = 0; i < to_move; ++i) {
+            
+            /*
+            for (int i = 0; i < to_move; ++i) {
+                set_child(1 + count() + i, src->child(i));
+            }
+            */
             i = 0
             while i < to_move {
-                //set_child(1 + count() + i, src->child(i));
-                
-                /*
-                guard let srcChild = src.child(index: i) else {
-                    fatalError("BTreeNode.rebalance_right_to_left missing child index: \(i)")
-                }
-                set_child(i: 1 + count, node: srcChild)
-                */
-                
                 if let srcChild = src.child(index: i) {
-                    set_child(i: 1 + count, node: srcChild)
+                    set_child(i: 1 + count + i, node: srcChild)
                 }
-                
-                
-                
                 i += 1
             }
             
-            //for (int i = 0; i <= src->count() - to_move; ++i) {
+            /*
+            for (int i = 0; i <= src->count() - to_move; ++i) {
+                assert(i + to_move <= src->max_count());
+                src->set_child(i, src->child(i + to_move));
+                *src->mutable_child(i + to_move) = NULL;
+            }
+            */
             i = 0
             while i <= (src.count - to_move) {
-                //assert(i + to_move <= src->max_count());
                 guard i + to_move <= src.order else {
                     fatalError("BTreeNode.rebalance_right_to_left i (\(i)) + to_move (\(to_move)) > src.order (\(src.order))")
                 }
-                
                 guard let srcChild = src.child(index: i + to_move) else {
                     fatalError("BTreeNode.rebalance_right_to_left missing child i (\(i)) + to_move (\(to_move))")
                 }
-                
-                //src->set_child(i, src->child(i + to_move));
                 src.set_child(i: i, node: srcChild)
-                
-                //*src->mutable_child(i + to_move) = NULL;
                 src.data.children[i + to_move] = nil
-                
                 i += 1
             }
         }
@@ -649,41 +667,39 @@ class BTreeNode<Element: Comparable>: Hashable {
 
         //if (!leaf()) {
         if !isLeaf {
-            // Move the child pointers from the left to the right node.
-            //for (int i = dest->count(); i >= 0; --i) {
+            
+            /*
+            for (int i = dest->count(); i >= 0; --i) {
+              dest->set_child(i + to_move, dest->child(i));
+              *dest->mutable_child(i) = NULL;
+            }
+            */
+            
             i = dest.count
             while i >= 0 {
-                
-                //dest->set_child(i + to_move, dest->child(i));
-                
                 guard let destChild = dest.child(index: i) else {
                     fatalError("BTreeNode.rebalance_left_to_right missing child index: \(i)")
                 }
-                
                 dest.set_child(i: i + to_move, node: destChild)
-                
-                //*dest->mutable_child(i) = NULL;
                 dest.data.children[i] = nil
-                
                 i -= 1
             }
             
-            //for (int i = 1; i <= to_move; ++i) {
+            /*
+            for (int i = 1; i <= to_move; ++i) {
+              dest->set_child(i - 1, child(count() - to_move + i));
+              *mutable_child(count() - to_move + i) = NULL;
+            }
+            */
+            
             i = 1
             while i <= to_move {
-                //dest->set_child(i - 1, child(count() - to_move + i));
                 
-                /*
-                guard let destChild = dest.child(index: count - to_move + i) else {
-                    fatalError("BTreeNode.rebalance_left_to_right missing child count (\(count)) - to_move (\(to_move)) + i (\(i))")
+                guard let selfChild = child(index: count - to_move + i) else {
+                    fatalError("BTreeNode.rebalance_left_to_right missing child index: (count (\(i)) - to_move (\(to_move)) + i (\(i)))")
                 }
                 
-                dest.set_child(i: i - 1, node: destChild)
-                */
-                if let destChild = dest.child(index: count - to_move + i) {
-                    dest.set_child(i: i - 1, node: destChild)
-                }
-                
+                dest.set_child(i: i - 1, node: selfChild)
                 
                 //*mutable_child(count() - to_move + i) = NULL;
                 data.children[count - to_move + i] = nil

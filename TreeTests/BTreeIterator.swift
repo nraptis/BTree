@@ -50,6 +50,13 @@ class BTreeIterator<Element: Comparable>: Equatable {
     }
     
     func increment() {
+        
+        /*
+        if (node->leaf() && ++position < node->count()) {
+          return;
+        }
+        increment_slow();
+        */
     
         //if (node->leaf() && ++index < node->count()) {
         if let node = node {
@@ -65,6 +72,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 }
             }
             */
+            
             
             if node.isLeaf {
                 index += 1

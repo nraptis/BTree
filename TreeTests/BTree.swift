@@ -376,7 +376,7 @@ class BTree<Element: Comparable> {
     */
     
     //@discardableResult
-    func insert(_ element: Element) -> BTreeIterator<Element> {
+    func insert(_ element: Element) {
         
         //if (empty()) {
         //  *mutable_root() = new_leaf_root_node(1);
@@ -403,7 +403,8 @@ class BTree<Element: Comparable> {
         }
         
         //return internal_insert(iter, *value);
-        return insert(iterator: iterator, element: element)
+        //return
+        insert(iterator: iterator, element: element)
     }
     
     
@@ -495,18 +496,191 @@ class BTree<Element: Comparable> {
         return iterator
     }
     
+
+    
     /*
-    inline IterType btree<P>::internal_last(IterType iter) {
-        while (iter.node && iter.position == iter.node->count()) {
-            iter.position = iter.node->position();
-            iter.node = iter.node->parent();
-            if (iter.node->leaf()) {
-                iter.node = NULL;
-            }
+    int btree<P>::erase_multi(const key_type &key) {
+        iterator begin = internal_lower_bound(key, iterator(root(), 0));
+        if (!begin.node) {
+        // The key doesn't exist in the tree, return nothing done.
+            return 0;
         }
-        return iter;
+        // Delete all of the keys between begin and upper_bound(key).
+        iterator end = internal_end(
+        internal_upper_bound(key, iterator(root(), 0)));
+        return erase(begin, end);
     }
     */
+    
+    /*
+    template <typename P>
+    typename btree<P>::iterator btree<P>::erase(iterator iter) {
+        bool internal_delete = false;
+        if (!iter.node->leaf()) {
+            // Deletion of a value on an internal node. Swap the key with the largest
+            // value of our left child. This is easy, we just decrement iter.
+            iterator tmp_iter(iter--);
+            assert(iter.node->leaf());
+            assert(!compare_keys(tmp_iter.key(), iter.key()));
+            iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
+            internal_delete = true;
+            --*mutable_size();
+        } else if (!root()->leaf()) {
+            --*mutable_size();
+        }
+
+        // Delete the key from the leaf.
+        iter.node->remove_value(iter.position);
+
+        // We want to return the next value after the one we just erased. If we
+        // erased from an internal node (internal_delete == true), then the next
+        // value is ++(++iter). If we erased from a leaf node (internal_delete ==
+        // false) then the next value is ++iter. Note that ++iter may point to an
+        // internal node and the value in the internal node may move to a leaf node
+        // (iter.node) when rebalancing is performed at the leaf level.
+
+        // Merge/rebalance as we walk back up the tree.
+        iterator res(iter);
+        for (;;) {
+            if (iter.node == root()) {
+                try_shrink();
+                if (empty()) {
+                    return end();
+                }
+                break;
+            }
+            if (iter.node->count() >= kMinNodeValues) {
+                break;
+            }
+            bool merged = try_merge_or_rebalance(&iter);
+            if (iter.node->leaf()) {
+                res = iter;
+            }
+            if (!merged) {
+                break;
+            }
+            iter.node = iter.node->parent();
+        }
+
+        // Adjust our return value. If we're pointing at the end of a node, advance
+        // the iterator.
+        if (res.position == res.node->count()) {
+        res.position = res.node->count() - 1;
+            ++res;
+        }
+        // If we erased from an internal node, advance the iterator.
+        if (internal_delete) {
+            ++res;
+        }
+        return res;
+    }
+    */
+     
+    /*
+    template <typename P>
+    int btree<P>::erase(iterator begin, iterator end) {
+        int count = distance(begin, end);
+        for (int i = 0; i < count; i++) {
+            begin = erase(begin);
+        }
+        return count;
+    }
+    */
+    
+    
+    
+    //void btree<P>::try_shrink() {
+    func try_shrink() {
+        //if (root()->count() > 0) {
+        //    return;
+        //}
+        
+        guard let root = root, root.count > 0 else {
+            return
+        }
+        
+        // Deleted the last item on the root node, shrink the height of the tree.
+        //if (root()->leaf()) {
+        if root.isLeaf {
+            //assert(size() == 0);
+            //delete_leaf_node(root());
+            delete_leaf_node(node: root)
+            
+            //*mutable_root() = NULL;
+            self.root = nil
+        } else {
+            //node_type *child = root()->child(0);
+            guard let child = root.child(index: 0) else {
+                fatalError("BTree.try_shrink() root.child(index: 0) is nil")
+            }
+            
+            //if (child->leaf()) {
+            if child.isLeaf {
+                // The child is a leaf node so simply make it the root node in the tree.
+                //child->make_root();
+                child.make_root()
+                child.rightmost = root.rightmost //TODO: Needed?
+                
+                //delete_internal_root_node();
+                delete_internal_root_node()
+                
+                //*mutable_root() = child;
+                self.root = child
+                
+            } else {
+                // The child is an internal node. We want to keep the existing root node
+                // so we move all of the values from the child node into the existing
+                // (empty) root node.
+                //child->swap(root());
+                child.swap(node: root)
+                
+                //delete_internal_node(child);
+                delete_internal_node(child)
+            }
+        }
+    }
+    
+    
+    //void delete_leaf_node(node_type *node) {
+    func delete_leaf_node(_ node: BTreeNode<Element>) {
+        //node->destroy();
+        
+        guard node.isLeaf else {
+            fatalError("BTree.delete_leaf_node() node.isLeaf (\(node.isLeaf)) should be true")
+        }
+        
+        node.destroy()
+        
+        //mutable_internal_allocator()->deallocate(
+        //reinterpret_cast<char*>(node),
+        //sizeof(base_fields) + node->max_count() * sizeof(value_type));
+    }
+    
+    //void delete_internal_node(node_type *node) {
+    func delete_internal_node(_ node: BTreeNode<Element>) {
+    
+        //node->destroy();
+        node.destroy()
+        
+        //assert(node != root());
+        guard node !== root else {
+            fatalError("BTree.delete_internal_node() node === root")
+        }
+        
+        //mutable_internal_allocator()->deallocate(
+        //reinterpret_cast<char*>(node), sizeof(internal_fields));
+    }
+    
+    
+    //void delete_internal_root_node() {
+    func delete_internal_root_node() {
+        //root()->destroy();
+        root?.destroy()
+        
+        //mutable_internal_allocator()->deallocate(
+        //reinterpret_cast<char*>(root()), sizeof(root_fields));
+        
+    }
     
     //inline IterType btree<P>::internal_last(IterType iter) {
     func internal_last(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
@@ -958,6 +1132,7 @@ class BTree<Element: Comparable> {
                 if node.isRoot {
                     let name = nameOfNode(node, level: level, nodes: nodes)
                     names[node] = name
+                    node.name = name
                     if node.isLeaf {
                         print("R|L {\(name)} (\(node.count) / \(node.order)) \(values)")
                     } else {
@@ -972,6 +1147,7 @@ class BTree<Element: Comparable> {
                     }
                     
                     names[node] = name
+                    node.name = name
                     
                     if node.isLeaf {
                         print("N|L {\(name)} (\(node.count) / \(node.order)) \(values) in {\(parentName)}[\(node.index)]")
