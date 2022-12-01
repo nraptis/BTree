@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D05308529384143007B1E95 /* BTreeInsertAndCountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D05308429384143007B1E95 /* BTreeInsertAndCountTests.swift */; };
 		0D44412329312F3F00850ACD /* BTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D44412229312F3F00850ACD /* BTree.swift */; };
 		0D49601F29310DAD0013B372 /* SplayTreeCombinatoricTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D49601E29310DAD0013B372 /* SplayTreeCombinatoricTests.swift */; };
 		0D49602129311A800013B372 /* SplayTreeStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D49602029311A800013B372 /* SplayTreeStressTests.swift */; };
@@ -53,6 +54,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0D05308429384143007B1E95 /* BTreeInsertAndCountTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTreeInsertAndCountTests.swift; sourceTree = "<group>"; };
 		0D44412229312F3F00850ACD /* BTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTree.swift; sourceTree = "<group>"; };
 		0D49601E29310DAD0013B372 /* SplayTreeCombinatoricTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplayTreeCombinatoricTests.swift; sourceTree = "<group>"; };
 		0D49602029311A800013B372 /* SplayTreeStressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplayTreeStressTests.swift; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 				0D837D422934429B001A2AC7 /* BTreeIteratorSimpleTests.swift */,
 				0D7AAA242935A1BB003F98A7 /* BTreeSimpleInsertionTests.swift */,
 				0D6B130D29380CA400010B0B /* BTreeLargerInsertionTests.swift */,
+				0D05308429384143007B1E95 /* BTreeInsertAndCountTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -318,6 +321,7 @@
 				0D74CADA292D4DFE00E41A5B /* AVLTreeSimpleTests.swift in Sources */,
 				0D837D3F2934055A001A2AC7 /* MockMultiSearchTreeStressTests.swift in Sources */,
 				0D74CADE292D6EFC00E41A5B /* MockSearchTreeSimpleTests.swift in Sources */,
+				0D05308529384143007B1E95 /* BTreeInsertAndCountTests.swift in Sources */,
 				0D49602129311A800013B372 /* SplayTreeStressTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

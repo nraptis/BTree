@@ -525,11 +525,19 @@ class BTreeNode<Element: Comparable>: Hashable {
             while i < to_move {
                 //set_child(1 + count() + i, src->child(i));
                 
+                /*
                 guard let srcChild = src.child(index: i) else {
                     fatalError("BTreeNode.rebalance_right_to_left missing child index: \(i)")
                 }
-                
                 set_child(i: 1 + count, node: srcChild)
+                */
+                
+                if let srcChild = src.child(index: i) {
+                    set_child(i: 1 + count, node: srcChild)
+                }
+                
+                
+                
                 i += 1
             }
             
@@ -665,11 +673,17 @@ class BTreeNode<Element: Comparable>: Hashable {
             while i <= to_move {
                 //dest->set_child(i - 1, child(count() - to_move + i));
                 
+                /*
                 guard let destChild = dest.child(index: count - to_move + i) else {
                     fatalError("BTreeNode.rebalance_left_to_right missing child count (\(count)) - to_move (\(to_move)) + i (\(i))")
                 }
                 
                 dest.set_child(i: i - 1, node: destChild)
+                */
+                if let destChild = dest.child(index: count - to_move + i) {
+                    dest.set_child(i: i - 1, node: destChild)
+                }
+                
                 
                 //*mutable_child(count() - to_move + i) = NULL;
                 data.children[count - to_move + i] = nil

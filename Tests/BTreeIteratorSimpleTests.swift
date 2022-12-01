@@ -296,7 +296,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             for index in 0..<count {
                 array.append(index)
             }
-            let order = (count == 0) ? 1 : count
+            let order = (count < 3) ? 3 : count
             let node = createRootLeafNodeFromArray(order: order, array: array)
             let tree = BTree<Int>(order: order)
             tree.setRoot(node)
@@ -322,7 +322,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         //
         // b1[1] _ b2[3]
         
-        let order = 1
+        let order = 3
         let result = BTree<Int>(order: order)
         let a1 = createRootInternalNodeFromArray(order: order, array: [2])
         let b1 = createLeafNodeFromArray(order: order, array: [1])
@@ -357,7 +357,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         //
         // b1[100] _ b2[102, 103]
         
-        let order = 2
+        let order = 3
         let result = BTree<Int>(order: order)
         let a1 = createRootInternalNodeFromArray(order: order, array: [101])
         let b1 = createLeafNodeFromArray(order: order, array: [100])
@@ -392,7 +392,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         //
         // b1[50] _ b2[52] _ b3[54]
         
-        let order = 2
+        let order = 3
         let result = BTree<Int>(order: order)
         let a1 = createRootInternalNodeFromArray(order: order, array: [51, 53])
         let b1 = createLeafNodeFromArray(order: order, array: [50])
@@ -428,7 +428,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         //
         // b1[74] _ b2[76] _ b3[78, 79]
         
-        let order = 2
+        let order = 3
         let result = BTree<Int>(order: order)
         let a1 = createRootInternalNodeFromArray(order: order, array: [75, 77])
         let b1 = createLeafNodeFromArray(order: order, array: [74])
@@ -466,7 +466,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         //
         // c1[25] _ c2[27] __ c3[29] _ c4[31]
         
-        let order = 1
+        let order = 3
         let result = BTree<Int>(order: order)
         let a1 = createRootInternalNodeFromArray(order: order, array: [28])
         

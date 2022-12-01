@@ -115,13 +115,13 @@ final class BTreeLargerInsertionTests: XCTestCase {
         }
     }
     
-    func testAdd0to100With100PermutationsOrder3() {
+    func testAdd0to100With10PermutationsOrder3() {
         let order = 3
         var array = [Int]()
         var index = 0
         while index <= 100 {
             array.append(index)
-            let permutations = array.permutations()
+            let permutations = array.permutations(maxCount: 10, maxTries: 10)
             for permutation in permutations {
                 let tree = BTree<Int>(order: order)
                 for value in array {
@@ -142,13 +142,13 @@ final class BTreeLargerInsertionTests: XCTestCase {
         }
     }
     
-    func testAdd0to100With100PermutationsOrder50() {
+    func testAdd0to100With10PermutationsOrder50() {
         let order = 50
         var array = [Int]()
         var index = 0
         while index <= 100 {
             array.append(index)
-            let permutations = array.permutations()
+            let permutations = array.permutations(maxCount: 10, maxTries: 10)
             for permutation in permutations {
                 let tree = BTree<Int>(order: order)
                 for value in array {
@@ -169,13 +169,13 @@ final class BTreeLargerInsertionTests: XCTestCase {
         }
     }
     
-    func testAdd0to100With100PermutationsOrder255() {
+    func testAdd0to100With10PermutationsOrder255() {
         let order = 255
         var array = [Int]()
         var index = 0
         while index <= 100 {
             array.append(index)
-            let permutations = array.permutations()
+            let permutations = array.permutations(maxCount: 10, maxTries: 10)
             for permutation in permutations {
                 let tree = BTree<Int>(order: order)
                 for value in array {
@@ -196,15 +196,15 @@ final class BTreeLargerInsertionTests: XCTestCase {
         }
     }
     
-    func testAdd0to60With25PermutationsOrder3to24() {
+    func testAdd0to60With10PermutationsOrder3to12() {
         var order = 3
-        while order < 24 {
-            print("testAdd0to100By10With25PermutationsOrder3to24() order = \(order)")
+        while order < 12 {
+            print("testAdd0to60With25PermutationsOrder3to24() order = \(order)")
             var array = [Int]()
             var index = 0
-            while index <= 100 {
+            while index <= 60 {
                 array.append(index)
-                let permutations = array.permutations(maxCount: 25, maxTries: 50)
+                let permutations = array.permutations(maxCount: 10, maxTries: 20)
                 for permutation in permutations {
                     let tree = BTree<Int>(order: order)
                     for value in array {
@@ -227,18 +227,18 @@ final class BTreeLargerInsertionTests: XCTestCase {
         }
     }
     
-    func testAdd0to60With25PermutationsOrder3to24RandomDupes() {
+    func testAdd0to60With10PermutationsOrder3to12RandomDupes() {
         var order = 3
-        while order < 24 {
+        while order < 12 {
             print("testAdd0to60With25PermutationsOrder3to24RandomDupes() order = \(order)")
             var array = [Int]()
             var index = 0
-            while index <= 100 {
+            while index <= 60 {
                 array.append(index)
                 if Bool.random() { array.append(index) }
                 if Bool.random() { array.append(index) }
                 
-                let permutations = array.permutations(maxCount: 25, maxTries: 50)
+                let permutations = array.permutations(maxCount: 10, maxTries: 20)
                 for permutation in permutations {
                     let tree = BTree<Int>(order: order)
                     for value in array {
@@ -260,4 +260,12 @@ final class BTreeLargerInsertionTests: XCTestCase {
             order += 1
         }
     }
+    
+    
+    
+    
+    
+    //
+    //let realTree = BTree<Int>(order: 4)
+    //let mockTree = MockMultiSearchTree<Int>()
 }
