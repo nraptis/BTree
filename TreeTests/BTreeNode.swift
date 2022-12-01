@@ -415,6 +415,134 @@ class BTreeNode<Element: Comparable>: Hashable {
         }
     }
     
+    //template <typename P>
+    //inline void btree_node<P>::remove_value(int i) {
+      
+    func remove_value(index: Int) {
+        //if (!leaf()) {
+        if !isLeaf {
+            //assert(child(i + 1)->count() == 0);
+            guard var child = child(index: index + 1) else {
+                fatalError("BTreeNode.remove_value(index: Int, element: Element) child index (\(index)) + 1 is null")
+            }
+            guard child.count == 0 else {
+                fatalError("BTreeNode.remove_value(index: Int, element: Element) child index (\(index)) + 1, child.count (\(child.count)) expected 0")
+            }
+            
+            //for (int j = i + 1; j < count(); ++j) {
+            var j = index + 1
+            while j < count {
+                
+                //*mutable_child(j) = child(j + 1);
+                
+                if let child = data.children[j + 1] {
+                    data.children[j] = child
+                    
+                    //child(j)->set_position(j);
+                    child.index = j
+                } else {
+                    fatalError("BTreeNode.remove_value(index: Int, element: Element) data.children[j (\(j))] is null")
+                    data.children[j] = nil
+                }
+                
+                j += 1
+            }
+            
+            data.children[count] = nil
+            //*mutable_child(count()) = NULL;
+        }
+
+        //set_count(count() - 1);
+        count -= 1
+        
+        //for (; i < count(); ++i) {
+        var index = index
+        while index < count {
+            //value_swap(i, this, i + 1);
+            //value_swap(i: index, x: self, j: index + 1)
+            data.values[index] = data.values[index + 1]
+            index += 1
+        }
+        //value_destroy(i);
+        //value_destroy(i: <#T##Int#>)
+        data.values[index] = nil
+    }
+    
+    
+    //template <typename P>
+    //void btree_node<P>::merge(btree_node *src) {
+    func merge(source: BTreeNode<Element>) {
+    
+        //assert(parent() == src->parent());
+        
+        guard let parent = parent else {
+            fatalError("BTreeNode.merge() parent is null")
+        }
+        guard parent === source.parent else {
+            fatalError("BTreeNode.merge() parent != source.parent")
+        }
+        
+        //assert(position() + 1 == src->position());
+        guard (index + 1) == source.index else {
+            fatalError("BTreeNode.merge() (index (\(index)) + 1) != source.index (\(source.index))")
+        }
+        
+        // Move the delimiting value to the left node.
+        //value_init(count());
+        //value_swap(count(), parent(), position());
+        value_swap(i: count, x: parent, j: index)
+        
+
+        // Move the values from the right to the left node.
+        //for (int i = 0; i < src->count(); ++i) {
+        var i = 0
+        while i < source.count {
+            //value_init(1 + count() + i);
+            //value_swap(1 + count() + i, src, i);
+            value_swap(i: 1 + count + i, x: source, j: i)
+            
+            //src->value_destroy(i);
+            source.value_destroy(i: i)
+            
+            i += 1
+        }
+
+        //if (!leaf()) {
+        if !isLeaf {
+            
+            // Move the child pointers from the right to the left node.
+            //for (int i = 0; i <= src->count(); ++i) {
+            i = 0
+            while i <= source.count {
+            
+                //set_child(1 + count() + i, src->child(i));
+                
+                guard let sourceChild = source.child(index: i) else {
+                    fatalError("BTreeNode.merge() source.child(index: i (\(i))) is null")
+                }
+                
+                set_child(i: 1 + count + i, node: sourceChild)
+                
+                //*src->mutable_child(i) = NULL;
+                source.data.children[i] = nil
+                
+                i += 1
+            }
+        }
+
+        // Fixup the counts on the src and dest nodes.
+        //set_count(1 + count() + src->count());
+        count = ((1 + count) + source.count)
+        
+        //src->set_count(0);
+        source.count = 0
+
+        // Remove the value on the parent node.
+        //parent()->remove_value(position());
+        parent.remove_value(index: index)
+    }
+    
+    
     //void value_swap(int i, btree_node *x, int j) {
         //params_type::swap(mutable_value(i), x->mutable_value(j));
     //}

@@ -75,6 +75,10 @@ class MockMultiSearchTree<Element: Comparable> {
         count = 0
     }
     
+    func remove(_ element: Element) {
+        removeAll(element: element)
+    }
+    
     func removeFirst(element: Element) {
         for index in 0..<data.count {
             let value = data[index]

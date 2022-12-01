@@ -64,12 +64,8 @@ final class BTreeInsertAndCountTests: XCTestCase {
                 }
             }
         }
-        
-        
-        
         return true
     }
-    //
     
     func testInsertSingle1() {
         let realTree = BTree<Int>(order: 3)
@@ -410,7 +406,7 @@ final class BTreeInsertAndCountTests: XCTestCase {
                     array.append(Int.random(in: 0...128))
                 }
                 
-                let realTree = BTree<Int>(order: 3)
+                let realTree = BTree<Int>(order: order)
                 let mockTree = MockMultiSearchTree<Int>()
                 for value in array {
                     realTree.insert(value)
@@ -425,63 +421,62 @@ final class BTreeInsertAndCountTests: XCTestCase {
     }
     
     func testExtremelyHardcore() {
+        var testCount = 0
         for order in 3...100 {
-            for loop in 0...100 {
+            for loop in 0...1000 {
                 if (loop % 100) == 0 {
-                    print("testExtremelyHardcore order \(order) / 100, loop \(loop) / 1000")
+                    print("testExtremelyHardcore order \(order) / 100, loop \(loop) / 1000 (\(testCount) tests!)")
                 }
-                
                 var array = [Int]()
                 if Bool.random() {
-                    let count = Int.random(in: 0...512)
+                    let count = Int.random(in: 0...256)
                     for _ in 0..<count {
-                        array.append(Int.random(in: 0...512))
+                        array.append(Int.random(in: 0...256))
                     }
                 }
                 if Bool.random() {
                     var count1 = 0
-                    if Bool.random() { count1 = Int.random(in: 0...300) }
+                    if Bool.random() { count1 = Int.random(in: 0...128) }
                     var count2 = 0
-                    if Bool.random() { count2 = Int.random(in: 0...300) }
+                    if Bool.random() { count2 = Int.random(in: 0...128) }
                     var count3 = 0
-                    if Bool.random() { count3 = Int.random(in: 0...300) }
+                    if Bool.random() { count3 = Int.random(in: 0...128) }
                     for _ in 0..<count1 { array.append(0) }
                     for _ in 0..<count2 { array.append(1) }
                     for _ in 0..<count3 { array.append(2) }
                 }
                 if Bool.random() {
-                    let count = Int.random(in: 0...512)
+                    let count = Int.random(in: 0...128)
                     for _ in 0..<count {
-                        array.append(Int.random(in: 0...512))
+                        array.append(Int.random(in: 0...128))
                     }
                 }
                 if Bool.random() {
                     var count1 = 0
-                    if Bool.random() { count1 = Int.random(in: 0...300) }
+                    if Bool.random() { count1 = Int.random(in: 0...128) }
                     var count2 = 0
-                    if Bool.random() { count2 = Int.random(in: 0...300) }
+                    if Bool.random() { count2 = Int.random(in: 0...128) }
                     var count3 = 0
-                    if Bool.random() { count3 = Int.random(in: 0...300) }
-                    for _ in 0..<count1 { array.append(3) }
-                    for _ in 0..<count2 { array.append(4) }
-                    for _ in 0..<count3 { array.append(5) }
+                    if Bool.random() { count3 = Int.random(in: 0...128) }
+                    for _ in 0..<count1 { array.append(0) }
+                    for _ in 0..<count2 { array.append(1) }
+                    for _ in 0..<count3 { array.append(2) }
                 }
                 if Bool.random() {
-                    let count = Int.random(in: 0...512)
+                    let count = Int.random(in: 0...128)
                     for _ in 0..<count {
-                        array.append(Int.random(in: 0...512))
+                        array.append(Int.random(in: 0...128))
                     }
                 }
-                
-                let permutations = array.permutations(maxCount: 50, maxTries: 75)
+                let permutations = array.permutations(maxCount: 10, maxTries: 15)
                 for permutation in permutations {
-                    
-                    let realTree = BTree<Int>(order: 3)
+                    let realTree = BTree<Int>(order: order)
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in permutation {
                         realTree.insert(value)
                         mockTree.insert(value)
                     }
+                    testCount += 1
                     if !compareTrees(realTree: realTree, mockTree: mockTree) {
                         XCTFail("BTreeInsertAndCountTests.testExtremelyHardcore() permutation: \(permutation)")
                         return
