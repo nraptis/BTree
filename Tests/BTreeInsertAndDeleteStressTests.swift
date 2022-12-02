@@ -2,7 +2,7 @@
 //  BBTreeInsertAndDeleteStressTests.swift
 //  Tests
 //
-//  Created by Nicky Taylor on 12/2/22.
+//  Created by Nick Raptis on 12/2/22.
 //
 
 import XCTest
@@ -229,4 +229,66 @@ final class BTreeInsertAndDeleteStressTests: XCTestCase {
             }
         }
     }
+    
+    func testExtremelyHardcore() {
+        for loop in 0..<1000 {
+            
+            if (loop % 100) == 0 {
+                print("BTreeInsertAndDeleteStressTests.testExtremelyHardcore() \(loop) / 10000")
+            }
+            
+            let order = Int.random(in: 3...60)
+            
+            var insertArray = [Int]()
+            let insertCount = Int.random(in: 0...2000)
+            for _ in 0..<insertCount {
+                insertArray.append(Int.random(in: 0...1024))
+            }
+            
+            var deleteArray = [Int]()
+            let deleteCount = Int.random(in: 0...2000)
+            for _ in 0..<deleteCount {
+                deleteArray.append(Int.random(in: 0...1024))
+            }
+            
+            let mockTree = MockMultiSearchTree<Int>()
+            let realTree = BTree<Int>(order: order)
+            
+            for value in insertArray {
+                realTree.insert(value)
+                mockTree.insert(value)
+            }
+            
+            for value in deleteArray {
+                realTree.remove(value)
+                mockTree.remove(value)
+            }
+            
+            if !compare(mockTree: mockTree, realTree: realTree) {
+                XCTFail("BTreeInsertAndDeleteStressTests.testExtremelyHardocore()")
+                return
+            }
+            
+            let dataClone = mockTree.data
+            
+            for value in dataClone {
+                realTree.remove(value)
+                mockTree.remove(value)
+                
+                if !compare(mockTree: mockTree, realTree: realTree) {
+                    XCTFail("BTreeInsertAndDeleteStressTests.testExtremelyHardocore()")
+                    return
+                }
+            }
+            
+            guard realTree.count == 0 else {
+                XCTFail("BTreeInsertAndDeleteStressTests.testExtremelyHardocore()")
+                return
+            }
+            
+        }
+    }
+    
+    
+    
 }

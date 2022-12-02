@@ -1,8 +1,7 @@
 //
-//  BTreeNode.swift
-//  TreeTests
+//  BTree.swift
 //
-//  Created by Nicky Taylor on 11/26/22.
+//  Created by Nick Raptis on 11/26/22.
 //
 
 import Foundation

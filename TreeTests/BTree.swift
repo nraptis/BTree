@@ -1,20 +1,17 @@
 //
 //  BTree.swift
-//  TreeTests
 //
-//  Created by Nicky Taylor on 11/25/22.
+//  Created by Nick Raptis on 11/25/22.
 //
 
 import Foundation
 
 class BTree<Element: Comparable> {
     
-    let order: Int
+    private let order: Int
     private let minOrder: Int
     
-    var root: BTreeNode<Element>? = nil
-    
-    //private var height = 0
+    private(set) var root: BTreeNode<Element>? = nil
     private(set) var count = 0
     
     required init(order: Int) {
@@ -29,39 +26,17 @@ class BTree<Element: Comparable> {
         return root === nil
     }
     
-    func begin() -> BTreeIterator<Element> {
+    func startIterator() -> BTreeIterator<Element> {
         BTreeIterator<Element>(node: root?.parent, index: 0)
     }
     
-    func end() -> BTreeIterator<Element> {
+    func endIterator() -> BTreeIterator<Element> {
         if let node = root?.rightmost {
             return BTreeIterator<Element>(node: node, index: node.count)
         } else {
             return BTreeIterator<Element>(node: nil, index: 0)
         }
     }
-    
-    /*
-    func rightmost() -> BTreeNode<Element>? {
-        guard let root = root else {
-            return nil
-        }
-        if root.isLeaf {
-            return root
-        }
-        return root.data.rightmost
-    }
-    
-    func leftMost() -> BTreeNode<Element>? {
-        guard let root = root else {
-            return nil
-        }
-        if root.isLeaf {
-            return root
-        }
-        return root.data.leftmost
-    }
-    */
     
     func delete_leaf_node(node: BTreeNode<Element>) {
         node.destroy()
@@ -357,7 +332,7 @@ class BTree<Element: Comparable> {
         if iterator.node != nil {
             return iterator
         } else {
-            return end()
+            return endIterator()
         }
     }
     
@@ -371,7 +346,7 @@ class BTree<Element: Comparable> {
     func countElement(_ element: Element) -> Int {
         let lowerBound = lower_bound(element: element)
         let upperBound = upper_bound(element: element)
-        return distance(iterator1: lowerBound, iterator2: upperBound)
+        return distance(startIterator: lowerBound, endIterator: upperBound)
     }
     
     /*
@@ -404,7 +379,7 @@ class BTree<Element: Comparable> {
         //    iter = end();
         //}
         if iterator.node == nil {
-            iterator = end()
+            iterator = endIterator()
         }
         
         //return internal_insert(iter, *value);
@@ -570,22 +545,6 @@ class BTree<Element: Comparable> {
     
     func remove(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
         
-        /*
-        bool internal_delete = false;
-        
-        if (!iter.node->leaf()) {
-            
-            iterator tmp_iter(iter--);
-            assert(iter.node->leaf());
-            assert(!compare_keys(tmp_iter.key(), iter.key()));
-            iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
-            internal_delete = true;
-            --*mutable_size();
-        } else if (!root()->leaf()) {
-            --*mutable_size();
-        }
-        */
-        
         var internal_delete = false
         
         if let node = iterator.node {
@@ -599,11 +558,7 @@ class BTree<Element: Comparable> {
                 guard iteratorNode.isLeaf else {
                     fatalError("BTree.remove(iterator: BTreeIterator<Element>) node.isLeaf is false")
                 }
-                /*
-                guard iteratorNode.value(index: iterator.index) == tempNode.value(index: tmp_iter.index) else {
-                    fatalError("BTree.remove(iterator: BTreeIterator<Element>) tmp_iter.value() (\(String(describing: iteratorNode.value(index: iterator.index))) != iterator.value() (\(String(describing: tempNode.value(index: tmp_iter.index))))")
-                }
-                */
+                
                 iteratorNode.value_swap(i: iterator.index, x: tempNode, j: tmp_iter.index)
                 internal_delete = true
                 count -= 1
@@ -615,42 +570,12 @@ class BTree<Element: Comparable> {
         //iter.node->remove_value(iter.position);
         
         if let node = iterator.node {
-            //print("node \(node.name) pre-delete (\(iterator.index)) \(node.data.values)")
             node.remove_value(index: iterator.index)
-            //print("node \(node.name) post-delete (\(iterator.index)) \(node.data.values)")
         }
-
-        /*
-        iterator res(iter);
-        for (;;) {
-            if (iter.node == root()) {
-                try_shrink();
-                if (empty()) {
-                    return end();
-                }
-                break;
-            }
-            if (iter.node->count() >= kMinNodeValues) {
-                break;
-            }
-            bool merged = try_merge_or_rebalance(&iter);
-            if (iter.node->leaf()) {
-                res = iter;
-            }
-            if (!merged) {
-                break;
-            }
-            iter.node = iter.node->parent();
-        }
-        */
         
         var result = BTreeIterator(iterator: iterator)
         while var node = iterator.node {
             if node === root {
-                
-                //print("pre-shrink...")
-                //printLevels()
-                
                 if let root = root, root.count <= 0 {
                     if root.isLeaf {
                         delete_leaf_node(node: root)
@@ -672,12 +597,8 @@ class BTree<Element: Comparable> {
                     }
                 }
                 
-                
-                //print("post-shrink...")
-                //printLevels()
-                
                 if root == nil {
-                    return end()
+                    return endIterator()
                 }
                 
                 break
@@ -685,9 +606,6 @@ class BTree<Element: Comparable> {
             if node.count >= minOrder {
                 break
             }
-            
-            //print("pre-merged...")
-            //printLevels()
             
             let merged = try_merge_or_rebalance(iterator: iterator)
             
@@ -747,7 +665,7 @@ class BTree<Element: Comparable> {
     
     func remove(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) -> Int {
         var iterator = BTreeIterator<Element>(iterator: startIterator)
-        let count = distance(iterator1: startIterator, iterator2: endIterator)
+        let count = distance(startIterator: startIterator, endIterator: endIterator)
         for _ in 0..<count {
             iterator = remove(iterator: iterator)
         }
@@ -1048,24 +966,15 @@ class BTree<Element: Comparable> {
         //reinterpret_cast<char*>(node), sizeof(internal_fields));
     }
     
-    
-    //void delete_internal_root_node() {
     func delete_internal_root_node() {
-        //root()->destroy();
         if let root = root {
             root.destroy()
             root.isRoot = false
         }
-        
-        //mutable_internal_allocator()->deallocate(
-        //reinterpret_cast<char*>(root()), sizeof(root_fields));
-        
     }
     
-    //inline IterType btree<P>::internal_last(IterType iter) {
     func internal_last(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
-     
-        //while (iter.node && iter.position == iter.node->count()) {
+        
         while let node = iterator.node, iterator.index == node.count {
             //iter.position = iter.node->position();
             iterator.index = node.index
@@ -1074,18 +983,13 @@ class BTree<Element: Comparable> {
             //if (iter.node->leaf()) {
             if let node = iterator.node {
                 if node.isLeaf {
-                    //iter.node = NULL;
                     iterator.node = nil
                 }
             }
         }
-        //return iter;
-        
         return iterator
     }
     
-    // Finds the first element whose key is not less than key.
-    //iterator lower_bound(const key_type &key) {
     func lower_bound(element: Element) -> BTreeIterator<Element> {
         let rootIterator = BTreeIterator(node: root, index: 0)
         
@@ -1094,7 +998,6 @@ class BTree<Element: Comparable> {
         return result
     }
     
-    // Finds the first element whose key is greater than key.
     func upper_bound(element: Element) -> BTreeIterator<Element> {
         let rootIterator = BTreeIterator(node: root, index: 0)
         let upperBound = internal_upper_bound(iterator: rootIterator, element: element)
@@ -1102,13 +1005,13 @@ class BTree<Element: Comparable> {
         return result
     }
     
-    func distance(iterator1: BTreeIterator<Element>, iterator2: BTreeIterator<Element>) -> Int {
-        if iterator1 == iterator2 {
+    private func distance(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) -> Int {
+        if startIterator == endIterator {
             return 0
         } else {
             var result = 0
-            var iterator = BTreeIterator<Element>(iterator: iterator1)
-            while iterator != iterator2 {
+            var iterator = BTreeIterator<Element>(iterator: startIterator)
+            while iterator != endIterator {
                 iterator.increment()
                 result += 1
             }

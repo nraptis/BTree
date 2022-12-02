@@ -16,14 +16,14 @@ final class BTreeLargerInsertionTests: XCTestCase {
             return false
         }
         if array.count == 0 {
-            guard tree.begin() == tree.end() else {
-                XCTFail("BTreeLargerInsertionTests.checkForwardsIterator() tree.begin() != tree.end() at count 0")
+            guard tree.startIterator() == tree.endIterator() else {
+                XCTFail("BTreeLargerInsertionTests.checkForwardsIterator() tree.startIterator() != tree.endIterator() at count 0")
                 return false
             }
         }
         let array = array.sorted()
-        let iterator = tree.begin()
-        let end = tree.end()
+        let iterator = tree.startIterator()
+        let end = tree.endIterator()
         var index = 0
         if let node = iterator.node, node.count <= 0 {
             XCTFail("BTreeLargerInsertionTests.checkForwardsIterator() node.count (\(node.count)) <= 0 (I)")
@@ -56,15 +56,15 @@ final class BTreeLargerInsertionTests: XCTestCase {
         }
         
         if array.count == 0 {
-            guard tree.begin() == tree.end() else {
-                XCTFail("BTreeLargerInsertionTests.checkBackwardsIterator() tree.begin() != tree.end() at count 0")
+            guard tree.startIterator() == tree.endIterator() else {
+                XCTFail("BTreeLargerInsertionTests.checkBackwardsIterator() tree.startIterator() != tree.endIterator() at count 0")
                 return false
             }
         }
         
         let array = array.sorted()
-        let iterator = tree.end()
-        let begin = tree.begin()
+        let iterator = tree.endIterator()
+        let begin = tree.startIterator()
         var index = array.count
         
         while iterator != begin && index > 0 {

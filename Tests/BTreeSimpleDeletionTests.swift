@@ -119,27 +119,22 @@ final class BTreeSimpleDeletionTests: XCTestCase {
     }
     
     func testInsertSingle1to5_AllPermutationsInserted_AllPermutationsRemoved() {
-        for loop in 1...5 {
+        for loop in 1..<5 {
             var array = [Int]()
             for index in 0...loop {
                 array.append(index)
             }
             
-            let insertPermutations = array.allPermutations()
-            for insertPermutation in insertPermutations {
-                
-                let removePermutations = array.allPermutations()
-                for removePermutation in removePermutations {
-                    
+            let permutations = array.allPermutations()
+            var index = 0
+            for insertPermutation in permutations {
+                index += 1
+                for removePermutation in permutations {
                     let realTree = BTree<Int>(order: 3)
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in insertPermutation {
                         realTree.insert(value)
                         mockTree.insert(value)
-                        if !compareTrees(realTree: realTree, mockTree: mockTree) {
-                            XCTFail("BTreeInsertAndCountTests.testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved() insertPermutation: \(insertPermutation) removePermutation: \(removePermutation)")
-                            return
-                        }
                     }
                     for value in removePermutation {
                         realTree.remove(value)
@@ -154,28 +149,23 @@ final class BTreeSimpleDeletionTests: XCTestCase {
         }
     }
     
-    func testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved() {
+    func testInsertSingle1to10_50PermutationsInserted_25PermutationsRemoved() {
         for loop in 1...10 {
+            print("testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved count \(loop) / 10")
             var array = [Int]()
             for index in 0...loop {
                 array.append(index)
             }
-            
-            let insertPermutations = array.permutations(maxCount: 100, maxTries: 200)
+            let insertPermutations = array.permutations(maxCount: 50, maxTries: 75)
             for insertPermutation in insertPermutations {
-                
-                let removePermutations = array.permutations(maxCount: 100, maxTries: 200)
+                let removePermutations = array.permutations(maxCount: 25, maxTries: 30)
                 for removePermutation in removePermutations {
                     
-                    let realTree = BTree<Int>(order: 3)
+                    let realTree = BTree<Int>(order: Int.random(in: 3...10))
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in insertPermutation {
                         realTree.insert(value)
                         mockTree.insert(value)
-                        if !compareTrees(realTree: realTree, mockTree: mockTree) {
-                            XCTFail("BTreeInsertAndCountTests.testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved() insertPermutation: \(insertPermutation) removePermutation: \(removePermutation)")
-                            return
-                        }
                     }
                     for value in removePermutation {
                         realTree.remove(value)
@@ -190,34 +180,29 @@ final class BTreeSimpleDeletionTests: XCTestCase {
         }
     }
     
-    func testInsertSingle16to24_100PermutationsInserted_100PermutationsRemoved() {
+    func testInsertSingle16to24_50PermutationsInserted_25PermutationsRemoved() {
         for loop in 16...24 {
+            print("testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved count \(loop) / 24")
             var array = [Int]()
             for index in 0...loop {
                 array.append(index)
             }
             
-            let insertPermutations = array.permutations(maxCount: 100, maxTries: 200)
+            let insertPermutations = array.permutations(maxCount: 50, maxTries: 35)
             for insertPermutation in insertPermutations {
                 
-                let removePermutations = array.permutations(maxCount: 100, maxTries: 200)
+                let removePermutations = array.permutations(maxCount: 25, maxTries: 35)
                 for removePermutation in removePermutations {
                     
-                    let realTree = BTree<Int>(order: 3)
+                    let realTree = BTree<Int>(order: Int.random(in: 3...10))
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in insertPermutation {
                         realTree.insert(value)
                         mockTree.insert(value)
-                        if !compareTrees(realTree: realTree, mockTree: mockTree) {
-                            XCTFail("BTreeInsertAndCountTests.testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved() insertPermutation: \(insertPermutation) removePermutation: \(removePermutation)")
-                            return
-                        }
                     }
                     for value in removePermutation {
-                        realTree.printLevels()
                         realTree.remove(value)
                         mockTree.remove(value)
-                        realTree.printLevels()
                         if !compareTrees(realTree: realTree, mockTree: mockTree) {
                             XCTFail("BTreeInsertAndCountTests.testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved() insertPermutation: \(insertPermutation) removePermutation: \(removePermutation)")
                             return
@@ -229,28 +214,27 @@ final class BTreeSimpleDeletionTests: XCTestCase {
         }
     }
     
-    func testInsertSingle40to44_100PermutationsInserted_100PermutationsRemoved() {
+    func testInsertSingle40to44_20PermutationsInserted_10PermutationsRemoved() {
         for loop in 40...44 {
+            
+            print("testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved count \(loop) / 44")
+            
             var array = [Int]()
             for index in 0...loop {
                 array.append(index)
             }
             
-            let insertPermutations = array.permutations(maxCount: 100, maxTries: 200)
+            let insertPermutations = array.permutations(maxCount: 20, maxTries: 25)
             for insertPermutation in insertPermutations {
                 
-                let removePermutations = array.permutations(maxCount: 100, maxTries: 200)
+                let removePermutations = array.permutations(maxCount: 10, maxTries: 15)
                 for removePermutation in removePermutations {
                     
-                    let realTree = BTree<Int>(order: 3)
+                    let realTree = BTree<Int>(order: Int.random(in: 3...10))
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in insertPermutation {
                         realTree.insert(value)
                         mockTree.insert(value)
-                        if !compareTrees(realTree: realTree, mockTree: mockTree) {
-                            XCTFail("BTreeInsertAndCountTests.testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved() insertPermutation: \(insertPermutation) removePermutation: \(removePermutation)")
-                            return
-                        }
                     }
                     for value in removePermutation {
                         realTree.remove(value)
@@ -342,5 +326,4 @@ final class BTreeSimpleDeletionTests: XCTestCase {
             return
         }
     }
-    
 }

@@ -97,9 +97,9 @@ final class BTreeIteratorSimpleTests: XCTestCase {
     
     func testIteratorZeroValues() {
         let tree = BTree<Int>(order: 3)
-        let iterator = tree.begin()
-        let begin = tree.begin()
-        let end = tree.end()
+        let iterator = tree.startIterator()
+        let begin = tree.startIterator()
+        let end = tree.endIterator()
         if iterator != begin {
             XCTFail("BTreeIteratorSimpleTests.testIteratorZeroValues() iterator == begin")
             return
@@ -115,8 +115,8 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = BTree<Int>(order: 3)
         tree.setRoot(node)
         
-        let iterator = tree.begin()
-        let end = tree.end()
+        let iterator = tree.startIterator()
+        let end = tree.endIterator()
         
         if iterator == end {
             XCTFail("BTreeIteratorSimpleTests.testIteratorOneValueForward() iterator == end")
@@ -146,8 +146,8 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = BTree<Int>(order: 3)
         tree.setRoot(node)
         
-        let iterator = tree.end()
-        let begin = tree.begin()
+        let iterator = tree.endIterator()
+        let begin = tree.startIterator()
         
         if iterator == begin {
             XCTFail("BTreeIteratorSimpleTests.testIteratorOneValueBackward() iterator == end")
@@ -179,8 +179,8 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = BTree<Int>(order: order)
         tree.setRoot(node)
         
-        let iterator = tree.begin()
-        let end = tree.end()
+        let iterator = tree.startIterator()
+        let end = tree.endIterator()
         var index = 0
         while iterator != end {
             if iterator.value() != array[index] {
@@ -203,8 +203,8 @@ final class BTreeIteratorSimpleTests: XCTestCase {
         let tree = BTree<Int>(order: order)
         tree.setRoot(node)
         
-        let iterator = tree.end()
-        let begin = tree.begin()
+        let iterator = tree.endIterator()
+        let begin = tree.startIterator()
         var index = array.count
         while iterator != begin {
             iterator.decrement()
@@ -226,8 +226,8 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             return false
         }
         
-        let iterator = tree.begin()
-        let end = tree.end()
+        let iterator = tree.startIterator()
+        let end = tree.endIterator()
         var index = 0
         while iterator != end {
             if iterator.value() != array[index] {
@@ -253,8 +253,8 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             return false
         }
         
-        let iterator = tree.end()
-        let begin = tree.begin()
+        let iterator = tree.endIterator()
+        let begin = tree.startIterator()
         var index = array.count
         while iterator != begin {
             iterator.decrement()
