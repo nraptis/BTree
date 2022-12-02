@@ -208,7 +208,6 @@ final class BTreeSimpleDeletionTests: XCTestCase {
                             return
                         }
                     }
-                    
                 }
             }
         }

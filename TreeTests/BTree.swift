@@ -50,16 +50,8 @@ class BTree<Element: Comparable> {
             fatalError("BTree.rebalance_or_split() iterator.node is null")
         }
         
-        //int &insert_position = iter->position;
         var insert_position = iterator.index
         
-        //assert(node->count() == node->max_count());
-        guard node.count == node.order else {
-            fatalError("BTree.rebalance_or_split() node.count (\(node.count)) != node.order (\(node.order))")
-        }
-
-        // First try to make room on the node by rebalancing.
-        //node_type *parent = node->parent();
         guard var parent = node.parent else {
             fatalError("BTree.rebalance_or_split() node.parent is null")
         }
@@ -109,26 +101,20 @@ class BTree<Element: Comparable> {
                             fatalError("BTree.rebalance_or_split() (node.order (\(node.order)) - node.count (\(node.count)) != to_move (\(to_move))")
                         }
                         
-                        //insert_position = insert_position - to_move;
                         insert_position -= to_move
                         
-                        //if (insert_position < 0) {
                         if insert_position < 0 {
                         
-                            //insert_position = insert_position + left->count() + 1;
                             insert_position = insert_position + left.count + 1
                             
-                            //node = left;
                             node = left
                             
                         }
-
-                        //assert(node->count() < node->max_count());
+                        
                         guard node.count < node.order else {
                             fatalError("BTree.rebalance_or_split() node.count (\(node.count)) >= node.order (\(node.order))")
                         }
                         
-                        //Update the iterator
                         iterator.node = node
                         
                         iterator.index = insert_position
@@ -138,65 +124,35 @@ class BTree<Element: Comparable> {
                     }
                 }
             }
-
             
-            
-            //if (node->position() < parent->count()) {
             if node.index < parent.count {
-            
-                // Try rebalancing with our right sibling.
-                //node_type *right = parent->child(node->position() + 1);
-                //var right = parent.child(index: node.index + 1)
                 guard let right = parent.child(index: node.index + 1) else {
                     fatalError("BTree.rebalance_or_split() right null node.index (\(node.index)) + 1")
                 }
                 
-                //if (right->count() < right->max_count()) {
                 if right.count < right.order {
-                    
-                    
-                    // We bias rebalancing based on the position being inserted. If we're
-                    // inserting at the beginning of the left node then we bias rebalancing
-                    // to fill up the right node.
-                    
-                    //int to_move = (right->max_count() - right->count()) /
-                    //(1 + (insert_position > 0));
-                
                     var denom = 1
                     if insert_position > 0 {
                         denom += 1
                     }
                     var to_move = (right.order - right.count) / (denom)
-                
-                    //to_move = std::max(1, to_move);
+                    
                     if to_move < 1 {
                         to_move = 1
                     }
                     
-                    //if ((insert_position <= (node->count() - to_move)) ||
-                    //    ((right->count() + to_move) < right->max_count())) {
                     if (insert_position <= (node.count - to_move)) || ((right.count + to_move) < right.order) {
                         
-                        //node->rebalance_left_to_right(right, to_move);
                         node.rebalance_left_to_right(dest: right, to_move: to_move)
                         
-                        //if (insert_position > node->count()) {
                         if insert_position > node.count {
                         
-                            //insert_position = insert_position - node->count() - 1;
-                            insert_position = insert_position - node.count - 1;
+                            insert_position = insert_position - node.count - 1
                             
-                            //node = right;
                             node = right
                             
                         }
                         
-                        //assert(node->count() < node->max_count());
-                        guard node.count < node.order else {
-                            fatalError("BTree.rebalance_or_split() node.count (\(node.count)) >= node.order (\(node.order))")
-                        }
-                        
-                        //Update the iterator
                         iterator.node = node
                         iterator.index = insert_position
                         
@@ -204,12 +160,7 @@ class BTree<Element: Comparable> {
                     }
                 }
             }
-            
-            
-            // Rebalancing failed, make sure there is room on the parent node for a new
-            // value.
-            
-            //if (parent->count() == parent->max_count()) {
+
             if parent.count == parent.order {
                 //iterator parent_iter(node->parent(), node->position());
                 let parentIterator = BTreeIterator<Element>(node: node.parent, index: node.index)
@@ -224,22 +175,8 @@ class BTree<Element: Comparable> {
                 fatalError("BTree.rebalance_or_split() root is null")
             }
             
-            // Rebalancing not possible because this is the root node.
-            //if (root()->leaf()) {
             if root.isLeaf {
-                
-                /*
-                // The root node is currently a leaf node: create a new root node and set
-                // the current root node as the child of the new root.
-                parent = new_internal_root_node();
-                parent->set_child(0, root());
-                *mutable_root() = parent;
-                assert(*mutable_rightmost() == parent->child(0));
-                */
-                
-                // The root node is currently a leaf node: create a new root node and set
-                // the current root node as the child of the new root.
-                //parent = new_internal_root_node();
+
                 parent = new_internal_root_node()
                 root.isRoot = false
                 
@@ -255,18 +192,8 @@ class BTree<Element: Comparable> {
                 }
                 
             } else {
-                // The root node is an internal node. We do not want to create a new root
-                // node because the root node is special and holds the size of the tree
-                // and a pointer to the rightmost node. So we create a new internal node
-                // and move all of the items on the current root into the new node.
-                
-                //parent = new_internal_node(parent);
+
                 parent = BTreeNode<Element>.createInternal(order: order, parent: parent)
-                //parent.leftmost = root.leftmost
-                //parent.rightmost = root.rightmost
-                
-                
-                //parent->set_child(0, parent);
                 parent.set_child(i: 0, node: parent)
                 
                 //parent->swap(root());
@@ -278,28 +205,18 @@ class BTree<Element: Comparable> {
             
         }
 
-        
-        // Split the node.
-        //node_type *split_node;
-        
-        //if (node->leaf()) {
         if node.isLeaf {
             
             guard let root = root else {
                 fatalError("BTree.rebalance_or_split() root is null")
             }
         
-            //split_node = new_leaf_node(parent);
             let split_node = new_leaf_node(parent: parent)
             
-            //node->split(split_node, insert_position);
             node.split(dest: split_node, insert_position: insert_position)
             
-            //if (rightmost() == node) {
-            //    *mutable_rightmost() = split_node;
-            //}
             if root.rightmost === node {
-                //rightmost = split_node
+                
                 root.rightmost = split_node
             }
             
@@ -308,10 +225,9 @@ class BTree<Element: Comparable> {
                 node = split_node
             }
         } else {
-            //split_node = new_internal_node(parent);
+            
             let split_node = BTreeNode<Element>.createInternal(order: order, parent: parent)
             
-            //node->split(split_node, insert_position);
             node.split(dest: split_node, insert_position: insert_position)
             
             if insert_position > node.count {
@@ -320,7 +236,6 @@ class BTree<Element: Comparable> {
             }
         }
 
-        //Update the iterator
         iterator.node = node
         iterator.index = insert_position
         
@@ -349,18 +264,8 @@ class BTree<Element: Comparable> {
         return distance(startIterator: lowerBound, endIterator: upperBound)
     }
     
-    /*
-    size_type count_multi(const key_type &key) const {
-      return distance(lower_bound(key), upper_bound(key));
-    }
-    */
-    
-    //@discardableResult
     func insert(_ element: Element) {
         
-        //if (empty()) {
-        //  *mutable_root() = new_leaf_root_node(1);
-        //}
         if isEmpty() {
             self.root = new_leaf_root_node()
         }
@@ -374,10 +279,7 @@ class BTree<Element: Comparable> {
         var iterator = internal_upper_bound(iterator: rootIterator, element: element)
         
         //TODO: upper bound...
-        
-        //if (!iter.node) {
-        //    iter = end();
-        //}
+
         if iterator.node == nil {
             iterator = endIterator()
         }
@@ -388,49 +290,7 @@ class BTree<Element: Comparable> {
     }
     
     
-    //need funcs:
-    // tree::delete_leaf_node
-    // tree::rebalance_or_split
     
-    /*
-    //inline typename btree<P>::iterator btree<P>::internal_insert(iterator iter, const value_type &v) {
-    private func insert(iterator: BTreeIterator<Element>, element: Element) -> BTreeIterator<Element> {
-        
-        guard let node = iterator.node else {
-            
-        }
-        
-        if (!iter.node->leaf()) {
-            // We can't insert on an internal node. Instead, we'll insert after the
-            // previous value which is guaranteed to be on a leaf node.
-            --iter;
-            ++iter.position;
-        }
-        if (iter.node->count() == iter.node->max_count()) {
-            // Make room in the leaf for the new item.
-            if (iter.node->max_count() < kNodeValues) {
-                // Insertion into the root where the root is smaller that the full node
-                // size. Simply grow the size of the root node.
-                assert(iter.node == root());
-                iter.node = new_leaf_root_node(
-                    std::min<int>(kNodeValues, 2 * iter.node->max_count()));
-                iter.node->swap(root());
-                delete_leaf_node(root());
-                *mutable_root() = iter.node;
-            } else {
-                rebalance_or_split(&iter);
-                ++*mutable_size();
-            }
-            
-        } else if (!root()->leaf()) {
-            ++*mutable_size();
-        }
-        iter.node->insert_value(iter.position, v);
-        return iter;
-    }
-    */
-    
-    //btree<P>::internal_insert(iterator iter, const value_type &v) {
     @discardableResult
     private func insert(iterator: BTreeIterator<Element>, element: Element) -> BTreeIterator<Element> {
         

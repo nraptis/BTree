@@ -50,5 +50,5 @@ class BTreeNodeData<Element: Comparable> {
     var parent: BTreeNode<Element>?
     var values: [Element?]
     var children: [BTreeNode<Element>?]
-    weak var rightmost: BTreeNode<Element>?
+    var rightmost: BTreeNode<Element>?
 }
