@@ -258,95 +258,58 @@ class BTreeNode<Element: Comparable>: Hashable {
         return start
     }
     
-    //void btree_node<P>::split(btree_node *dest, int insert_position) {
     func split(dest: BTreeNode<Element>, insert_position: Int) {
-
-        //assert(dest->count() == 0);
+        
         guard dest.count == 0 else {
             fatalError("BTreeNode.split() dest.count (\(dest.count)) not 0")
         }
-
-        // We bias the split based on the position being inserted. If we're
-        // inserting at the beginning of the left node then bias the split to put
-        // more values on the right node. If we're inserting at the end of the
-        // right node then bias the split to put more values on the left node.
-        //if (insert_position == 0) {
+        
         if insert_position == 0 {
-            //dest->set_count(count() - 1);
-            //dest.count -= 1
-            //if dest.count > 0 {
-            //dest.count -= 1
             dest.count = count - 1
-            //}
-            
-        //} else if (insert_position == max_count()) {
         } else if insert_position == order {
             
-            //dest->set_count(0);
-            
         } else {
-            //dest->set_count(count() / 2);
             dest.count = count >> 1
         }
         
-        //set_count(count() - dest->count());
         count = count - dest.count
         
-        //assert(count() >= 1);
         guard count >= 1 else {
             fatalError("BTreeNode.split() count (\(count)) < 1")
         }
-
-            // Move values from the left sibling to the right sibling.
-        //for (int i = 0; i < dest->count(); ++i) {
+        
         var i = 0
         while i < dest.count {
-        
-            //dest->value_init(i);
-            //value_swap(count() + i, dest, i);
             value_swap(i: count + i, x: dest, j: i)
             
-            //value_destroy(count() + i);
             value_destroy(i: count + i)
             
             i += 1
         }
-
-        // The split key is the largest value in the left sibling.
-        //set_count(count() - 1);
+        
         count = count - 1
         
-        //parent()->insert_value(position(), value_type());
         guard let parent = parent else {
             fatalError("BTreeNode.split() parent is null")
         }
         parent.insert_value(index: index, element: nil)
         
-        //value_swap(count(), parent(), position());
         value_swap(i: count, x: parent, j: index)
         
-        //value_destroy(count());
         value_destroy(i: count)
         
-        //parent()->set_child(position() + 1, dest);
         parent.set_child(i: index + 1, node: dest)
         
-        //if (!leaf()) {
         if !isLeaf {
             
-            //for (int i = 0; i <= dest->count(); ++i) {
             i = 0
             while i <= dest.count {
             
-                //assert(child(count() + i + 1) != NULL);
                 guard let child = child(index: count + i + 1) else {
                     fatalError("BTreeNode.split() child missing count (\(count)) + i (\(i)) + 1")
                 }
                 
-                //dest->set_child(i, child(count() + i + 1));
                 dest.set_child(i: i, node: child)
-                
-                //*mutable_child(count() + i + 1) = NULL;
                 data.children[count + i + 1] = nil
                 
                 i += 1
@@ -354,10 +317,8 @@ class BTreeNode<Element: Comparable>: Hashable {
         }
     }
     
-    //inline void btree_node<P>::insert_value(int i, const value_type &x) {
     func insert_value(index: Int, element: Element?) {
         
-        //assert(i <= count());
         guard index <= count else {
             fatalError("BTreeNode.insert_value(index: Int, element: Element) index (\(index)) > count (\(count))")
         }
@@ -374,40 +335,21 @@ class BTreeNode<Element: Comparable>: Hashable {
             fatalError("BTreeNode.insert_value(index: Int, element: Element) count (\(count)) >= order (\(order))")
         }
         
-        //value_init(count(), x);
-        //for (int j = count(); j > i; --j) {
         var j = count
         while j > index {
-            //value_swap(j, this, j - 1);
-            
             data.values[j] = data.values[j - 1]
             j -= 1
         }
         
         data.values[index] = element
         
-        //set_count(count() + 1);
         count += 1
         
-        //if (!leaf()) {
         if !isLeaf {
-        
-            //guard data.children.count == (count + 1) else {
-            //    fatalError("BTreeNode.insert_value(index: Int, element: Element) data.children.count (\(data.children.count)) != count (\(count))")
-            //}
-          
-            //++i;
             let index = index + 1
-          
-            //for (int j = count(); j > i; --j) {
             j = count
             while j > index {
-                
-                
-                //*mutable_child(j) = child(j - 1);
                 data.children[j] = data.children[j - 1]
-                
-                //  child(j)->set_position(j);
                 data.children[j]?.index = j
                 
                 j -= 1
@@ -415,13 +357,8 @@ class BTreeNode<Element: Comparable>: Hashable {
         }
     }
     
-    //template <typename P>
-    //inline void btree_node<P>::remove_value(int i) {
-      
     func remove_value(index: Int) {
-        //if (!leaf()) {
         if !isLeaf {
-            //assert(child(i + 1)->count() == 0);
             guard var child = child(index: index + 1) else {
                 fatalError("BTreeNode.remove_value(index: Int, element: Element) child index (\(index)) + 1 is null")
             }
@@ -429,7 +366,6 @@ class BTreeNode<Element: Comparable>: Hashable {
                 fatalError("BTreeNode.remove_value(index: Int, element: Element) child index (\(index)) + 1, child.count (\(child.count)) expected 0")
             }
             
-            //for (int j = i + 1; j < count(); ++j) {
             var j = index + 1
             while j < count {
                 
@@ -441,7 +377,6 @@ class BTreeNode<Element: Comparable>: Hashable {
                     //child(j)->set_position(j);
                     child.index = j
                 } else {
-                    fatalError("BTreeNode.remove_value(index: Int, element: Element) data.children[j (\(j))] is null")
                     data.children[j] = nil
                 }
                 
@@ -449,46 +384,16 @@ class BTreeNode<Element: Comparable>: Hashable {
             }
             
             data.children[count] = nil
-            //*mutable_child(count()) = NULL;
         }
-
-        //set_count(count() - 1);
-        count -= 1
         
-        //for (; i < count(); ++i) {
+        count -= 1
         var index = index
         while index < count {
-            //value_swap(i, this, i + 1);
-            //value_swap(i: index, x: self, j: index + 1)
             data.values[index] = data.values[index + 1]
             index += 1
         }
-        //value_destroy(i);
-        //value_destroy(i: <#T##Int#>)
         data.values[index] = nil
     }
-    
-    
-    /*
-    void btree_node<P>::merge(btree_node *src) {
-        value_init(count());
-        value_swap(count(), parent(), position());
-        for (int i = 0; i < src->count(); ++i) {
-            value_init(1 + count() + i);
-            value_swap(1 + count() + i, src, i);
-            src->value_destroy(i);
-        }
-        if (!leaf()) {
-            for (int i = 0; i <= src->count(); ++i) {
-                set_child(1 + count() + i, src->child(i));
-                *src->mutable_child(i) = NULL;
-            }
-        }
-        set_count(1 + count() + src->count());
-        src->set_count(0);
-        parent()->remove_value(position());
-    }
-    */
     
     func merge(source: BTreeNode<Element>) {
         guard let parent = parent else {
@@ -500,33 +405,16 @@ class BTreeNode<Element: Comparable>: Hashable {
         guard (index + 1) == source.index else {
             fatalError("BTreeNode.merge() (index (\(index)) + 1) != source.index (\(source.index))")
         }
-        //value_swap(count(), parent(), position());
+        
         value_swap(i: count, x: parent, j: index)
         
-
-        /*
-        for (int i = 0; i < src->count(); ++i) {
-            value_init(1 + count() + i);
-            value_swap(1 + count() + i, src, i);
-            src->value_destroy(i);
-        }
-        */
         var i = 0
         while i < source.count {
             value_swap(i: 1 + count + i, x: source, j: i)
             source.value_destroy(i: i)
             i += 1
         }
-
         
-        /*
-        if (!leaf()) {
-            for (int i = 0; i <= src->count(); ++i) {
-                set_child(1 + count() + i, src->child(i));
-                *src->mutable_child(i) = NULL;
-            }
-        }
-        */
         if !isLeaf {
             i = 0
             while i <= source.count {
@@ -538,22 +426,12 @@ class BTreeNode<Element: Comparable>: Hashable {
                 i += 1
             }
         }
-
-        /*
-        set_count(1 + count() + src->count());
-        src->set_count(0);
-        parent()->remove_value(position());
-        */
         
         count = ((1 + count) + source.count)
         source.count = 0
         parent.remove_value(index: index)
     }
     
-    
-    //void value_swap(int i, btree_node *x, int j) {
-        //params_type::swap(mutable_value(i), x->mutable_value(j));
-    //}
     func value_swap(i: Int, x: BTreeNode<Element>, j: Int) {
         var hold = data.values[i]
         data.values[i] = x.data.values[j]
