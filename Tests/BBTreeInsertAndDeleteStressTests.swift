@@ -34,39 +34,16 @@ final class BBTreeInsertAndDeleteStressTests: XCTestCase {
         return true
     }
     
-    
-    func testInsertAndDeleteOneElement() {
-        
-        let mockTree = MockMultiSearchTree<Int>()
-        let realTree = BTree<Int>(order: 3)
-        
-        mockTree.insert(42)
-        realTree.insert(42)
-        
-        if !compare(mockTree: mockTree, realTree: realTree) {
-            XCTFail("BBTreeInsertAndDeleteStressTests.testInsertAndDeleteOneElement()")
-            return
-        }
-        
-        mockTree.remove(42)
-        realTree.remove(42)
-        
-        if !compare(mockTree: mockTree, realTree: realTree) {
-            XCTFail("BBTreeInsertAndDeleteStressTests.testInsertAndDeleteOneElement()")
-            return
-        }
-    }
-    
-    func testInsertAndDeleteUpTo100Elements1000Times() {
-        for _ in 0..<1000 {
+    func testInsertAndDeleteUpTo100Elements500Times() {
+        for _ in 0..<500 {
             var insertArray = [Int]()
-            var insertCount = Int.random(in: 0...100)
+            let insertCount = Int.random(in: 0...100)
             for _ in 0..<insertCount {
                 insertArray.append(Int.random(in: 0...100))
             }
             
             var deleteArray = [Int]()
-            var deleteCount = Int.random(in: 0...100)
+            let deleteCount = Int.random(in: 0...100)
             for _ in 0..<deleteCount {
                 deleteArray.append(Int.random(in: 0...100))
             }
@@ -97,13 +74,13 @@ final class BBTreeInsertAndDeleteStressTests: XCTestCase {
         for order in 3...12 {
             for _ in 0..<50 {
                 var insertArray = [Int]()
-                var insertCount = Int.random(in: 0...50)
+                let insertCount = Int.random(in: 0...50)
                 for _ in 0..<insertCount {
                     insertArray.append(Int.random(in: 0...50))
                 }
                 
                 var deleteArray = [Int]()
-                var deleteCount = Int.random(in: 0...50)
+                let deleteCount = Int.random(in: 0...50)
                 for _ in 0..<deleteCount {
                     deleteArray.append(Int.random(in: 0...50))
                 }
@@ -128,5 +105,75 @@ final class BBTreeInsertAndDeleteStressTests: XCTestCase {
         }
     }
     
-
+    func test100RandomMediumArraysStrict() {
+        
+        for _ in 0..<100 {
+            let order = Int.random(in: 3...16)
+            var insertArray = [Int]()
+            let insertCount = Int.random(in: 0...200)
+            for _ in 0..<insertCount {
+                insertArray.append(Int.random(in: 0...255))
+            }
+            
+            var deleteArray = [Int]()
+            let deleteCount = Int.random(in: 0...200)
+            for _ in 0..<deleteCount {
+                deleteArray.append(Int.random(in: 0...255))
+            }
+            
+            let mockTree = MockMultiSearchTree<Int>()
+            let realTree = BTree<Int>(order: order)
+            
+            for value in insertArray {
+                realTree.insert(value)
+                mockTree.insert(value)
+            }
+            
+            for value in deleteArray {
+                realTree.remove(value)
+                mockTree.remove(value)
+                
+                if !compare(mockTree: mockTree, realTree: realTree) {
+                    XCTFail("BBTreeInsertAndDeleteStressTests.test1000RandomMediumArraysStrict()")
+                    return
+                }
+            }
+        }
+    }
+    
+    func test1000RandomMediumArraysOnlyComparingEndResult() {
+        for _ in 0..<1000 {
+            let order = Int.random(in: 3...16)
+            
+            var insertArray = [Int]()
+            let insertCount = Int.random(in: 0...200)
+            for _ in 0..<insertCount {
+                insertArray.append(Int.random(in: 0...255))
+            }
+            
+            var deleteArray = [Int]()
+            let deleteCount = Int.random(in: 0...200)
+            for _ in 0..<deleteCount {
+                deleteArray.append(Int.random(in: 0...255))
+            }
+            
+            let mockTree = MockMultiSearchTree<Int>()
+            let realTree = BTree<Int>(order: order)
+            
+            for value in insertArray {
+                realTree.insert(value)
+                mockTree.insert(value)
+            }
+            
+            for value in deleteArray {
+                realTree.remove(value)
+                mockTree.remove(value)
+            }
+            
+            if !compare(mockTree: mockTree, realTree: realTree) {
+                XCTFail("BBTreeInsertAndDeleteStressTests.test1000RandomMediumArraysStrict()")
+                return
+            }
+        }
+    }
 }

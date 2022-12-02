@@ -651,12 +651,32 @@ class BTree<Element: Comparable> {
                 //print("pre-shrink...")
                 //printLevels()
                 
-                try_shrink()
+                if let root = root, root.count <= 0 {
+                    if root.isLeaf {
+                        delete_leaf_node(node: root)
+                        self.root = nil
+                    } else {
+                        guard let child = root.child(index: 0) else {
+                            fatalError("BTree.try_shrink() root.child(index: 0) is nil")
+                        }
+                        if child.isLeaf {
+                            child.make_root()
+                            //child.rightmost = root.rightmost //TODO: Needed?
+                            delete_internal_root_node()
+                            self.root = child
+                            
+                        } else {
+                            child.swap(node: root)
+                            delete_internal_node(child)
+                        }
+                    }
+                }
+                
                 
                 //print("post-shrink...")
                 //printLevels()
                 
-                if self.root == nil {
+                if root == nil {
                     return end()
                 }
                 
