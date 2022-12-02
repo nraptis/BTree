@@ -1095,34 +1095,34 @@ void btree_node<P>::split(btree_node *dest, int insert_position) {
 
 template <typename P>
 void btree_node<P>::merge(btree_node *src) {
-  assert(parent() == src->parent());
-  assert(position() + 1 == src->position());
+    assert(parent() == src->parent());
+    assert(position() + 1 == src->position());
 
-  // Move the delimiting value to the left node.
-  value_init(count());
-  value_swap(count(), parent(), position());
+    // Move the delimiting value to the left node.
+    value_init(count());
+    value_swap(count(), parent(), position());
 
-  // Move the values from the right to the left node.
-  for (int i = 0; i < src->count(); ++i) {
-    value_init(1 + count() + i);
-    value_swap(1 + count() + i, src, i);
-    src->value_destroy(i);
-  }
-
-  if (!leaf()) {
-    // Move the child pointers from the right to the left node.
-    for (int i = 0; i <= src->count(); ++i) {
-      set_child(1 + count() + i, src->child(i));
-      *src->mutable_child(i) = NULL;
+    // Move the values from the right to the left node.
+    for (int i = 0; i < src->count(); ++i) {
+        value_init(1 + count() + i);
+        value_swap(1 + count() + i, src, i);
+        src->value_destroy(i);
     }
-  }
 
-  // Fixup the counts on the src and dest nodes.
-  set_count(1 + count() + src->count());
-  src->set_count(0);
+    if (!leaf()) {
+        // Move the child pointers from the right to the left node.
+        for (int i = 0; i <= src->count(); ++i) {
+            set_child(1 + count() + i, src->child(i));
+            *src->mutable_child(i) = NULL;
+        }
+    }
 
-  // Remove the value on the parent node.
-  parent()->remove_value(position());
+    // Fixup the counts on the src and dest nodes.
+    set_count(1 + count() + src->count());
+    src->set_count(0);
+
+    // Remove the value on the parent node.
+    parent()->remove_value(position());
 }
 
 template <typename P>
@@ -1364,66 +1364,52 @@ void btree<P>::assign(const self_type &x) {
   }
 }
 
-template <typename P>
 typename btree<P>::iterator btree<P>::erase(iterator iter) {
-  bool internal_delete = false;
-  if (!iter.node->leaf()) {
-    // Deletion of a value on an internal node. Swap the key with the largest
-    // value of our left child. This is easy, we just decrement iter.
-    iterator tmp_iter(iter--);
-    assert(iter.node->leaf());
-    assert(!compare_keys(tmp_iter.key(), iter.key()));
-    iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
-    internal_delete = true;
-    --*mutable_size();
-  } else if (!root()->leaf()) {
-    --*mutable_size();
-  }
-
-  // Delete the key from the leaf.
-  iter.node->remove_value(iter.position);
-
-  // We want to return the next value after the one we just erased. If we
-  // erased from an internal node (internal_delete == true), then the next
-  // value is ++(++iter). If we erased from a leaf node (internal_delete ==
-  // false) then the next value is ++iter. Note that ++iter may point to an
-  // internal node and the value in the internal node may move to a leaf node
-  // (iter.node) when rebalancing is performed at the leaf level.
-
-  // Merge/rebalance as we walk back up the tree.
-  iterator res(iter);
-  for (;;) {
-    if (iter.node == root()) {
-      try_shrink();
-      if (empty()) {
-        return end();
-      }
-      break;
+    bool internal_delete = false;
+    
+    if (!iter.node->leaf()) {
+        
+        iterator tmp_iter(iter--);
+        assert(iter.node->leaf());
+        assert(!compare_keys(tmp_iter.key(), iter.key()));
+        iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
+        internal_delete = true;
+        --*mutable_size();
+    } else if (!root()->leaf()) {
+        --*mutable_size();
     }
-    if (iter.node->count() >= kMinNodeValues) {
-      break;
-    }
-    bool merged = try_merge_or_rebalance(&iter);
-    if (iter.node->leaf()) {
-      res = iter;
-    }
-    if (!merged) {
-      break;
-    }
-    iter.node = iter.node->parent();
-  }
+    
+    iter.node->remove_value(iter.position);
 
-  // Adjust our return value. If we're pointing at the end of a node, advance
-  // the iterator.
-  if (res.position == res.node->count()) {
+    iterator res(iter);
+    for (;;) {
+        if (iter.node == root()) {
+            try_shrink();
+            if (empty()) {
+                return end();
+            }
+            break;
+        }
+        if (iter.node->count() >= kMinNodeValues) {
+            break;
+        }
+        bool merged = try_merge_or_rebalance(&iter);
+        if (iter.node->leaf()) {
+            res = iter;
+        }
+        if (!merged) {
+            break;
+        }
+        iter.node = iter.node->parent();
+    }
+    if (res.position == res.node->count()) {
     res.position = res.node->count() - 1;
-    ++res;
-  }
-  // If we erased from an internal node, advance the iterator.
-  if (internal_delete) {
-    ++res;
-  }
-  return res;
+        ++res;
+    }
+    if (internal_delete) {
+        ++res;
+    }
+    return res;
 }
 
 template <typename P>
@@ -1599,94 +1585,85 @@ void btree<P>::rebalance_or_split(iterator *iter) {
 
 template <typename P>
 void btree<P>::merge_nodes(node_type *left, node_type *right) {
-  left->merge(right);
-  if (right->leaf()) {
-    if (rightmost() == right) {
-      *mutable_rightmost() = left;
+    left->merge(right);
+    if (right->leaf()) {
+        if (rightmost() == right) {
+            *mutable_rightmost() = left;
+        }
+        delete_leaf_node(right);
+    } else {
+        delete_internal_node(right);
     }
-    delete_leaf_node(right);
-  } else {
-    delete_internal_node(right);
-  }
 }
 
 template <typename P>
 bool btree<P>::try_merge_or_rebalance(iterator *iter) {
-  node_type *parent = iter->node->parent();
-  if (iter->node->position() > 0) {
-    // Try merging with our left sibling.
-    node_type *left = parent->child(iter->node->position() - 1);
-    if ((1 + left->count() + iter->node->count()) <= left->max_count()) {
-      iter->position += 1 + left->count();
-      merge_nodes(left, iter->node);
-      iter->node = left;
-      return true;
+    node_type *parent = iter->node->parent();
+    if (iter->node->position() > 0) {
+        node_type *left = parent->child(iter->node->position() - 1);
+        if ((1 + left->count() + iter->node->count()) <= left->max_count()) {
+            iter->position += 1 + left->count();
+            merge_nodes(left, iter->node);
+            iter->node = left;
+            return true;
+        }
     }
-  }
-  if (iter->node->position() < parent->count()) {
-    // Try merging with our right sibling.
-    node_type *right = parent->child(iter->node->position() + 1);
-    if ((1 + iter->node->count() + right->count()) <= right->max_count()) {
-      merge_nodes(iter->node, right);
-      return true;
-    }
-    // Try rebalancing with our right sibling. We don't perform rebalancing if
-    // we deleted the first element from iter->node and the node is not
-    // empty. This is a small optimization for the common pattern of deleting
-    // from the front of the tree.
-    if ((right->count() > kMinNodeValues) &&
+    if (iter->node->position() < parent->count()) {
+        node_type *right = parent->child(iter->node->position() + 1);
+        if ((1 + iter->node->count() + right->count()) <= right->max_count()) {
+            merge_nodes(iter->node, right);
+            return true;
+        }
+        if ((right->count() > kMinNodeValues) &&
         ((iter->node->count() == 0) ||
-         (iter->position > 0))) {
-      int to_move = (right->count() - iter->node->count()) / 2;
-      to_move = std::min(to_move, right->count() - 1);
-      iter->node->rebalance_right_to_left(right, to_move);
-      return false;
+        (iter->position > 0))) {
+            int to_move = (right->count() - iter->node->count()) / 2;
+            to_move = std::min(to_move, right->count() - 1);
+            iter->node->rebalance_right_to_left(right, to_move);
+            return false;
+        }
     }
-  }
-  if (iter->node->position() > 0) {
-    // Try rebalancing with our left sibling. We don't perform rebalancing if
-    // we deleted the last element from iter->node and the node is not
-    // empty. This is a small optimization for the common pattern of deleting
-    // from the back of the tree.
-    node_type *left = parent->child(iter->node->position() - 1);
-    if ((left->count() > kMinNodeValues) &&
+    
+    if (iter->node->position() > 0) {
+        node_type *left = parent->child(iter->node->position() - 1);
+        if ((left->count() > kMinNodeValues) &&
         ((iter->node->count() == 0) ||
-         (iter->position < iter->node->count()))) {
-      int to_move = (left->count() - iter->node->count()) / 2;
-      to_move = std::min(to_move, left->count() - 1);
-      left->rebalance_left_to_right(iter->node, to_move);
-      iter->position += to_move;
-      return false;
+        (iter->position < iter->node->count()))) {
+            int to_move = (left->count() - iter->node->count()) / 2;
+            to_move = std::min(to_move, left->count() - 1);
+            left->rebalance_left_to_right(iter->node, to_move);
+            iter->position += to_move;
+            return false;
+        }
     }
-  }
-  return false;
+    return false;
 }
 
 template <typename P>
 void btree<P>::try_shrink() {
-  if (root()->count() > 0) {
-    return;
-  }
-  // Deleted the last item on the root node, shrink the height of the tree.
-  if (root()->leaf()) {
-    assert(size() == 0);
-    delete_leaf_node(root());
-    *mutable_root() = NULL;
-  } else {
-    node_type *child = root()->child(0);
-    if (child->leaf()) {
-      // The child is a leaf node so simply make it the root node in the tree.
-      child->make_root();
-      delete_internal_root_node();
-      *mutable_root() = child;
-    } else {
-      // The child is an internal node. We want to keep the existing root node
-      // so we move all of the values from the child node into the existing
-      // (empty) root node.
-      child->swap(root());
-      delete_internal_node(child);
+    if (root()->count() > 0) {
+        return;
     }
-  }
+    // Deleted the last item on the root node, shrink the height of the tree.
+    if (root()->leaf()) {
+        assert(size() == 0);
+        delete_leaf_node(root());
+        *mutable_root() = NULL;
+    } else {
+        node_type *child = root()->child(0);
+        if (child->leaf()) {
+        // The child is a leaf node so simply make it the root node in the tree.
+            child->make_root();
+            delete_internal_root_node();
+            *mutable_root() = child;
+        } else {
+            // The child is an internal node. We want to keep the existing root node
+            // so we move all of the values from the child node into the existing
+            // (empty) root node.
+            child->swap(root());
+            delete_internal_node(child);
+        }
+    }
 }
 
 template <typename P> template <typename IterType>

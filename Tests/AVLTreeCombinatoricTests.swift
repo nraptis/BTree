@@ -166,6 +166,7 @@ final class AVLTreeCombinatoricTests: XCTestCase {
     func testInsertThenRemoveAllWithCount4() { testInsertThenRemoveAllWithCount(4) }
     func testInsertThenRemoveAllWithCount5() { testInsertThenRemoveAllWithCount(5) }
     
+    
     func testInsertThenPopMinWithCount(_ count: Int) {
         var array = [Int]()
         for index in 0..<count {

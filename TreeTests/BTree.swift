@@ -64,7 +64,7 @@ class BTree<Element: Comparable> {
     */
     
     func delete_leaf_node(node: BTreeNode<Element>) {
-        
+        node.destroy()
     }
     
     //void btree<P>::rebalance_or_split(iterator *iter) {
@@ -155,7 +155,9 @@ class BTree<Element: Comparable> {
                         
                         //Update the iterator
                         iterator.node = node
+                        
                         iterator.index = insert_position
+                        
                         
                         return
                     }
@@ -499,24 +501,14 @@ class BTree<Element: Comparable> {
         return iterator
     }
     
-
-    
     func remove(_ element: Element) {
-        //iterator begin = internal_lower_bound(key, iterator(root(), 0));
-        
-        let rootIterator = BTreeIterator(node: root, index: 0)
-        let begin = internal_lower_bound(iterator: rootIterator, element: element)
-        
+        let begin = internal_lower_bound(iterator: BTreeIterator(node: root, index: 0), element: element)
         if begin.node == nil {
             return
         }
-        
-        
-        // Delete all of the keys between begin and upper_bound(key).
-        let rootIterator2 = BTreeIterator(node: root, index: 0)
-        let upperBnd = internal_upper_bound(iterator: rootIterator2, element: element)
+        let upperBnd = internal_upper_bound(iterator: BTreeIterator(node: root, index: 0), element: element)
         let end = internal_end(iterator: upperBnd)
-        
+        //print("Delete from \(begin.node!.name) (\(begin.index)) to \(end.node!.name) (\(end.index))")
         _ = remove(startIterator: begin, endIterator: end)
     }
     /*
@@ -525,125 +517,171 @@ class BTree<Element: Comparable> {
     }
     */
     
-    //template <typename P>
-    //typename btree<P>::iterator btree<P>::erase(iterator iter) {
+    /*
+    typename btree<P>::iterator btree<P>::erase(iterator iter) {
+        bool internal_delete = false;
+        
+        if (!iter.node->leaf()) {
+            
+            iterator tmp_iter(iter--);
+            assert(iter.node->leaf());
+            assert(!compare_keys(tmp_iter.key(), iter.key()));
+            iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
+            internal_delete = true;
+            --*mutable_size();
+        } else if (!root()->leaf()) {
+            --*mutable_size();
+        }
+        
+        iter.node->remove_value(iter.position);
+
+        iterator res(iter);
+        for (;;) {
+            if (iter.node == root()) {
+                try_shrink();
+                if (empty()) {
+                    return end();
+                }
+                break;
+            }
+            if (iter.node->count() >= kMinNodeValues) {
+                break;
+            }
+            bool merged = try_merge_or_rebalance(&iter);
+            if (iter.node->leaf()) {
+                res = iter;
+            }
+            if (!merged) {
+                break;
+            }
+            iter.node = iter.node->parent();
+        }
+     
+        if (res.position == res.node->count()) {
+        res.position = res.node->count() - 1;
+            ++res;
+        }
+        if (internal_delete) {
+            ++res;
+        }
+        return res;
+    }
+    */
+    
     func remove(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
         
-        //bool internal_delete = false;
+        /*
+        bool internal_delete = false;
+        
+        if (!iter.node->leaf()) {
+            
+            iterator tmp_iter(iter--);
+            assert(iter.node->leaf());
+            assert(!compare_keys(tmp_iter.key(), iter.key()));
+            iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
+            internal_delete = true;
+            --*mutable_size();
+        } else if (!root()->leaf()) {
+            --*mutable_size();
+        }
+        */
+        
         var internal_delete = false
         
-        guard let node = iterator.node else {
-            fatalError("BTree.remove(iterator: BTreeIterator<Element>) iterator.node is null (I)")
+        if let node = iterator.node {
+            if !node.isLeaf {
+                let tmp_iter = BTreeIterator(iterator: iterator)
+                let tempNode = node
+                iterator.decrement()
+                guard let iteratorNode = iterator.node else {
+                    fatalError("BTree.remove(iterator: BTreeIterator<Element>) iterator.node is null (II)")
+                }
+                guard iteratorNode.isLeaf else {
+                    fatalError("BTree.remove(iterator: BTreeIterator<Element>) node.isLeaf is false")
+                }
+                /*
+                guard iteratorNode.value(index: iterator.index) == tempNode.value(index: tmp_iter.index) else {
+                    fatalError("BTree.remove(iterator: BTreeIterator<Element>) tmp_iter.value() (\(String(describing: iteratorNode.value(index: iterator.index))) != iterator.value() (\(String(describing: tempNode.value(index: tmp_iter.index))))")
+                }
+                */
+                iteratorNode.value_swap(i: iterator.index, x: tempNode, j: tmp_iter.index)
+                internal_delete = true
+                count -= 1
+            } else {
+                count -= 1
+            }
         }
         
-        
-        
-        //if (!iter.node->leaf()) {
-        if !node.isLeaf {
-            
-            guard let root = root else {
-                fatalError("BTree.remove(iterator: BTreeIterator<Element>) root is null")
-            }
-            
-            // Deletion of a value on an internal node. Swap the key with the largest
-            // value of our left child. This is easy, we just decrement iter.
-            //iterator tmp_iter(iter--);
-            
-            let tmp_iter = BTreeIterator(iterator: iterator)
-            let tempNode = node
-            iterator.decrement()
-            
-            guard let iteratorNode = iterator.node else {
-                fatalError("BTree.remove(iterator: BTreeIterator<Element>) iterator.node is null (II)")
-            }
-            
-            //assert(iter.node->leaf());
-            guard node.isLeaf else {
-                fatalError("BTree.remove(iterator: BTreeIterator<Element>) node.isLeaf is false")
-            }
-            
-            //assert(!compare_keys(tmp_iter.key(), iter.key()));
-            guard iteratorNode.value(index: iterator.index) == tempNode.value(index: tmp_iter.index) else {
-                fatalError("BTree.remove(iterator: BTreeIterator<Element>) tmp_iter.value() (\(String(describing: iteratorNode.value(index: iterator.index))) != iterator.value() (\(String(describing: tempNode.value(index: tmp_iter.index))))")
-            }
-            
-            //iter.node->value_swap(iter.position, tmp_iter.node, tmp_iter.position);
-            iteratorNode.value_swap(i: iterator.index, x: tempNode, j: tmp_iter.index)
-            
-            //internal_delete = true;
-            internal_delete = true
-            
-            //--*mutable_size();
-            count -= 1
-            
-        //} else if (!root()->leaf()) {
-        } else { //if !root.isLeaf {
-            //--*mutable_size();
-            count -= 1
-        }
-        
-        guard let node = iterator.node else {
-            fatalError("BTree.remove(iterator: BTreeIterator<Element>) iterator.node is null (II)")
-        }
-
-        // Delete the key from the leaf.
         //iter.node->remove_value(iter.position);
-        node.remove_value(index: iterator.index)
-
-        // We want to return the next value after the one we just erased. If we
-        // erased from an internal node (internal_delete == true), then the next
-        // value is ++(++iter). If we erased from a leaf node (internal_delete ==
-        // false) then the next value is ++iter. Note that ++iter may point to an
-        // internal node and the value in the internal node may move to a leaf node
-        // (iter.node) when rebalancing is performed at the leaf level.
-
-        // Merge/rebalance as we walk back up the tree.
-        //iterator res(iter);
-        var result = BTreeIterator(iterator: iterator)
         
-        //for (;;) {
-        while let node = iterator.node {
-            //if (iter.node == root()) {
+        if let node = iterator.node {
+            //print("node \(node.name) pre-delete (\(iterator.index)) \(node.data.values)")
+            node.remove_value(index: iterator.index)
+            //print("node \(node.name) post-delete (\(iterator.index)) \(node.data.values)")
+        }
+
+        /*
+        iterator res(iter);
+        for (;;) {
+            if (iter.node == root()) {
+                try_shrink();
+                if (empty()) {
+                    return end();
+                }
+                break;
+            }
+            if (iter.node->count() >= kMinNodeValues) {
+                break;
+            }
+            bool merged = try_merge_or_rebalance(&iter);
+            if (iter.node->leaf()) {
+                res = iter;
+            }
+            if (!merged) {
+                break;
+            }
+            iter.node = iter.node->parent();
+        }
+        */
+        
+        var result = BTreeIterator(iterator: iterator)
+        while var node = iterator.node {
             if node === root {
-            
-                //try_shrink();
+                
+                //print("pre-shrink...")
+                //printLevels()
+                
                 try_shrink()
-            
-                //if (empty()) {
-                //    return end();
-                //}
-                //break;
+                
+                //print("post-shrink...")
+                //printLevels()
+                
                 if self.root == nil {
                     return end()
                 }
+                
+                break
             }
-            //if (iter.node->count() >= kMinNodeValues) {
-            //    break;
-            //}
             if node.count >= minOrder {
                 break
             }
             
+            //print("pre-merged...")
+            //printLevels()
             
-            //bool merged = try_merge_or_rebalance(&iter);
             let merged = try_merge_or_rebalance(iterator: iterator)
             
-            //if (iter.node->leaf()) {
-            //    res = iter;
-            //}
+            //print("post-merged...")
+            //printLevels()
+            
             if node.isLeaf {
                 result.set(iterator: iterator)
             }
-            
-            //if (!merged) {
-            //    break;
-            //}
             if !merged {
                 break
             }
             
-            //iter.node = iter.node->parent();
-            iterator.node = node.parent
+            iterator.node = iterator.node?.parent
         }
 
         // Adjust our return value. If we're pointing at the end of a node, advance
@@ -697,208 +735,263 @@ class BTree<Element: Comparable> {
     }
     
     
-    //template <typename P>
-    //void btree<P>::merge_nodes(node_type *left, node_type *right) {
-    func merge_nodes(left: BTreeNode<Element>, right: BTreeNode<Element>) {
-        //left->merge(right);
-        left.merge(source: right)
-        
-        //if (right->leaf()) {
-        if right.isLeaf {
-            /*
+    /*
+    void btree<P>::merge_nodes(node_type *left, node_type *right) {
+        left->merge(right);
+        if (right->leaf()) {
             if (rightmost() == right) {
                 *mutable_rightmost() = left;
             }
             delete_leaf_node(right);
-            */
+        } else {
+            delete_internal_node(right);
+        }
+    }
+    */
+    
+    func merge_nodes(left: BTreeNode<Element>, right: BTreeNode<Element>) {
+        
+        /*
+        print("pre left.merge(right) left \(left.name) \(left.data.values) count \(left.data.count)")
+        print("pre left.merge(right) right \(right.name) \(right.data.values) count \(right.data.count)")
+        print("pre left.merge(right) l_parent \(left.parent!.name) \(left.parent!.data.values) count \(left.parent!.data.count)")
+        print("pre left.merge(right) r_parent \(right.parent!.name) \(right.parent!.data.values) count \(right.parent!.data.count)")
+        */
+         
+        left.merge(source: right)
+        
+        /*
+        print("post left.merge(right) left \(left.name) \(left.data.values) count \(left.data.count)")
+        print("post left.merge(right) right \(right.name) \(right.data.values) count \(right.data.count)")
+        print("post left.merge(right) l_parent \(left.parent!.name) \(left.parent!.data.values) count \(left.parent!.data.count)")
+        print("post left.merge(right) r_parent \(right.parent!.name) \(right.parent!.data.values) count \(right.parent!.data.count)")
+        */
+         
+        if right.isLeaf {
             if let root = root, root.rightmost == right {
                 root.rightmost = left
             }
-            delete_leaf_node(node: left)
+            delete_leaf_node(node: right)
         } else {
-            //delete_internal_node(right);
             delete_internal_node(right)
         }
     }
     
-    //bool btree<P>::try_merge_or_rebalance(iterator *iter) {
+    
+    /*
+    bool btree<P>::try_merge_or_rebalance(iterator *iter) {
+        node_type *parent = iter->node->parent();
+        if (iter->node->position() > 0) {
+            node_type *left = parent->child(iter->node->position() - 1);
+            if ((1 + left->count() + iter->node->count()) <= left->max_count()) {
+                iter->position += 1 + left->count();
+                merge_nodes(left, iter->node);
+                iter->node = left;
+                return true;
+            }
+        }
+        if (iter->node->position() < parent->count()) {
+            node_type *right = parent->child(iter->node->position() + 1);
+            if ((1 + iter->node->count() + right->count()) <= right->max_count()) {
+                merge_nodes(iter->node, right);
+                return true;
+            }
+            if ((right->count() > kMinNodeValues) &&
+            ((iter->node->count() == 0) ||
+            (iter->position > 0))) {
+                int to_move = (right->count() - iter->node->count()) / 2;
+                to_move = std::min(to_move, right->count() - 1);
+                iter->node->rebalance_right_to_left(right, to_move);
+                return false;
+            }
+        }
+        
+        if (iter->node->position() > 0) {
+            node_type *left = parent->child(iter->node->position() - 1);
+            if ((left->count() > kMinNodeValues) &&
+            ((iter->node->count() == 0) ||
+            (iter->position < iter->node->count()))) {
+                int to_move = (left->count() - iter->node->count()) / 2;
+                to_move = std::min(to_move, left->count() - 1);
+                left->rebalance_left_to_right(iter->node, to_move);
+                iter->position += to_move;
+                return false;
+            }
+        }
+        return false;
+    }
+    */
     func try_merge_or_rebalance(iterator: BTreeIterator<Element>) -> Bool {
-        //node_type *parent = iter->node->parent();
-        guard let node = iterator.node else {
-            fatalError("BTree.try_merge_or_rebalance() iterator.node is nil (I)")
-        }
-        guard let parent = node.parent else {
-            fatalError("BTree.try_merge_or_rebalance() node.parent is nil")
-        }
-        
-        //if (iter->node->position() > 0) {
-        if node.index > 0 {
-            // Try merging with our left sibling.
-            //node_type *left = parent->child(iter->node->position() - 1);
-            guard let left = parent.child(index: node.index - 1) else {
-                fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) - 1) is nil")
-            }
-            
-            //if ((1 + left->count() + iter->node->count()) <= left->max_count()) {
-            if (1 + left.count + node.count) <= left.order {
-            
-                //iter->position += 1 + left->count();
-                iterator.index += (1 + left.count)
-                
-                //merge_nodes(left, iter->node);
-                merge_nodes(left: left, right: node)
-                
-                
-                //iter->node = left;
-                iterator.node = left
-                
-                //return true;
-                return true
+        /*
+        node_type *parent = iter->node->parent();
+        if (iter->node->position() > 0) {
+            node_type *left = parent->child(iter->node->position() - 1);
+            if ((1 + left->count() + iter->node->count()) <= left->max_count()) {
+                iter->position += 1 + left->count();
+                merge_nodes(left, iter->node);
+                iter->node = left;
+                return true;
             }
         }
+        */
         
-        guard let node = iterator.node else {
-            fatalError("BTree.try_merge_or_rebalance() iterator.node is nil (I)")
+        guard let parent = iterator.node?.parent else {
+            fatalError("BTree.try_merge_or_rebalance() iterator.node?.parent is nil node: \(String(describing: iterator.node)) parent: \(String(describing: iterator.node?.parent))")
         }
         
-        //if (iter->node->position() < parent->count()) {
-        if node.index < parent.count {
+        if let node = iterator.node {
+            if node.index > 0 {
+                guard let left = parent.child(index: node.index - 1) else {
+                    fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) - 1) is nil")
+                }
+                if (1 + left.count + node.count) <= left.order {
+                    iterator.index += (1 + left.count)
+                    merge_nodes(left: left, right: node)
+                    iterator.node = left
+                    return true
+                }
+            }
+        }
+
+        /*
+        if (iter->node->position() < parent->count()) {
+            node_type *right = parent->child(iter->node->position() + 1);
+            if ((1 + iter->node->count() + right->count()) <= right->max_count()) {
+                merge_nodes(iter->node, right);
+                return true;
+            }
+            if ((right->count() > kMinNodeValues) &&
+            ((iter->node->count() == 0) ||
+            (iter->position > 0))) {
+                int to_move = (right->count() - iter->node->count()) / 2;
+                to_move = std::min(to_move, right->count() - 1);
+                iter->node->rebalance_right_to_left(right, to_move);
+                return false;
+            }
+        }
+        */
         
-            // Try merging with our right sibling.
-            //node_type *right = parent->child(iter->node->position() + 1);
-            guard let right = parent.child(index: node.index + 1) else {
-                fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) + 1) is nil")
+        if let node = iterator.node {
+            if node.index < parent.count {
+                guard let right = parent.child(index: node.index + 1) else {
+                    fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) + 1) is nil")
+                }
+                if (1 + node.count + right.count) <= right.order {
+                    
+                    //print("pre-merge_nodes left: \(node.name) \(node.data.values)")
+                    //print("pre-merge_nodes right: \(right.name) \(right.data.values)")
+                    //printLevels()
+                    
+                    merge_nodes(left: node, right: right)
+                    
+                    //print("post-merge_nodes left: \(node.name) \(node.data.values)")
+                    //print("post-merge_nodes right: \(right.name) \(right.data.values)")
+                    //print("post-merge_nodes")
+                    //printLevels()
+                    
+                    return true
+                }
+                var cond1 = right.count > minOrder
+                var cond2 = node.count == 0
+                var cond3 = node.index > 0
+                
+                if cond1 && (cond2 || cond3) {
+                    var to_move = (right.count - node.count) >> 1
+                    if to_move > (right.count - 1) {
+                        to_move = (right.count - 1)
+                    }
+                    node.rebalance_right_to_left(src: right, to_move: to_move)
+                    return false
+                }
             }
-            
-            
-            //if ((1 + iter->node->count() + right->count()) <= right->max_count()) {
-            if (1 + node.count + right.count) <= right.order {
-            
-                //merge_nodes(iter->node, right);
-                merge_nodes(left: node, right: right)
+        }
+        
+        if let node = iterator.node {
+            if node.index > 0 {
+                // Try rebalancing with our left sibling. We don't perform rebalancing if
+                // we deleted the last element from iter->node and the node is not
+                // empty. This is a small optimization for the common pattern of deleting
+                // from the back of the tree.
                 
-                //return true;
-                return true
-            }
-            
-            // Try rebalancing with our right sibling. We don't perform rebalancing if
-            // we deleted the first element from iter->node and the node is not
-            // empty. This is a small optimization for the common pattern of deleting
-            // from the front of the tree.
-            
-            var cond1 = right.count > minOrder
-            var cond2 = node.count == 0
-            var cond3 = node.index > 0
-            
-            //if ((right->count() > kMinNodeValues) &&
-            //((iter->node->count() == 0) ||
-            //(iter->position > 0))) {
-            if cond1 && (cond2 || cond3) {
-                
-                //int to_move = (right->count() - iter->node->count()) / 2;
-                var to_move = (right.count - node.count) >> 1
-                
-                //to_move = std::min(to_move, right->count() - 1);
-                if to_move > (right.count - 1) {
-                    to_move = (right.count - 1)
+                //node_type *left = parent->child(iter->node->position() - 1);
+                guard let left = parent.child(index: node.index - 1) else {
+                    fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) - 1) is nil")
                 }
                 
-                //iter->node->rebalance_right_to_left(right, to_move);
-                node.rebalance_right_to_left(src: right, to_move: to_move)
                 
-                //return false;
-                return false
-            }
-        }
-        
-        
-        //if (iter->node->position() > 0) {
-        if node.index > 0 {
-            // Try rebalancing with our left sibling. We don't perform rebalancing if
-            // we deleted the last element from iter->node and the node is not
-            // empty. This is a small optimization for the common pattern of deleting
-            // from the back of the tree.
-            
-            //node_type *left = parent->child(iter->node->position() - 1);
-            guard let left = parent.child(index: node.index - 1) else {
-                fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) - 1) is nil")
-            }
-            
-            
-            //if ((left->count() > kMinNodeValues) &&
-            //((iter->node->count() == 0) || (iter->position < iter->node->count()))) {
-            let cond1 = left.count > minOrder
-            let cond2 = node.count == 0
-            let cond3 = iterator.index < node.count
-            if cond1 && (cond2 || cond3) {
-            
-                //int to_move = (left->count() - iter->node->count()) / 2;
-                var to_mode = (left.count - node.count) >> 1
-                
-                //to_move = std::min(to_move, left->count() - 1);
-                if to_mode > (left.count - 1) {
-                    to_mode = (left.count - 1)
+                //if ((left->count() > kMinNodeValues) &&
+                //((iter->node->count() == 0) || (iter->position < iter->node->count()))) {
+                let cond1 = left.count > minOrder
+                let cond2 = node.count == 0
+                let cond3 = iterator.index < node.count
+                if cond1 && (cond2 || cond3) {
+                    
+                    //int to_move = (left->count() - iter->node->count()) / 2;
+                    var to_mode = (left.count - node.count) >> 1
+                    
+                    //to_move = std::min(to_move, left->count() - 1);
+                    if to_mode > (left.count - 1) {
+                        to_mode = (left.count - 1)
+                    }
+                    
+                    //left->rebalance_left_to_right(iter->node, to_move);
+                    left.rebalance_left_to_right(dest: node, to_move: to_mode)
+                    
+                    //iter->position += to_move;
+                    iterator.index += to_mode
+                    //return false;
+                    return false
                 }
-                
-                //left->rebalance_left_to_right(iter->node, to_move);
-                left.rebalance_left_to_right(dest: node, to_move: to_mode)
-                
-                //iter->position += to_move;
-                iterator.index += to_mode
-                //return false;
-                return false
             }
         }
         //return false;
         return false
     }
     
-    //void btree<P>::try_shrink() {
+    
+    
+    /*
+    void btree<P>::try_shrink() {
+        if (root()->count() > 0) {
+            return;
+        }
+        if (root()->leaf()) {
+            assert(size() == 0);
+            delete_leaf_node(root());
+            *mutable_root() = NULL;
+        } else {
+            node_type *child = root()->child(0);
+            if (child->leaf()) {
+                child->make_root();
+                delete_internal_root_node();
+                *mutable_root() = child;
+            } else {
+                child->swap(root());
+                delete_internal_node(child);
+            }
+        }
+    }
+    */
+    
     func try_shrink() {
-        //if (root()->count() > 0) {
-        //    return;
-        //}
-        
         guard let root = root, root.count <= 0 else {
             return
         }
-        
-        // Deleted the last item on the root node, shrink the height of the tree.
-        //if (root()->leaf()) {
         if root.isLeaf {
-            //assert(size() == 0);
-            //delete_leaf_node(root());
             delete_leaf_node(node: root)
-            
-            //*mutable_root() = NULL;
             self.root = nil
         } else {
-            //node_type *child = root()->child(0);
             guard let child = root.child(index: 0) else {
                 fatalError("BTree.try_shrink() root.child(index: 0) is nil")
             }
-            
-            //if (child->leaf()) {
             if child.isLeaf {
-                // The child is a leaf node so simply make it the root node in the tree.
-                //child->make_root();
                 child.make_root()
-                child.rightmost = root.rightmost //TODO: Needed?
-                
-                //delete_internal_root_node();
+                //child.rightmost = root.rightmost //TODO: Needed?
                 delete_internal_root_node()
-                
-                //*mutable_root() = child;
                 self.root = child
                 
             } else {
-                // The child is an internal node. We want to keep the existing root node
-                // so we move all of the values from the child node into the existing
-                // (empty) root node.
-                //child->swap(root());
                 child.swap(node: root)
-                
-                //delete_internal_node(child);
                 delete_internal_node(child)
             }
         }
@@ -939,7 +1032,10 @@ class BTree<Element: Comparable> {
     //void delete_internal_root_node() {
     func delete_internal_root_node() {
         //root()->destroy();
-        root?.destroy()
+        if let root = root {
+            root.destroy()
+            root.isRoot = false
+        }
         
         //mutable_internal_allocator()->deallocate(
         //reinterpret_cast<char*>(root()), sizeof(root_fields));

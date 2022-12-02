@@ -138,7 +138,7 @@ class MockMultiSearchTree<Element: Comparable> {
     }
     
     func printTree() {
-        if count == nil {
+        if count == 0 {
             print("{nil mock tree}")
         } else {
             print("\(data)")

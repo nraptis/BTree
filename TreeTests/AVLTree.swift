@@ -8,7 +8,7 @@
 import Foundation
 
 class AVLTree<Element: Comparable>: BinarySearchTreeConforming {
-
+    
     var root: AVLTreeNode<Element>?
     
     final class AVLTreeNode<Element>: BinaryTreeNodeConforming {
