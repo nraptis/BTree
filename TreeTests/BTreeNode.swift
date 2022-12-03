@@ -398,7 +398,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         node.index = i
     }
     
-    func rebalance_right_to_left(src: BTreeNode<Element>, to_move: Int) {
+    func rebalance_right_to_left(src: BTreeNode<Element>, moveCount: Int) {
         
         
         if let parent = parent {
@@ -409,33 +409,33 @@ class BTreeNode<Element: Comparable>: Hashable {
             
             value_swap(i: count, x: parent, j: index)
             
-            //parent()->value_swap(position(), src, to_move - 1);
-            parent.value_swap(i: index, x: src, j: to_move - 1)
+            //parent()->value_swap(position(), src, moveCount - 1);
+            parent.value_swap(i: index, x: src, j: moveCount - 1)
             
         } else {
-            fatalError("BTreeNode.rebalance_right_to_left to_move parent is nil")
+            fatalError("BTreeNode.rebalance_right_to_left moveCount parent is nil")
         }
         
         // Move the values from the right to the left node.
-        //for (int i = 1; i < to_move; ++i) {
+        //for (int i = 1; i < moveCount; ++i) {
         var i = 1
-        while i < to_move {
+        while i < moveCount {
             //value_swap(count() + i, src, i - 1);
             value_swap(i: count + i, x: src, j: i - 1)
             i += 1
         }
         // Shift the values in the right node to their correct position.
-        //for (int i = to_move; i < src->count(); ++i) {
-        i = to_move
+        //for (int i = moveCount; i < src->count(); ++i) {
+        i = moveCount
         while i < src.count {
-            //src->value_swap(i - to_move, src, i);
-            src.value_swap(i: i - to_move, x: src, j: i)
+            //src->value_swap(i - moveCount, src, i);
+            src.value_swap(i: i - moveCount, x: src, j: i)
             i += 1
         }
         
-        //for (int i = 1; i <= to_move; ++i) {
+        //for (int i = 1; i <= moveCount; ++i) {
         i = 1
-        while i <= to_move {
+        while i <= moveCount {
             //src->value_destroy(src->count() - i);
             src.value_destroy(i: src.count - i)
             i += 1
@@ -445,12 +445,12 @@ class BTreeNode<Element: Comparable>: Hashable {
         if !isLeaf {
             
             /*
-            for (int i = 0; i < to_move; ++i) {
+            for (int i = 0; i < moveCount; ++i) {
                 set_child(1 + count() + i, src->child(i));
             }
             */
             i = 0
-            while i < to_move {
+            while i < moveCount {
                 if let srcChild = src.child(index: i) {
                     set_child(i: 1 + count + i, node: srcChild)
                 }
@@ -458,74 +458,74 @@ class BTreeNode<Element: Comparable>: Hashable {
             }
             
             /*
-            for (int i = 0; i <= src->count() - to_move; ++i) {
-                assert(i + to_move <= src->max_count());
-                src->set_child(i, src->child(i + to_move));
-                *src->mutable_child(i + to_move) = NULL;
+            for (int i = 0; i <= src->count() - moveCount; ++i) {
+                assert(i + moveCount <= src->max_count());
+                src->set_child(i, src->child(i + moveCount));
+                *src->mutable_child(i + moveCount) = NULL;
             }
             */
             i = 0
-            while i <= (src.count - to_move) {
-                guard i + to_move <= src.order else {
-                    fatalError("BTreeNode.rebalance_right_to_left i (\(i)) + to_move (\(to_move)) > src.order (\(src.order))")
+            while i <= (src.count - moveCount) {
+                guard i + moveCount <= src.order else {
+                    fatalError("BTreeNode.rebalance_right_to_left i (\(i)) + moveCount (\(moveCount)) > src.order (\(src.order))")
                 }
-                guard let srcChild = src.child(index: i + to_move) else {
-                    fatalError("BTreeNode.rebalance_right_to_left missing child i (\(i)) + to_move (\(to_move))")
+                guard let srcChild = src.child(index: i + moveCount) else {
+                    fatalError("BTreeNode.rebalance_right_to_left missing child i (\(i)) + moveCount (\(moveCount))")
                 }
                 src.set_child(i: i, node: srcChild)
-                src.data.children[i + to_move] = nil
+                src.data.children[i + moveCount] = nil
                 i += 1
             }
         }
 
         // Fixup the counts on the src and dest nodes.
-        //set_count(count() + to_move);
-        count += to_move
+        //set_count(count() + moveCount);
+        count += moveCount
         
-        //src->set_count(src->count() - to_move);
-        src.count -= to_move
+        //src->set_count(src->count() - moveCount);
+        src.count -= moveCount
     }
     
-    //void btree_node<P>::rebalance_left_to_right(btree_node *dest, int to_move) {
-    func rebalance_left_to_right(dest: BTreeNode<Element>, to_move: Int) {
+    //void btree_node<P>::rebalance_left_to_right(btree_node *dest, int moveCount) {
+    func rebalance_left_to_right(dest: BTreeNode<Element>, moveCount: Int) {
 
         //for (int i = dest->count() - 1; i >= 0; --i) {
         var i = dest.count - 1
         while i >= 0 {
         
-            //dest->value_swap(i, dest, i + to_move);
-            dest.value_swap(i: i, x: dest, j: i + to_move)
+            //dest->value_swap(i, dest, i + moveCount);
+            dest.value_swap(i: i, x: dest, j: i + moveCount)
             
             i -= 1
         }
 
         // Move the delimiting value to the right node and the new delimiting value
         // from the left node.
-        //dest->value_swap(to_move - 1, parent(), position());
+        //dest->value_swap(moveCount - 1, parent(), position());
         
         if let parent = parent {
             //TODO: Is this required?
-            //dest.value_swap(i: to_move - 1, x: parent, j: index)
-            dest.value_swap(i: to_move - 1, x: parent, j: index)
+            //dest.value_swap(i: moveCount - 1, x: parent, j: index)
+            dest.value_swap(i: moveCount - 1, x: parent, j: index)
             
-            //parent()->value_swap(position(), this, count() - to_move);
-            parent.value_swap(i: index, x: self, j: count - to_move)
+            //parent()->value_swap(position(), this, count() - moveCount);
+            parent.value_swap(i: index, x: self, j: count - moveCount)
         } else {
-            fatalError("BTreeNode.rebalance_left_to_right to_move parent is nil")
+            fatalError("BTreeNode.rebalance_left_to_right moveCount parent is nil")
         }
         
-        //value_destroy(count() - to_move);
-        value_destroy(i: count - to_move)
+        //value_destroy(count() - moveCount);
+        value_destroy(i: count - moveCount)
 
         // Move the values from the left to the right node.
-        //for (int i = 1; i < to_move; ++i) {
+        //for (int i = 1; i < moveCount; ++i) {
         i = 1
-        while i < to_move {
+        while i < moveCount {
             
-            //value_swap(count() - to_move + i, dest, i - 1);
-            value_swap(i: count - to_move + i, x: dest, j: i - 1)
-            //value_destroy(count() - to_move + i);
-            value_destroy(i: count - to_move + i)
+            //value_swap(count() - moveCount + i, dest, i - 1);
+            value_swap(i: count - moveCount + i, x: dest, j: i - 1)
+            //value_destroy(count() - moveCount + i);
+            value_destroy(i: count - moveCount + i)
             
             i += 1
         }
@@ -535,7 +535,7 @@ class BTreeNode<Element: Comparable>: Hashable {
             
             /*
             for (int i = dest->count(); i >= 0; --i) {
-              dest->set_child(i + to_move, dest->child(i));
+              dest->set_child(i + moveCount, dest->child(i));
               *dest->mutable_child(i) = NULL;
             }
             */
@@ -545,40 +545,40 @@ class BTreeNode<Element: Comparable>: Hashable {
                 guard let destChild = dest.child(index: i) else {
                     fatalError("BTreeNode.rebalance_left_to_right missing child index: \(i)")
                 }
-                dest.set_child(i: i + to_move, node: destChild)
+                dest.set_child(i: i + moveCount, node: destChild)
                 dest.data.children[i] = nil
                 i -= 1
             }
             
             /*
-            for (int i = 1; i <= to_move; ++i) {
-              dest->set_child(i - 1, child(count() - to_move + i));
-              *mutable_child(count() - to_move + i) = NULL;
+            for (int i = 1; i <= moveCount; ++i) {
+              dest->set_child(i - 1, child(count() - moveCount + i));
+              *mutable_child(count() - moveCount + i) = NULL;
             }
             */
             
             i = 1
-            while i <= to_move {
+            while i <= moveCount {
                 
-                guard let selfChild = child(index: count - to_move + i) else {
-                    fatalError("BTreeNode.rebalance_left_to_right missing child index: (count (\(i)) - to_move (\(to_move)) + i (\(i)))")
+                guard let selfChild = child(index: count - moveCount + i) else {
+                    fatalError("BTreeNode.rebalance_left_to_right missing child index: (count (\(i)) - moveCount (\(moveCount)) + i (\(i)))")
                 }
                 
                 dest.set_child(i: i - 1, node: selfChild)
                 
-                //*mutable_child(count() - to_move + i) = NULL;
-                data.children[count - to_move + i] = nil
+                //*mutable_child(count() - moveCount + i) = NULL;
+                data.children[count - moveCount + i] = nil
                 
                 i += 1
             }
         }
 
         // Fixup the counts on the src and dest nodes.
-        //set_count(count() - to_move);
-        count -= to_move
+        //set_count(count() - moveCount);
+        count -= moveCount
         
-        //dest->set_count(dest->count() + to_move);
-        dest.count += to_move
+        //dest->set_count(dest->count() + moveCount);
+        dest.count += moveCount
     }
     
 }
@@ -800,8 +800,8 @@ class btree_node {
   void remove_value(int i);
 
   // Rebalances a node with its right sibling.
-  void rebalance_right_to_left(btree_node *sibling, int to_move);
-  void rebalance_left_to_right(btree_node *sibling, int to_move);
+  void rebalance_right_to_left(btree_node *sibling, int moveCount);
+  void rebalance_left_to_right(btree_node *sibling, int moveCount);
 
   // Splits a node, moving a portion of the node's values to its right sibling.
   void split(btree_node *sibling, int insert_position);
