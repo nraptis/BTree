@@ -41,10 +41,6 @@ class BTree<Element: Comparable> {
         }
     }
     
-    func delete_leaf_node(node: BTreeNode<Element>) {
-        node.destroy()
-    }
-    
     //void btree<P>::rebalance_or_split(iterator *iter) {
     func rebalance_or_split(iterator: BTreeIterator<Element>) {
         
@@ -302,17 +298,17 @@ class BTree<Element: Comparable> {
             if node === root {
                 if let root = root, root.count <= 0 {
                     if root.isLeaf {
-                        delete_leaf_node(node: root)
+                        root.destroy()
                         self.root = nil
                     } else {
                         if let child = root.child(index: 0) {
                             if child.isLeaf {
                                 child.make_root()
-                                delete_internal_root_node()
+                                root.destroy()
                                 self.root = child
                             } else {
                                 child.swap(node: root)
-                                delete_internal_node(child)
+                                child.destroy()
                             }
                         }
                     }
@@ -337,13 +333,11 @@ class BTree<Element: Comparable> {
             iterator.node = iterator.node?.parent
         }
         
-        guard let node = result.node else {
-            fatalError("BTree.remove(iterator: BTreeIterator<Element>) result.node is null")
-        }
-        
-        if result.index == node.count {
-            result.index = (node.count - 1)
-            result.increment()
+        if let node = result.node {
+            if result.index == node.count {
+                result.index = (node.count - 1)
+                result.increment()
+            }
         }
         
         if internal_delete {
@@ -367,10 +361,8 @@ class BTree<Element: Comparable> {
             if rightMost === right {
                 rightMost = left
             }
-            delete_leaf_node(node: right)
-        } else {
-            delete_internal_node(right)
         }
+        right.destroy()
     }
     
     func try_merge_or_rebalance(iterator: BTreeIterator<Element>) -> Bool {
@@ -421,39 +413,22 @@ class BTree<Element: Comparable> {
                     
                     if (left.count > minOrder) && ((node.count == 0) || (iterator.index < node.count)) {
                         
-                        var to_mode = (left.count - node.count) >> 1
+                        var moveCount = (left.count - node.count) >> 1
                         
-                        
-                        if to_mode > (left.count - 1) {
-                            to_mode = (left.count - 1)
+                        if moveCount > (left.count - 1) {
+                            moveCount = (left.count - 1)
                         }
                         
-                        left.rebalance_left_to_right(dest: node, moveCount: to_mode)
+                        left.rebalance_left_to_right(dest: node, moveCount: moveCount)
                         
-                        iterator.index += to_mode
+                        iterator.index += moveCount
                         
                         return false
                     }
                 }
             }
         }
-        
         return false
-    }
-    
-    func delete_leaf_node(_ node: BTreeNode<Element>) {
-        node.destroy()
-    }
-    
-    func delete_internal_node(_ node: BTreeNode<Element>) {
-        node.destroy()
-    }
-    
-    func delete_internal_root_node() {
-        if let root = root {
-            root.destroy()
-            //root.isRoot = false
-        }
     }
     
     func lastIterator(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
