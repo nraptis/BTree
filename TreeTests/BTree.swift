@@ -14,6 +14,10 @@ class BTree<Element: Comparable> {
     private(set) var root: BTreeNode<Element>? = nil
     private(set) var count = 0
     
+    private var rightMost: BTreeNode<Element>? = nil
+    private var leftMost: BTreeNode<Element>? = nil
+    
+    
     required init(order: Int) {
         guard order >= 3 else {
             fatalError("BTree.init(order:) order (\(order)) must be >= 3")
@@ -31,7 +35,7 @@ class BTree<Element: Comparable> {
     }
     
     func endIterator() -> BTreeIterator<Element> {
-        if let node = root?.rightmost {
+        if let node = rightMost {
             return BTreeIterator<Element>(tree: self, node: node, index: node.count)
         } else {
             return BTreeIterator<Element>(tree: self, node: nil, index: 0)
@@ -159,11 +163,6 @@ class BTree<Element: Comparable> {
                 //*mutable_root() = parent;
                 self.root = parent
                 
-                //assert(*mutable_rightmost() == parent->child(0));
-                guard parent.rightmost == parent.child(index: 0) else {
-                    fatalError("BTree.rebalance_or_split() rightmost() != parent.child(index: 0)")
-                }
-                
             } else {
 
                 parent = BTreeNode<Element>.createInternal(order: order, parent: parent)
@@ -180,17 +179,13 @@ class BTree<Element: Comparable> {
 
         if node.isLeaf {
             
-            guard let root = root else {
-                fatalError("BTree.rebalance_or_split() root is null")
-            }
-        
             let split_node = new_leaf_node(parent: parent)
             
             node.split(dest: split_node, insert_position: insert_position)
             
-            if root.rightmost === node {
+            if rightMost === node {
                 
-                root.rightmost = split_node
+                rightMost = split_node
             }
             
             if insert_position > node.count {
@@ -240,7 +235,9 @@ class BTree<Element: Comparable> {
     func insert(_ element: Element) {
         
         if isEmpty() {
-            self.root = new_leaf_root_node()
+            root = BTreeNode<Element>.createRootLeaf(order: order)
+            rightMost = root
+            leftMost = root
         }
         
         guard let root = root else {
@@ -389,8 +386,8 @@ class BTree<Element: Comparable> {
     func merge_nodes(left: BTreeNode<Element>, right: BTreeNode<Element>) {
         left.merge(source: right)
         if right.isLeaf {
-            if let root = root, root.rightmost == right {
-                root.rightmost = left
+            if rightMost === right {
+                rightMost = left
             }
             delete_leaf_node(node: right)
         } else {
@@ -588,11 +585,6 @@ class BTree<Element: Comparable> {
         return result
     }
     
-    func new_leaf_root_node() -> BTreeNode<Element> {
-        let result = BTreeNode<Element>.createRootLeaf(order: order)
-        return result
-    }
-    
     func setRoot(_ node: BTreeNode<Element>?) {
         self.root = node
         self.count = countValues(node)
@@ -602,7 +594,7 @@ class BTree<Element: Comparable> {
         }
         
         node.parent = findLeftMost(node)
-        node.rightmost = findRightMost(node)
+        rightMost = findRightMost(node)
     }
     
     func findRightMost(_ node: BTreeNode<Element>?) -> BTreeNode<Element>? {
@@ -798,7 +790,7 @@ class BTree<Element: Comparable> {
         if let lm = root?.parent {
             print("left most: \(names[lm] ?? "?")")
         }
-        if let rm = root?.rightmost {
+        if let rm = rightMost {
             print("right most: \(names[rm] ?? "?")")
         }
         

@@ -32,7 +32,8 @@ class BTreeNode<Element: Comparable>: Hashable {
     
     static func createRootLeaf(order: Int) -> BTreeNode<Element> {
         let result = BTreeNode(data: BTreeNodeData.createRootLeaf(order: order))
-        result.rightmost = result
+        //result.rightmost = result
+        
         result.parent = result
         return result
     }
@@ -67,11 +68,12 @@ class BTreeNode<Element: Comparable>: Hashable {
         set { data.isRoot = newValue }
     }
     
-    
+    /*
     var rightmost: BTreeNode<Element>? {
         get { data.rightmost }
         set { data.rightmost = newValue }
     }
+    */
     
     /*
     var leftmost: BTreeNode<Element>? {
