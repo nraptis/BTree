@@ -231,10 +231,10 @@ final class BTreeInsertAndDeleteStressTests: XCTestCase {
     }
     
     func testExtremelyHardcore() {
-        for loop in 0...1000 {
+        for loop in 0...3000 {
             
             if (loop % 25) == 0 {
-                print("BTreeInsertAndDeleteStressTests.testExtremelyHardcore() \(loop) / 1000")
+                print("BTreeInsertAndDeleteStressTests.testExtremelyHardcore() \(loop) / 3000")
             }
             
             let order = Int.random(in: 3...60)

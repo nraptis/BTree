@@ -13,7 +13,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
     func testIteratorZeroNodes() {
         
         let tree = BTree<Int>(order: 3)
-        let iterator = BTreeIterator(node: tree.root, index: 0)
+        let iterator = BTreeIterator(tree: tree, node: tree.root, index: 0)
         if iterator.node != nil {
             XCTFail("BTreeIteratorSimpleTests.testIteratorZeroNodes() iterator not nil (I)")
             return
