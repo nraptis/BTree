@@ -371,7 +371,7 @@ final class BTreeInsertAndCountTests: XCTestCase {
     func test1000LargeRandomArrays() {
         for loop in 0...1000 {
             if (loop % 100) == 0 {
-                print("test1000LargeRandomArrays \(loop) / 10000")
+                print("test1000LargeRandomArrays \(loop) / 1000")
             }
             
             let count = Int.random(in: 0...512)
