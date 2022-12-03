@@ -178,11 +178,6 @@ class BTreeNode<Element: Comparable>: Hashable {
 
         //if (!leaf()) {
         if !isLeaf {
-        
-          // Swap the child pointers.
-          //for (int i = 0; i <= n; ++i) {
-          //  btree_swap_helper(*mutable_child(i), *x->mutable_child(i));
-          //}
             i = 0
             while i <= n {
                 let hold = data.children[i]
@@ -190,30 +185,20 @@ class BTreeNode<Element: Comparable>: Hashable {
                 node.data.children[i] = hold
                 i += 1
             }
-            
-            //for (int i = 0; i <= count(); ++i) {
-            //    x->child(i)->fields_.parent = x;
-            //}
-            
+
             i = 0
             while i <= count {
                 node.data.children[i]?.parent = node
                 i += 1
             }
-          
             
-            //for (int i = 0; i <= x->count(); ++i) {
-            //    child(i)->fields_.parent = this;
-            //}
             i = 0
             while i <= node.count {
                 data.children[i]?.parent = self
                 i += 1
             }
         }
-
-        // Swap the counts.
-        //btree_swap_helper(fields_.count, x->fields_.count);
+        
         let hold = count
         count = node.count
         node.count = hold
@@ -258,10 +243,6 @@ class BTreeNode<Element: Comparable>: Hashable {
     }
     
     func split(dest: BTreeNode<Element>, insert_position: Int) {
-        
-        guard dest.count == 0 else {
-            fatalError("BTreeNode.split() dest.count (\(dest.count)) not 0")
-        }
         
         if insert_position == 0 {
             dest.count = count - 1
@@ -318,22 +299,6 @@ class BTreeNode<Element: Comparable>: Hashable {
     
     func insert_value(index: Int, element: Element?) {
         
-        guard index <= count else {
-            fatalError("BTreeNode.insert_value(index: Int, element: Element) index (\(index)) > count (\(count))")
-        }
-        
-        guard index >= 0 else {
-            fatalError("BTreeNode.insert_value(index: Int, element: Element) index (\(index)) < 0")
-        }
-        
-        guard order >= 1 else {
-            fatalError("BTreeNode.insert_value(index: Int, element: Element) order (\(order)) < 1")
-        }
-        
-        guard count < order else {
-            fatalError("BTreeNode.insert_value(index: Int, element: Element) count (\(count)) >= order (\(order))")
-        }
-        
         var j = count
         while j > index {
             data.values[j] = data.values[j - 1]
@@ -367,13 +332,8 @@ class BTreeNode<Element: Comparable>: Hashable {
             
             var j = index + 1
             while j < count {
-                
-                //*mutable_child(j) = child(j + 1);
-                
                 if let child = data.children[j + 1] {
                     data.children[j] = child
-                    
-                    //child(j)->set_position(j);
                     child.index = j
                 } else {
                     data.children[j] = nil
@@ -397,12 +357,6 @@ class BTreeNode<Element: Comparable>: Hashable {
     func merge(source: BTreeNode<Element>) {
         guard let parent = parent else {
             fatalError("BTreeNode.merge() parent is null")
-        }
-        guard parent === source.parent else {
-            fatalError("BTreeNode.merge() parent != source.parent")
-        }
-        guard (index + 1) == source.index else {
-            fatalError("BTreeNode.merge() (index (\(index)) + 1) != source.index (\(source.index))")
         }
         
         value_swap(i: count, x: parent, j: index)
@@ -441,7 +395,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         data.values[i] = nil
     }
     
-    //void make_root() {
     func make_root() {
         //assert(parent()->is_root());
         guard let parent = parent else {
@@ -452,70 +405,23 @@ class BTreeNode<Element: Comparable>: Hashable {
             fatalError("BTreeNode.make_root() parent.isRoot (\(parent.isRoot)) should be true")
         }
         
-        //fields_.parent = fields_.parent->parent();
         self.parent = parent.parent
         self.isRoot = true
     }
     
-    //void destroy() {
     func destroy() {
-        //for (int i = 0; i < count(); ++i) {
         for index in 0..<count {
-            //value_destroy(i);
             value_destroy(i: index)
         }
     }
     
-    //void set_child(int i, btree_node *c) {
     func set_child(i: Int, node: BTreeNode<Element>) {
-        //*mutable_child(i) = c;
         data.children[i] = node
-        //c->fields_.parent = this;
         node.parent = self
-        
-        //c->fields_.position = i;
         node.index = i
     }
     
-    //void btree_node<P>::rebalance_right_to_left(btree_node *src, int to_move) {
     func rebalance_right_to_left(src: BTreeNode<Element>, to_move: Int) {
-        
-        //assert(parent() == src->parent());
-        guard parent === src.parent else {
-            fatalError("BTreeNode.rebalance_right_to_left parent != src.parent")
-        }
-        
-        //assert(position() + 1 == src->position());
-        guard (index + 1) == src.index else {
-            fatalError("BTreeNode.rebalance_right_to_left (index + 1) (\(index) + \(1)) != src.index (\(src.index))")
-        }
-        
-        //assert(src->count() >= count());
-        guard src.count >= count else {
-            fatalError("BTreeNode.rebalance_right_to_left src.count (\(src.count)) < count (\(count))")
-        }
-        
-        //assert(to_move >= 1);
-        guard to_move >= 1 else {
-            fatalError("BTreeNode.rebalance_right_to_left to_move (\(to_move)) < 1")
-        }
-        
-        //assert(to_move <= src->count());
-        guard to_move <= src.count else {
-            fatalError("BTreeNode.rebalance_right_to_left to_move (\(to_move)) > src.count (\(src.count))")
-        }
-
-        // Make room in the left node for the new values.
-        //for (int i = 0; i < to_move; ++i) {
-        //    value_init(i + count());
-        //}
-        
-        // Move the delimiting value to the left node and the new delimiting value
-        // from the right node.
-        
-        //void value_swap(int i, btree_node *x, int j) {
-            //params_type::swap(mutable_value(i), x->mutable_value(j));
-        //}
         
         
         if let parent = parent {
@@ -605,39 +511,7 @@ class BTreeNode<Element: Comparable>: Hashable {
     
     //void btree_node<P>::rebalance_left_to_right(btree_node *dest, int to_move) {
     func rebalance_left_to_right(dest: BTreeNode<Element>, to_move: Int) {
-     
-        //assert(parent() == dest->parent());
-        guard parent === dest.parent else {
-            fatalError("BTreeNode.rebalance_left_to_right parent != dest.parent")
-        }
-        
-        //assert(position() + 1 == dest->position());
-        guard (index + 1) == dest.index else {
-            fatalError("BTreeNode.rebalance_left_to_right (index + 1) (\(index) + \(1)) != dest.index (\(dest.index))")
-        }
-        
-        //assert(count() >= dest->count());
-        guard count >= dest.count else {
-            fatalError("BTreeNode.rebalance_left_to_right count (\(count)) < dest.count (\(dest.count))")
-        }
-        
-        
-        //assert(to_move >= 1);
-        guard to_move >= 1 else {
-            fatalError("BTreeNode.rebalance_left_to_right to_move (\(to_move)) < 1")
-        }
-        
-        //assert(to_move <= count());
-        guard to_move <= count else {
-            fatalError("BTreeNode.rebalance_left_to_right to_move (\(to_move)) > count (\(count))")
-        }
-        
 
-        // Make room in the right node for the new values.
-        //for (int i = 0; i < to_move; ++i) {
-        //    dest->value_init(i + dest->count());
-        //}
-        
         //for (int i = dest->count() - 1; i >= 0; --i) {
         var i = dest.count - 1
         while i >= 0 {
