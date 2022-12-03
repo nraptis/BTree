@@ -124,7 +124,6 @@ final class BTreeSimpleDeletionTests: XCTestCase {
             for index in 0...loop {
                 array.append(index)
             }
-            
             let permutations = array.allPermutations()
             var index = 0
             for insertPermutation in permutations {
@@ -187,13 +186,10 @@ final class BTreeSimpleDeletionTests: XCTestCase {
             for index in 0...loop {
                 array.append(index)
             }
-            
             let insertPermutations = array.permutations(maxCount: 50, maxTries: 35)
             for insertPermutation in insertPermutations {
-                
                 let removePermutations = array.permutations(maxCount: 25, maxTries: 35)
                 for removePermutation in removePermutations {
-                    
                     let realTree = BTree<Int>(order: Int.random(in: 3...10))
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in insertPermutation {
@@ -215,20 +211,15 @@ final class BTreeSimpleDeletionTests: XCTestCase {
     
     func testInsertSingle40to44_20PermutationsInserted_10PermutationsRemoved() {
         for loop in 40...44 {
-            
             print("testInsertSingle1to10_100PermutationsInserted_100PermutationsRemoved count \(loop) / 44")
-            
             var array = [Int]()
             for index in 0...loop {
                 array.append(index)
             }
-            
             let insertPermutations = array.permutations(maxCount: 20, maxTries: 25)
             for insertPermutation in insertPermutations {
-                
                 let removePermutations = array.permutations(maxCount: 10, maxTries: 15)
                 for removePermutation in removePermutations {
-                    
                     let realTree = BTree<Int>(order: Int.random(in: 3...10))
                     let mockTree = MockMultiSearchTree<Int>()
                     for value in insertPermutation {
@@ -253,13 +244,7 @@ final class BTreeSimpleDeletionTests: XCTestCase {
         let mockTree = MockMultiSearchTree<Int>()
         realTree.insert(0); realTree.insert(3); realTree.insert(2); realTree.insert(1)
         mockTree.insert(0); mockTree.insert(3); mockTree.insert(2); mockTree.insert(1)
-        
-        realTree.remove(0)
-        mockTree.remove(0)
-        
-        realTree.remove(1)
-        mockTree.remove(1)
-        
+        realTree.remove(0); mockTree.remove(0); realTree.remove(1); mockTree.remove(1)
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
             XCTFail("BTreeInsertAndCountTests.testKnownFailureCase01()")
             return
@@ -271,16 +256,7 @@ final class BTreeSimpleDeletionTests: XCTestCase {
         let mockTree = MockMultiSearchTree<Int>()
         realTree.insert(0); realTree.insert(1); realTree.insert(2); realTree.insert(3)
         mockTree.insert(0); mockTree.insert(1); mockTree.insert(2); mockTree.insert(3)
-        
-        realTree.printLevels()
-        realTree.remove(0)
-        mockTree.remove(0)
-        realTree.printLevels()
-        
-        realTree.remove(1)
-        mockTree.remove(1)
-        realTree.printLevels()
-        
+        realTree.remove(0); mockTree.remove(0); realTree.remove(1); mockTree.remove(1)
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
             XCTFail("BTreeInsertAndCountTests.testKnownFailureCase02()")
             return
@@ -292,34 +268,22 @@ final class BTreeSimpleDeletionTests: XCTestCase {
         let mockTree = MockMultiSearchTree<Int>()
         realTree.insert(0); realTree.insert(3); realTree.insert(2); realTree.insert(1)
         mockTree.insert(0); mockTree.insert(3); mockTree.insert(2); mockTree.insert(1)
-        
-        realTree.remove(2)
-        mockTree.remove(2)
-        
+        realTree.remove(2); mockTree.remove(2)
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
             XCTFail("BTreeInsertAndCountTests.testKnownFailureCase03()")
             return
         }
-        
-        realTree.remove(1)
-        mockTree.remove(1)
-        
+        realTree.remove(1); mockTree.remove(1)
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
             XCTFail("BTreeInsertAndCountTests.testKnownFailureCase03()")
             return
         }
-        
-        realTree.remove(0)
-        mockTree.remove(0)
-        
+        realTree.remove(0); mockTree.remove(0)
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
             XCTFail("BTreeInsertAndCountTests.testKnownFailureCase03()")
             return
         }
-        
-        realTree.remove(3)
-        mockTree.remove(3)
-        
+        realTree.remove(3); mockTree.remove(3)
         if !compareTrees(realTree: realTree, mockTree: mockTree) {
             XCTFail("BTreeInsertAndCountTests.testKnownFailureCase03()")
             return

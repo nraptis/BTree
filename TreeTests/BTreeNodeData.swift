@@ -12,7 +12,6 @@ class BTreeNodeData<Element: Comparable> {
     private init(order: Int, isLeaf: Bool, isRoot: Bool, parent: BTreeNode<Element>?) {
         self.order = order
         self.isLeaf = isLeaf
-        self.isRoot = isRoot
         self.parent = parent
         self.values = [Element?](repeating: nil, count: order)
         if isLeaf {
@@ -20,11 +19,6 @@ class BTreeNodeData<Element: Comparable> {
         } else {
             self.children = [BTreeNode<Element>?](repeating: nil, count: order + 1)
         }
-        /*
-        if isRoot {
-            self.rightmost = parent
-        }
-        */
     }
     
     static func createLeaf(order: Int, parent: BTreeNode<Element>?) -> BTreeNodeData<Element> {
@@ -48,7 +42,6 @@ class BTreeNodeData<Element: Comparable> {
     var count: Int = 0
     var size: Int = 0
     var isLeaf: Bool
-    var isRoot: Bool
     
     var parent: BTreeNode<Element>?
     var values: [Element?]

@@ -63,25 +63,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         set { data.isLeaf = newValue }
     }
     
-    var isRoot: Bool {
-        get { data.isRoot }
-        set { data.isRoot = newValue }
-    }
-    
-    /*
-    var rightmost: BTreeNode<Element>? {
-        get { data.rightmost }
-        set { data.rightmost = newValue }
-    }
-    */
-    
-    /*
-    var leftmost: BTreeNode<Element>? {
-        get { data.leftmost }
-        set { data.leftmost = newValue }
-    }
-    */
-    
     var parent: BTreeNode<Element>? {
         get {
             //guard let result = data.parent else {
@@ -402,13 +383,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         guard let parent = parent else {
             fatalError("BTreeNode.make_root() parent is nul")
         }
-        
-        guard parent.isRoot else {
-            fatalError("BTreeNode.make_root() parent.isRoot (\(parent.isRoot)) should be true")
-        }
-        
         self.parent = parent.parent
-        self.isRoot = true
     }
     
     func destroy() {

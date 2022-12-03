@@ -90,7 +90,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             data.count += 1
         }
         let result = BTreeNode<Int>(data: data)
-        result.isRoot = true
+        //result.isRoot = true
         result.parent = result
         return result
     }

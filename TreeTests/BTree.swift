@@ -155,7 +155,7 @@ class BTree<Element: Comparable> {
             if root.isLeaf {
 
                 parent = new_internal_root_node()
-                root.isRoot = false
+                //root.isRoot = false
                 
                 //parent->set_child(0, root());
                 parent.set_child(i: 0, node: root)
@@ -474,7 +474,7 @@ class BTree<Element: Comparable> {
     func delete_internal_root_node() {
         if let root = root {
             root.destroy()
-            root.isRoot = false
+            //root.isRoot = false
         }
     }
     
@@ -757,7 +757,7 @@ class BTree<Element: Comparable> {
             print("_Level: \(level + 1)")
             for node in list {
                 let values = nodeValues(node)
-                if node.isRoot {
+                if node === root {
                     let name = nameOfNode(node, level: level, nodes: nodes)
                     names[node] = name
                     node.name = name
