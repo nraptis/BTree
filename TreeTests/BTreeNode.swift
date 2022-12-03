@@ -34,7 +34,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         let result = BTreeNode(data: BTreeNodeData.createRootLeaf(order: order))
         //result.rightmost = result
         
-        result.parent = result
+        //result.parent = result
         return result
     }
     
