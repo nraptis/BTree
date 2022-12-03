@@ -50,113 +50,86 @@ class BTree<Element: Comparable> {
             fatalError("BTree.rebalance_or_split() iterator.node is null")
         }
         
-        var insert_position = iterator.index
+        
         
         guard var parent = node.parent else {
             fatalError("BTree.rebalance_or_split() node.parent is null")
         }
         
-        //if (node != root()) {
+        var insert_position = iterator.index
+        
         if node != root {
             
-            //if (node->position() > 0) {
             if node.index > 0 {
-                // Try rebalancing with our left sibling.
-                //node_type *left = parent->child(node->position() - 1);
-                guard let left = parent.child(index: node.index - 1) else {
-                    fatalError("BTree.rebalance_or_split() left null node.index (\(node.index)) - 1")
-                }
-                
-                
-                //if (left->count() < left->max_count()) {
-                if left.count < left.order {
-                
-                    // We bias rebalancing based on the position being inserted. If we're
-                    // inserting at the end of the right node then we bias rebalancing to
-                    // fill up the left node.
-                    //int to_move = (left->max_count() - left->count()) / (1 + (insert_position < left->max_count()));
-                    
-                    var denom = 1
-                    if insert_position < left.order {
-                        denom += 1
-                    }
-                    var to_move = (left.order - left.count) / denom
-                    
-                    //to_move = std::max(1, to_move);
-                    if to_move < 1 {
-                        to_move = 1
-                    }
-                    
 
-                    //if (((insert_position - to_move) >= 0) ||
-                    //((left->count() + to_move) < left->max_count())) {
-                    
-                    if ((insert_position - to_move) >= 0) || ((left.count + to_move) < left.order) {
+                if let left = parent.child(index: node.index - 1) {
+                    if left.count < left.order {
                         
-                        //left->rebalance_right_to_left(node, to_move);
-                        left.rebalance_right_to_left(src: node, to_move: to_move)
-
-                        //assert(node->max_count() - node->count() == to_move);
-                        guard (node.order - node.count) == to_move else {
-                            fatalError("BTree.rebalance_or_split() (node.order (\(node.order)) - node.count (\(node.count)) != to_move (\(to_move))")
+                        var denom = 1
+                        if insert_position < left.order {
+                            denom += 1
+                        }
+                        var to_move = (left.order - left.count) / denom
+                        
+                        //to_move = std::max(1, to_move);
+                        if to_move < 1 {
+                            to_move = 1
                         }
                         
-                        insert_position -= to_move
-                        
-                        if insert_position < 0 {
-                        
-                            insert_position = insert_position + left.count + 1
+                        if ((insert_position - to_move) >= 0) || ((left.count + to_move) < left.order) {
                             
-                            node = left
+                            left.rebalance_right_to_left(src: node, to_move: to_move)
                             
+                            insert_position -= to_move
+                            
+                            if insert_position < 0 {
+                                
+                                insert_position = insert_position + left.count + 1
+                                
+                                node = left
+                                
+                            }
+                            
+                            iterator.node = node
+                            
+                            iterator.index = insert_position
+                            
+                            return
                         }
-                        
-                        guard node.count < node.order else {
-                            fatalError("BTree.rebalance_or_split() node.count (\(node.count)) >= node.order (\(node.order))")
-                        }
-                        
-                        iterator.node = node
-                        
-                        iterator.index = insert_position
-                        
-                        
-                        return
                     }
                 }
             }
             
             if node.index < parent.count {
-                guard let right = parent.child(index: node.index + 1) else {
-                    fatalError("BTree.rebalance_or_split() right null node.index (\(node.index)) + 1")
-                }
-                
-                if right.count < right.order {
-                    var denom = 1
-                    if insert_position > 0 {
-                        denom += 1
-                    }
-                    var to_move = (right.order - right.count) / (denom)
-                    
-                    if to_move < 1 {
-                        to_move = 1
-                    }
-                    
-                    if (insert_position <= (node.count - to_move)) || ((right.count + to_move) < right.order) {
+                if let right = parent.child(index: node.index + 1)  {
+                    if right.count < right.order {
+                        var denom = 1
+                        if insert_position > 0 {
+                            denom += 1
+                        }
+                        var to_move = (right.order - right.count) / (denom)
                         
-                        node.rebalance_left_to_right(dest: right, to_move: to_move)
-                        
-                        if insert_position > node.count {
-                        
-                            insert_position = insert_position - node.count - 1
-                            
-                            node = right
-                            
+                        if to_move < 1 {
+                            to_move = 1
                         }
                         
-                        iterator.node = node
-                        iterator.index = insert_position
-                        
-                        return
+                        if (insert_position <= (node.count - to_move)) || ((right.count + to_move) < right.order) {
+                            
+                            node.rebalance_left_to_right(dest: right, to_move: to_move)
+                            
+                            if insert_position > node.count {
+                                
+                                insert_position = insert_position - node.count - 1
+                                
+                                node = right
+                                
+                            }
+                            
+                            iterator.node = node
+                            iterator.index = insert_position
+                            
+                            return
+                        }
                     }
                 }
             }
@@ -356,17 +329,16 @@ class BTree<Element: Comparable> {
                         delete_leaf_node(node: root)
                         self.root = nil
                     } else {
-                        guard let child = root.child(index: 0) else {
-                            fatalError("BTree.try_shrink() root.child(index: 0) is nil")
-                        }
-                        if child.isLeaf {
-                            child.make_root()
-                            delete_internal_root_node()
-                            self.root = child
-                            
-                        } else {
-                            child.swap(node: root)
-                            delete_internal_node(child)
+                        if let child = root.child(index: 0) {
+                            if child.isLeaf {
+                                child.make_root()
+                                delete_internal_root_node()
+                                self.root = child
+                                
+                            } else {
+                                child.swap(node: root)
+                                delete_internal_node(child)
+                            }
                         }
                     }
                 }
@@ -455,11 +427,8 @@ class BTree<Element: Comparable> {
                     merge_nodes(left: node, right: right)
                     return true
                 }
-                var cond1 = right.count > minOrder
-                var cond2 = node.count == 0
-                var cond3 = node.index > 0
                 
-                if cond1 && (cond2 || cond3) {
+                if (right.count > minOrder) && ((node.count == 0) || (node.index > 0)) {
                     var to_move = (right.count - node.count) >> 1
                     if to_move > (right.count - 1) {
                         to_move = (right.count - 1)
@@ -472,124 +441,37 @@ class BTree<Element: Comparable> {
         
         if let node = iterator.node {
             if node.index > 0 {
-                // Try rebalancing with our left sibling. We don't perform rebalancing if
-                // we deleted the last element from iter->node and the node is not
-                // empty. This is a small optimization for the common pattern of deleting
-                // from the back of the tree.
-                
-                //node_type *left = parent->child(iter->node->position() - 1);
-                guard let left = parent.child(index: node.index - 1) else {
-                    fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) - 1) is nil")
-                }
-                
-                
-                //if ((left->count() > kMinNodeValues) &&
-                //((iter->node->count() == 0) || (iter->position < iter->node->count()))) {
-                let cond1 = left.count > minOrder
-                let cond2 = node.count == 0
-                let cond3 = iterator.index < node.count
-                if cond1 && (cond2 || cond3) {
+
+                if let left = parent.child(index: node.index - 1) {
                     
-                    //int to_move = (left->count() - iter->node->count()) / 2;
-                    var to_mode = (left.count - node.count) >> 1
-                    
-                    //to_move = std::min(to_move, left->count() - 1);
-                    if to_mode > (left.count - 1) {
-                        to_mode = (left.count - 1)
+                    if (left.count > minOrder) && ((node.count == 0) || (iterator.index < node.count)) {
+                        
+                        var to_mode = (left.count - node.count) >> 1
+                        
+                        
+                        if to_mode > (left.count - 1) {
+                            to_mode = (left.count - 1)
+                        }
+                        
+                        left.rebalance_left_to_right(dest: node, to_move: to_mode)
+                        
+                        iterator.index += to_mode
+                        
+                        return false
                     }
-                    
-                    //left->rebalance_left_to_right(iter->node, to_move);
-                    left.rebalance_left_to_right(dest: node, to_move: to_mode)
-                    
-                    //iter->position += to_move;
-                    iterator.index += to_mode
-                    //return false;
-                    return false
                 }
             }
         }
-        //return false;
+        
         return false
     }
     
-    
-    
-    /*
-    void btree<P>::try_shrink() {
-        if (root()->count() > 0) {
-            return;
-        }
-        if (root()->leaf()) {
-            assert(size() == 0);
-            delete_leaf_node(root());
-            *mutable_root() = NULL;
-        } else {
-            node_type *child = root()->child(0);
-            if (child->leaf()) {
-                child->make_root();
-                delete_internal_root_node();
-                *mutable_root() = child;
-            } else {
-                child->swap(root());
-                delete_internal_node(child);
-            }
-        }
-    }
-    */
-    
-    func try_shrink() {
-        guard let root = root, root.count <= 0 else {
-            return
-        }
-        if root.isLeaf {
-            delete_leaf_node(node: root)
-            self.root = nil
-        } else {
-            guard let child = root.child(index: 0) else {
-                fatalError("BTree.try_shrink() root.child(index: 0) is nil")
-            }
-            if child.isLeaf {
-                child.make_root()
-                //child.rightmost = root.rightmost //TODO: Needed?
-                delete_internal_root_node()
-                self.root = child
-                
-            } else {
-                child.swap(node: root)
-                delete_internal_node(child)
-            }
-        }
-    }
-    
-    
-    //void delete_leaf_node(node_type *node) {
     func delete_leaf_node(_ node: BTreeNode<Element>) {
-        //node->destroy();
-        
-        guard node.isLeaf else {
-            fatalError("BTree.delete_leaf_node() node.isLeaf (\(node.isLeaf)) should be true")
-        }
-        
         node.destroy()
-        
-        //mutable_internal_allocator()->deallocate(
-        //reinterpret_cast<char*>(node),
-        //sizeof(base_fields) + node->max_count() * sizeof(value_type));
     }
     
-    //void delete_internal_node(node_type *node) {
     func delete_internal_node(_ node: BTreeNode<Element>) {
-    
-        //node->destroy();
         node.destroy()
-        
-        //assert(node != root());
-        guard node !== root else {
-            fatalError("BTree.delete_internal_node() node === root")
-        }
-        
-        //mutable_internal_allocator()->deallocate(
-        //reinterpret_cast<char*>(node), sizeof(internal_fields));
     }
     
     func delete_internal_root_node() {
@@ -599,14 +481,11 @@ class BTree<Element: Comparable> {
         }
     }
     
-    func internal_last(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
-        
+    func lastIterator(iterator: BTreeIterator<Element>) -> BTreeIterator<Element> {
+        let iterator = BTreeIterator<Element>(iterator: iterator)
         while let node = iterator.node, iterator.index == node.count {
-            //iter.position = iter.node->position();
             iterator.index = node.index
-            //iter.node = iter.node->parent();
             iterator.node = node.parent
-            //if (iter.node->leaf()) {
             if let node = iterator.node {
                 if node.isLeaf {
                     iterator.node = nil
@@ -651,7 +530,7 @@ class BTree<Element: Comparable> {
             iterator = lowerBound(iterator: iterator, element: element)
             
             if iterator.node != nil {
-                iterator = internal_last(iterator: iterator)
+                iterator = lastIterator(iterator: iterator)
                 if let node = iterator.node, node.value(index: iterator.index) == element {
                     return iterator
                 }
@@ -670,7 +549,7 @@ class BTree<Element: Comparable> {
                 }
                 iterator.node = node.child(index: iterator.index)
             }
-            iterator = internal_last(iterator: iterator)
+            iterator = lastIterator(iterator: iterator)
         }
         return iterator
     }
@@ -686,7 +565,7 @@ class BTree<Element: Comparable> {
                 }
                 iterator.node = node.child(index: iterator.index)
             }
-            iterator = internal_last(iterator: iterator)
+            iterator = lastIterator(iterator: iterator)
         }
         return iterator
     }
