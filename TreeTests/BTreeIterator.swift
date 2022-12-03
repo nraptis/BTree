@@ -61,25 +61,15 @@ class BTreeIterator<Element: Comparable>: Equatable {
     }
     
     func incrementSlow() {
-        
         if var node = node {
             if node.isLeaf {
-                
                 let holdNode = node
                 let holdIndex = index
-                
                 while (index >= node.count) && (node != tree.root) {
-                
-                    guard let parent = node.parent else {
-                        fatalError("BTreeIterator.incrementSlow node.parent is null")
+                    if let parent = node.parent {
+                        index = node.index
+                        node = parent
                     }
-                    
-                    guard parent.child(index: node.index) === node else {
-                        fatalError("BTreeIterator.incrementSlow node.parent.child(index: node.index (\(node.index))) !== node")
-                    }
-                    
-                    index = node.index
-                    node = parent
                 }
                 
                 if index >= node.count {
@@ -92,14 +82,12 @@ class BTreeIterator<Element: Comparable>: Equatable {
                     node = child
                     while !node.isLeaf {
                         guard let innerChild = node.child(index: 0) else {
-                            fatalError("BTreeIterator.incrementSlow missing child index 0")
+                            return
                         }
                         node = innerChild
                     }
-                    
                     index = 0
                 }
-                
             }
             self.node = node
         }
@@ -118,58 +106,35 @@ class BTreeIterator<Element: Comparable>: Equatable {
     }
     
     func decrementSlow() {
-        
         if var node = node {
             if node.isLeaf {
-                
-                guard index <= -1 else {
-                    fatalError("BTreeIterator.decrementSlow index (\(index)) >= 0")
-                }
-                
                 let holdNode = node
                 let holdIndex = index
                 
                 while (index < 0) && (node != tree.root) {
                     
-                    guard let parent = node.parent else {
-                        fatalError("BTreeIterator.incrementSlow node.parent is null")
+                    if let parent = node.parent {
+                        index = node.index - 1
+                        node = parent
                     }
-                    
-                    index = node.index - 1
-                    
-                    //node = node->parent();
-                    node = parent
                 }
                 
                 if index < 0 {
-                    
                     node = holdNode
                     index = holdIndex
                 }
             } else {
-                
                 if let child = node.child(index: index) {
-                    
                     node = child
-                    
-                    //while (!node->leaf()) {
                     while !node.isLeaf {
-                        
-                        guard let child = node.child(index: node.count) else {
-                            fatalError("BTreeIterator.decrementSlow missing child node.count (\(node.count))")
+                        if let child = node.child(index: node.count) {
+                            node = child
                         }
-                        
-                        //node = node->child(node->count());
-                        node = child
                     }
-                    
                     index = node.count - 1
                 }
-                
-                
             }
             self.node = node
         }
-        
     }
 }

@@ -22,25 +22,12 @@ class BTreeNode<Element: Comparable>: Hashable {
         self.data = data
     }
     
-    static func createLeaf(order: Int, parent: BTreeNode<Element>?) -> BTreeNode<Element> {
-        BTreeNode(data: BTreeNodeData.createLeaf(order: order, parent: parent))
+    static func createLeaf(order: Int) -> BTreeNode<Element> {
+        BTreeNode(data: BTreeNodeData.createLeaf(order: order))
     }
     
-    static func createInternal(order: Int, parent: BTreeNode<Element>?) -> BTreeNode<Element> {
-        BTreeNode(data: BTreeNodeData.createInternal(order: order, parent: parent))
-    }
-    
-    static func createRootLeaf(order: Int) -> BTreeNode<Element> {
-        let result = BTreeNode(data: BTreeNodeData.createRootLeaf(order: order))
-        //result.rightmost = result
-        
-        //result.parent = result
-        return result
-    }
-    
-    static func createRootInternal(order: Int, parent: BTreeNode<Element>?) -> BTreeNode<Element> {
-        let result = BTreeNode(data: BTreeNodeData.createRootInternal(order: order, parent: parent))
-        return result
+    static func createInternal(order: Int) -> BTreeNode<Element> {
+        BTreeNode(data: BTreeNodeData.createInternal(order: order))
     }
     
     var data: BTreeNodeData<Element>
@@ -352,14 +339,6 @@ class BTreeNode<Element: Comparable>: Hashable {
     
     func value_destroy(i: Int) {
         data.values[i] = nil
-    }
-    
-    func make_root() {
-        //assert(parent()->is_root());
-        guard let parent = parent else {
-            fatalError("BTreeNode.make_root() parent is nul")
-        }
-        self.parent = parent.parent
     }
     
     func destroy() {

@@ -1,6 +1,5 @@
 //
 //  BTreeNodeData.swift
-//  TreeTests
 //
 //  Created by Nicky Taylor on 11/27/22.
 //
@@ -9,10 +8,9 @@ import Foundation
 
 class BTreeNodeData<Element: Comparable> {
     
-    private init(order: Int, isLeaf: Bool, isRoot: Bool, parent: BTreeNode<Element>?) {
+    private init(order: Int, isLeaf: Bool) {
         self.order = order
         self.isLeaf = isLeaf
-        self.parent = parent
         self.values = [Element?](repeating: nil, count: order)
         if isLeaf {
             self.children = [BTreeNode<Element>?]()
@@ -21,20 +19,12 @@ class BTreeNodeData<Element: Comparable> {
         }
     }
     
-    static func createLeaf(order: Int, parent: BTreeNode<Element>?) -> BTreeNodeData<Element> {
-        BTreeNodeData(order: order, isLeaf: true, isRoot: false, parent: parent)
+    static func createLeaf(order: Int) -> BTreeNodeData<Element> {
+        BTreeNodeData(order: order, isLeaf: true)
     }
     
-    static func createInternal(order: Int, parent: BTreeNode<Element>?) -> BTreeNodeData<Element> {
-        BTreeNodeData(order: order, isLeaf: false, isRoot: false, parent: parent)
-    }
-    
-    static func createRootLeaf(order: Int) -> BTreeNodeData<Element> {
-        BTreeNodeData(order: order, isLeaf: true, isRoot: true, parent: nil)
-    }
-    
-    static func createRootInternal(order: Int, parent: BTreeNode<Element>?) -> BTreeNodeData<Element> {
-        BTreeNodeData(order: order, isLeaf: false, isRoot: true, parent: parent)
+    static func createInternal(order: Int) -> BTreeNodeData<Element> {
+        BTreeNodeData(order: order, isLeaf: false)
     }
     
     var order: Int
@@ -46,6 +36,4 @@ class BTreeNodeData<Element: Comparable> {
     var parent: BTreeNode<Element>?
     var values: [Element?]
     var children: [BTreeNode<Element>?]
-    //var rightmost: BTreeNode<Element>?
-    
 }

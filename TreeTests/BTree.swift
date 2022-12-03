@@ -41,55 +41,36 @@ class BTree<Element: Comparable> {
         }
     }
     
-    //void btree<P>::rebalance_or_split(iterator *iter) {
     func rebalance_or_split(iterator: BTreeIterator<Element>) {
         
-        //node_type *&node = iter->node;
         guard var node = iterator.node else {
             fatalError("BTree.rebalance_or_split() iterator.node is null")
         }
         
         
         if var target = node.parent ?? leftMost {
-            
-            
             var insert_position = iterator.index
-            
             if node != root {
-                
                 if node.index > 0 {
-                    
                     if let left = target.child(index: node.index - 1) {
                         if left.count < left.order {
-                            
                             var denom = 1
                             if insert_position < left.order {
                                 denom += 1
                             }
                             var moveCount = (left.order - left.count) / denom
-                            
                             if moveCount < 1 {
                                 moveCount = 1
                             }
-                            
                             if ((insert_position - moveCount) >= 0) || ((left.count + moveCount) < left.order) {
-                                
                                 left.rebalance_right_to_left(src: node, moveCount: moveCount)
-                                
                                 insert_position -= moveCount
-                                
                                 if insert_position < 0 {
-                                    
                                     insert_position = insert_position + left.count + 1
-                                    
                                     node = left
-                                    
                                 }
-                                
                                 iterator.node = node
-                                
                                 iterator.index = insert_position
-                                
                                 return
                             }
                         }
@@ -110,20 +91,13 @@ class BTree<Element: Comparable> {
                             }
                             
                             if (insert_position <= (node.count - moveCount)) || ((right.count + moveCount) < right.order) {
-                                
                                 node.rebalance_left_to_right(dest: right, moveCount: moveCount)
-                                
                                 if insert_position > node.count {
-                                    
                                     insert_position = insert_position - node.count - 1
-                                    
                                     node = right
-                                    
                                 }
-                                
                                 iterator.node = node
                                 iterator.index = insert_position
-                                
                                 return
                             }
                         }
@@ -142,36 +116,26 @@ class BTree<Element: Comparable> {
                 }
                 
                 if root.isLeaf {
-                    
                     let holdTarget = target
-                    target = BTreeNode<Element>.createRootInternal(order: order, parent: nil)
+                    target = BTreeNode<Element>.createInternal(order: order)
                     target.parent = holdTarget
-                    
-                    //parent.parent = root.parent
-                    //leftMost = root.parent
-                    
                     target.set_child(i: 0, node: root)
-                    
                     self.root = target
                     
                 } else {
                     
                     let holdTarget = target
-                    target = BTreeNode<Element>.createInternal(order: order, parent: nil)
+                    target = BTreeNode<Element>.createInternal(order: order)
                     target.parent = holdTarget
-                    
                     target.set_child(i: 0, node: target)
-                    
                     target.swap(node: root)
-                    
                     node = target
                 }
-                
             }
             
             if node.isLeaf {
                 
-                let split_node = BTreeNode<Element>.createLeaf(order: order, parent: nil)
+                let split_node = BTreeNode<Element>.createLeaf(order: order)
                 split_node.parent = target
                 
                 node.split(dest: split_node, insert_position: insert_position)
@@ -187,7 +151,7 @@ class BTree<Element: Comparable> {
             } else {
                 
                 let holdTarget = target
-                let split_node = BTreeNode<Element>.createInternal(order: order, parent: nil)
+                let split_node = BTreeNode<Element>.createInternal(order: order)
                 split_node.parent = holdTarget
                 
                 node.split(dest: split_node, insert_position: insert_position)
@@ -226,11 +190,8 @@ class BTree<Element: Comparable> {
     func insert(_ element: Element) {
         
         if isEmpty() {
-            let newRoot = BTreeNode<Element>.createLeaf(order: order, parent: nil)
-            //newRoot.parent = newRoot
-            
+            let newRoot = BTreeNode<Element>.createLeaf(order: order)
             root = newRoot
-            
             rightMost = root
             leftMost = root
         }
@@ -314,7 +275,6 @@ class BTree<Element: Comparable> {
                     } else {
                         if let child = root.child(index: 0) {
                             if child.isLeaf {
-                                child.make_root()
                                 root.destroy()
                                 self.root = child
                             } else {
@@ -377,63 +337,51 @@ class BTree<Element: Comparable> {
     }
     
     func try_merge_or_rebalance(iterator: BTreeIterator<Element>) -> Bool {
-
         guard let parent = iterator.node?.parent else {
-            fatalError("BTree.try_merge_or_rebalance() iterator.node?.parent is nil node: \(String(describing: iterator.node)) parent: \(String(describing: iterator.node?.parent))")
+            return false
         }
-        
         if let node = iterator.node {
             if node.index > 0 {
-                guard let left = parent.child(index: node.index - 1) else {
-                    fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) - 1) is nil")
-                }
-                if (1 + left.count + node.count) <= left.order {
-                    iterator.index += (1 + left.count)
-                    merge(left: left, right: node)
-                    iterator.node = left
-                    return true
+                if let left = parent.child(index: node.index - 1) {
+                    if (1 + left.count + node.count) <= left.order {
+                        iterator.index += (1 + left.count)
+                        merge(left: left, right: node)
+                        iterator.node = left
+                        return true
+                    }
                 }
             }
         }
         
         if let node = iterator.node {
             if node.index < parent.count {
-                guard let right = parent.child(index: node.index + 1) else {
-                    fatalError("BTree.try_merge_or_rebalance() parent.child(index: node.index (\(node.index)) + 1) is nil")
-                }
-                if (1 + node.count + right.count) <= right.order {
-                    merge(left: node, right: right)
-                    return true
-                }
-                
-                if (right.count > minOrder) && ((node.count == 0) || (node.index > 0)) {
-                    var moveCount = (right.count - node.count) >> 1
-                    if moveCount > (right.count - 1) {
-                        moveCount = (right.count - 1)
+                if let right = parent.child(index: node.index + 1) {
+                    if (1 + node.count + right.count) <= right.order {
+                        merge(left: node, right: right)
+                        return true
                     }
-                    node.rebalance_right_to_left(src: right, moveCount: moveCount)
-                    return false
+                    if (right.count > minOrder) && ((node.count == 0) || (node.index > 0)) {
+                        var moveCount = (right.count - node.count) >> 1
+                        if moveCount > (right.count - 1) {
+                            moveCount = (right.count - 1)
+                        }
+                        node.rebalance_right_to_left(src: right, moveCount: moveCount)
+                        return false
+                    }
                 }
             }
         }
         
         if let node = iterator.node {
             if node.index > 0 {
-
                 if let left = parent.child(index: node.index - 1) {
-                    
                     if (left.count > minOrder) && ((node.count == 0) || (iterator.index < node.count)) {
-                        
                         var moveCount = (left.count - node.count) >> 1
-                        
                         if moveCount > (left.count - 1) {
                             moveCount = (left.count - 1)
                         }
-                        
                         left.rebalance_left_to_right(dest: node, moveCount: moveCount)
-                        
                         iterator.index += moveCount
-                        
                         return false
                     }
                 }
@@ -549,9 +497,6 @@ class BTree<Element: Comparable> {
         if node.isLeaf {
             return node
         }
-        if node.count <= 0 {
-            fatalError("BTree.findRightMost(_ node: BTreeNode<Element>?) node has count of 0")
-        }
         if let child = node.data.children[node.count] {
             return findRightMost(child)
         } else {
@@ -566,14 +511,10 @@ class BTree<Element: Comparable> {
         if node.isLeaf {
             return node
         }
-        if node.count <= 0 {
-            fatalError("BTree.findLeftMost(_ node: BTreeNode<Element>?) node has count of 0")
-        }
         if let child = node.data.children[0] {
             return findLeftMost(child)
         } else {
             fatalError("BTree.findLeftMost(_ node: BTreeNode<Element>?) child expected at 0")
-            //return node
         }
     }
     

@@ -36,7 +36,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
         
-        let data = BTreeNodeData<Int>.createLeaf(order: order, parent: nil)
+        let data = BTreeNodeData<Int>.createLeaf(order: order)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1
@@ -52,7 +52,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let data = BTreeNodeData<Int>.createInternal(order: order, parent: nil)
+        let data = BTreeNodeData<Int>.createInternal(order: order)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1
@@ -68,7 +68,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let data = BTreeNodeData<Int>.createRootLeaf(order: order)
+        let data = BTreeNodeData<Int>.createLeaf(order: order)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1
@@ -84,7 +84,7 @@ final class BTreeIteratorSimpleTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let data = BTreeNodeData<Int>.createRootInternal(order: order, parent: nil)
+        let data = BTreeNodeData<Int>.createInternal(order: order)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1

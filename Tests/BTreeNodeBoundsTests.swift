@@ -20,7 +20,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
     }
     
     func testLowerBound1() {
-        let data = BTreeNodeData<Int>.createLeaf(order: 1, parent: nil)
+        let data = BTreeNodeData<Int>.createLeaf(order: 3)
         let node = BTreeNode(data: data)
         addValue(node: node, value: 0)
         if node.lowerBound(element: 0) != 0 {
@@ -29,7 +29,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
     }
     
     func testUpperBound1() {
-        let data = BTreeNodeData<Int>.createLeaf(order: 1, parent: nil)
+        let data = BTreeNodeData<Int>.createLeaf(order: 3)
         let node = BTreeNode(data: data)
         addValue(node: node, value: 0)
         if node.upperBound(element: 0) != 1 {
@@ -44,7 +44,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...2 {
             for countMiddle in 0...2 {
                 for countRightPadding in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -81,7 +81,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...2 {
             for countRightPadding in 0...2 {
                 for countMiddle in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -118,7 +118,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...2 {
             for countLeftPadding in 0...2 {
                 for countRightPadding in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -155,7 +155,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...2 {
             for countRightPadding in 0...2 {
                 for countLeftPadding in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -192,7 +192,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...2 {
             for countLeftPadding in 0...2 {
                 for countMiddle in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -229,7 +229,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...2 {
             for countMiddle in 0...2 {
                 for countLeftPadding in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -267,7 +267,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countMiddle in 0...2 {
                 for countRightPadding in 0...2 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -304,7 +304,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...2 {
             for countRightPadding in 0...2 {
                 for countMiddle in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -342,7 +342,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...2 {
                 for countRightPadding in 0...2 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -379,7 +379,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...2 {
             for countRightPadding in 0...2 {
                 for countLeftPadding in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -417,7 +417,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...2 {
                 for countMiddle in 0...2 {
                 
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -454,7 +454,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...2 {
             for countMiddle in 0...2 {
                 for countLeftPadding in 0...2 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -492,7 +492,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...3 {
             for countMiddle in 0...3 {
                 for countRightPadding in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -529,7 +529,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...3 {
             for countRightPadding in 0...3 {
                 for countMiddle in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -566,7 +566,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...3 {
             for countLeftPadding in 0...3 {
                 for countRightPadding in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -603,7 +603,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...3 {
             for countRightPadding in 0...3 {
                 for countLeftPadding in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -640,7 +640,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...3 {
             for countLeftPadding in 0...3 {
                 for countMiddle in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -677,7 +677,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...3 {
             for countMiddle in 0...3 {
                 for countLeftPadding in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -715,7 +715,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countMiddle in 0...3 {
                 for countRightPadding in 0...3 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -752,7 +752,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...3 {
             for countRightPadding in 0...3 {
                 for countMiddle in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -790,7 +790,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...3 {
                 for countRightPadding in 0...3 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -827,7 +827,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...3 {
             for countRightPadding in 0...3 {
                 for countLeftPadding in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -865,7 +865,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...3 {
                 for countMiddle in 0...3 {
                 
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -902,7 +902,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...3 {
             for countMiddle in 0...3 {
                 for countLeftPadding in 0...3 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -939,7 +939,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...10 {
             for countMiddle in 0...10 {
                 for countRightPadding in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -976,7 +976,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...10 {
             for countRightPadding in 0...10 {
                 for countMiddle in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1013,7 +1013,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...10 {
             for countLeftPadding in 0...10 {
                 for countRightPadding in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1050,7 +1050,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...10 {
             for countRightPadding in 0...10 {
                 for countLeftPadding in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1087,7 +1087,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...10 {
             for countLeftPadding in 0...10 {
                 for countMiddle in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1124,7 +1124,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...10 {
             for countMiddle in 0...10 {
                 for countLeftPadding in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1162,7 +1162,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countMiddle in 0...10 {
                 for countRightPadding in 0...10 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1199,7 +1199,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...10 {
             for countRightPadding in 0...10 {
                 for countMiddle in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1237,7 +1237,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...10 {
                 for countRightPadding in 0...10 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1274,7 +1274,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...10 {
             for countRightPadding in 0...10 {
                 for countLeftPadding in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1312,7 +1312,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...10 {
                 for countMiddle in 0...10 {
                 
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1349,7 +1349,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...10 {
             for countMiddle in 0...10 {
                 for countLeftPadding in 0...10 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1386,7 +1386,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...25 {
             for countMiddle in 0...25 {
                 for countRightPadding in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1423,7 +1423,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...25 {
             for countRightPadding in 0...25 {
                 for countMiddle in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1460,7 +1460,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...25 {
             for countLeftPadding in 0...25 {
                 for countRightPadding in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1497,7 +1497,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...25 {
             for countRightPadding in 0...25 {
                 for countLeftPadding in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1534,7 +1534,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...25 {
             for countLeftPadding in 0...25 {
                 for countMiddle in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1571,7 +1571,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...25 {
             for countMiddle in 0...25 {
                 for countLeftPadding in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1609,7 +1609,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countMiddle in 0...25 {
                 for countRightPadding in 0...25 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1646,7 +1646,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countLeftPadding in 0...25 {
             for countRightPadding in 0...25 {
                 for countMiddle in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1684,7 +1684,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...25 {
                 for countRightPadding in 0...25 {
                     
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1721,7 +1721,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countMiddle in 0...25 {
             for countRightPadding in 0...25 {
                 for countLeftPadding in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1759,7 +1759,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
             for countLeftPadding in 0...25 {
                 for countMiddle in 0...25 {
                 
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {
@@ -1796,7 +1796,7 @@ final class BTreeNodeBoundsTests: XCTestCase {
         for countRightPadding in 0...25 {
             for countMiddle in 0...25 {
                 for countLeftPadding in 0...25 {
-                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding, parent: nil)
+                    let data = BTreeNodeData<Int>.createLeaf(order: countLeftPadding + countMiddle + countRightPadding)
                     let node = BTreeNode(data: data)
                     
                     for _ in 0..<countLeftPadding {

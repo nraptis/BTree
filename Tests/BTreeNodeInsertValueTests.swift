@@ -65,7 +65,7 @@ final class BTreeNodeInsertValueTests: XCTestCase {
             fatalError("BTreeNodeSimpleTests.createNodeFromArray array.count: (\(array.count)) order: \(order) count overflow")
         }
 
-        let data = BTreeNodeData<Int>.createInternal(order: order, parent: nil)
+        let data = BTreeNodeData<Int>.createInternal(order: order)
         for (index, value) in array.enumerated() {
             data.values[index] = value
             data.count += 1
@@ -74,7 +74,7 @@ final class BTreeNodeInsertValueTests: XCTestCase {
     }
     
     func testInsertOneAtZeroFromZero() {
-        let data = BTreeNodeData<Int>.createLeaf(order: 1, parent: nil)
+        let data = BTreeNodeData<Int>.createLeaf(order: 3)
         let node = BTreeNode(data: data)
         insertValue(node: node, index: 0, value: 0)
         if node.count != 1 {
@@ -88,7 +88,7 @@ final class BTreeNodeInsertValueTests: XCTestCase {
     }
     
     func testCreateSimpleSequenceOne() {
-        let node = createSequentialNode(order: 1, count: 1)
+        let node = createSequentialNode(order: 3, count: 1)
         if node.count != 1 {
             XCTFail("BTreeNodeInsertValueTests.testInsertOneAtZero node.count (\(node.count)) != 1")
             return
@@ -116,7 +116,7 @@ final class BTreeNodeInsertValueTests: XCTestCase {
     func testCreateSimpleSequencesWithOneInsert100TimesAnd10OrdersAnd10Inserts() {
         let insertValue = 999
         for iteration in 0...100 {
-            for order in 1...10 {
+            for order in 3...10 {
                 for insert in 0...order {
                     for count in 0...order {
                         
