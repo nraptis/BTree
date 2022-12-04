@@ -10,8 +10,8 @@ import XCTest
 
 final class BTreeTestsRigorous: XCTestCase {
 
-    func test10000SmallTrees3Permutations() {
-        for loop in 0...10000 {
+    func test25000SmallTrees3Permutations() {
+        for loop in 0...25000 {
             let insertCount = Int.random(in: 0...24)
             var insertArray = [Int]()
             for _ in 0..<insertCount {
@@ -37,7 +37,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test10000SmallTrees10Permutations()")
+                        XCTFail("Failed: test25000SmallTrees3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deletePermutation)")
                         return
@@ -49,7 +49,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test10000SmallTrees10Permutations()")
+                        XCTFail("Failed: test25000SmallTrees3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deletePermutation)")
                         return
@@ -58,14 +58,14 @@ final class BTreeTestsRigorous: XCTestCase {
             }
             
             if (loop % 1000) == 0 {
-                print("test10000SmallTrees3Permutations() [\(loop) / 10000]")
+                print("test25000SmallTrees3Permutations() [\(loop) / 25000]")
             }
         }
     }
     
-    func test10000SmallTreesDeleteAll3Permutations() {
+    func test25000SmallTreesDeleteAll3Permutations() {
         
-        for loop in 0...10000 {
+        for loop in 0...25000 {
             let insertCount = Int.random(in: 0...24)
             var insertArray = [Int]()
             for _ in 0..<insertCount {
@@ -86,7 +86,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test10000SmallTreesDeleteAll3Permutations()")
+                        XCTFail("Failed: test25000SmallTreesDeleteAll3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deleteArray)")
                         return
@@ -98,14 +98,14 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test10000SmallTreesDeleteAll3Permutations()")
+                        XCTFail("Failed: test25000SmallTreesDeleteAll3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deleteArray)")
                         return
                     }
                     
                     if mockTree.count != 0 {
-                        XCTFail("Failed: test10000SmallTreesDeleteAll3Permutations()")
+                        XCTFail("Failed: test25000SmallTreesDeleteAll3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deleteArray)")
                     }
@@ -113,13 +113,13 @@ final class BTreeTestsRigorous: XCTestCase {
             }
             
             if (loop % 1000) == 0 {
-                print("test10000SmallTreesDeleteAll3Permutations() [\(loop) / 10000]")
+                print("test25000SmallTreesDeleteAll3Permutations() [\(loop) / 25000]")
             }
         }
     }
     
-    func test1000MediumTrees3Permutations() {
-        for loop in 0...1000 {
+    func test2000MediumTrees3Permutations() {
+        for loop in 0...2000 {
             let insertCount = Int.random(in: 0...128)
             var insertArray = [Int]()
             for _ in 0..<insertCount {
@@ -145,7 +145,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test1000MediumTrees3Permutations()")
+                        XCTFail("Failed: test2000MediumTrees3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deletePermutation)")
                         return
@@ -157,7 +157,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test1000MediumTrees3Permutations()")
+                        XCTFail("Failed: test2000MediumTrees3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deletePermutation)")
                         return
@@ -165,15 +165,14 @@ final class BTreeTestsRigorous: XCTestCase {
                 }
             }
             
-            if (loop % 1000) == 0 {
-                print("test1000MediumTrees3Permutations() [\(loop) / 10000]")
+            if (loop % 100) == 0 {
+                print("test2000MediumTrees3Permutations() [\(loop) / 2000]")
             }
         }
     }
     
-    func test1000MediumTreesDeleteAll3Permutations() {
-        
-        for loop in 0...1000 {
+    func test2000MediumTreesDeleteAll3Permutations() {
+        for loop in 0...2000 {
             let insertCount = Int.random(in: 0...128)
             var insertArray = [Int]()
             for _ in 0..<insertCount {
@@ -220,14 +219,14 @@ final class BTreeTestsRigorous: XCTestCase {
                 }
             }
             
-            if (loop % 1000) == 0 {
-                print("test10000SmallTreesDeleteAll3Permutations() [\(loop) / 10000]")
+            if (loop % 100) == 0 {
+                print("test10000SmallTreesDeleteAll3Permutations() [\(loop) / 2000]")
             }
         }
     }
     
-    func test100LargeTrees3Permutations() {
-        for loop in 0...100 {
+    func test300LargeTrees3Permutations() {
+        for loop in 0...300 {
             let insertCount = Int.random(in: 128...1024)
             var insertArray = [Int]()
             for _ in 0..<insertCount {
@@ -253,7 +252,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test1000MediumTrees3Permutations()")
+                        XCTFail("Failed: test200LargeTrees3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deletePermutation)")
                         return
@@ -265,7 +264,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test1000MediumTrees3Permutations()")
+                        XCTFail("Failed: test200LargeTrees3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deletePermutation)")
                         return
@@ -273,15 +272,14 @@ final class BTreeTestsRigorous: XCTestCase {
                 }
             }
             
-            if (loop % 1000) == 0 {
-                print("test1000MediumTrees3Permutations() [\(loop) / 10000]")
+            if (loop % 10) == 0 {
+                print("test200LargeTrees3Permutations() [\(loop) / 300]")
             }
         }
     }
     
-    func test100LargeTreesDeleteAll3Permutations() {
-        
-        for loop in 0...1000 {
+    func test300LargeTreesDeleteAll3Permutations() {
+        for loop in 0...300 {
             let insertCount = Int.random(in: 128...1024)
             var insertArray = [Int]()
             for _ in 0..<insertCount {
@@ -302,7 +300,7 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test1000MediumTreesDeleteAll3Permutations()")
+                        XCTFail("Failed: test200LargeTreesDeleteAll3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deleteArray)")
                         return
@@ -314,22 +312,22 @@ final class BTreeTestsRigorous: XCTestCase {
                     }
                     
                     if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                        XCTFail("Failed: test1000MediumTreesDeleteAll3Permutations()")
+                        XCTFail("Failed: test200LargeTreesDeleteAll3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deleteArray)")
                         return
                     }
                     
                     if mockTree.count != 0 {
-                        XCTFail("Failed: test1000MediumTreesDeleteAll3Permutations()")
+                        XCTFail("Failed: test200LargeTreesDeleteAll3Permutations()")
                         print("insert array: \(insertPermutation)")
                         print("delete array: \(deleteArray)")
                     }
                 }
             }
             
-            if (loop % 1000) == 0 {
-                print("test10000SmallTreesDeleteAll3Permutations() [\(loop) / 10000]")
+            if (loop % 10) == 0 {
+                print("test200LargeTreesDeleteAll3Permutations() [\(loop) / 300]")
             }
         }
     }

@@ -21,7 +21,7 @@ class MockMultiSearchTree<Element: Comparable> {
     
     func contains(_ element: Element) -> Bool {
         var lo = 0
-        var hi = data.count - 1
+        var hi = count - 1
         while lo <= hi {
             let mid = (lo + hi) >> 1
             if (element < data[mid]) {
@@ -43,7 +43,7 @@ class MockMultiSearchTree<Element: Comparable> {
     
     func lowerBound(element: Element) -> Int {
         var start = 0
-        var end = data.count
+        var end = count
         while start != end {
             let mid = (start + end) >> 1
             if element > data[mid] {
@@ -57,7 +57,7 @@ class MockMultiSearchTree<Element: Comparable> {
     
     func upperBound(element: Element) -> Int {
         var start = 0
-        var end = data.count
+        var end = count
         while start != end {
             let mid = (start + end) >> 1
             if element >= data[mid] {
@@ -79,7 +79,7 @@ class MockMultiSearchTree<Element: Comparable> {
     }
     
     func removeFirst(element: Element) {
-        for index in 0..<data.count {
+        for index in 0..<count {
             let value = data[index]
             if value == element {
                 data.remove(at: index)
@@ -103,14 +103,14 @@ class MockMultiSearchTree<Element: Comparable> {
     }
     
     func getMin() -> Element? {
-        if data.count > 0 {
+        if count > 0 {
             return data[0]
         }
         return nil
     }
     
     func removeMin() {
-        if data.count > 0 {
+        if count > 0 {
             data.remove(at: 0)
             count -= 1
         }
@@ -123,15 +123,15 @@ class MockMultiSearchTree<Element: Comparable> {
     }
     
     func getMax() -> Element? {
-        if data.count > 0 {
-            return data[data.count - 1]
+        if count > 0 {
+            return data[count - 1]
         }
         return nil
     }
     
     func removeMax() {
-        if data.count > 0 {
-            data.remove(at: data.count - 1)
+        if count > 0 {
+            data.remove(at: count - 1)
             count -= 1
         }
     }

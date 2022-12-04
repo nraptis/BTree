@@ -497,7 +497,7 @@ class BTree<Element: Comparable> {
         if node.isLeaf {
             return node
         }
-        if let child = node.data.children[node.count] {
+        if let child = node.children[node.count] {
             return findRightMost(child)
         } else {
             fatalError("BTree.findRightMost(_ node: BTreeNode<Element>?) child expected at count")
@@ -511,7 +511,7 @@ class BTree<Element: Comparable> {
         if node.isLeaf {
             return node
         }
-        if let child = node.data.children[0] {
+        if let child = node.children[0] {
             return findLeftMost(child)
         } else {
             fatalError("BTree.findLeftMost(_ node: BTreeNode<Element>?) child expected at 0")
@@ -529,7 +529,7 @@ class BTree<Element: Comparable> {
         var result = node.count
         if !node.isLeaf {
             for index in 0...node.count {
-                if let child = node.data.children[index] {
+                if let child = node.children[index] {
                     if child.isLeaf {
                         result += child.count
                     } else {
@@ -552,7 +552,7 @@ class BTree<Element: Comparable> {
         var maxChildDepth = 0
         if !node.isLeaf {
             for index in 0...node.count {
-                if let child = node.data.children[index] {
+                if let child = node.children[index] {
                     if child.isLeaf {
                         let childDepth = 1
                         if childDepth > maxChildDepth {
@@ -589,7 +589,7 @@ class BTree<Element: Comparable> {
             result.append(node)
         } else if depth < level, !node.isLeaf {
             for index in 0...node.count {
-                allNodesAtLevel(node.data.children[index], depth: depth + 1, level: level, &result)
+                allNodesAtLevel(node.children[index], depth: depth + 1, level: level, &result)
             }
         }
     }
@@ -600,7 +600,7 @@ class BTree<Element: Comparable> {
         }
         var result = [Element]()
         for i in 0..<node.count {
-            if let value = node.data.values[i] {
+            if let value = node.values[i] {
                 result.append(value)
             }
         }
