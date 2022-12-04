@@ -1,6 +1,6 @@
 //
-//  BTreeApp.swift
-//  BTree
+//  BTreeMacApp.swift
+//  BTreeMac
 //
 //  Created by Nicky Taylor on 12/4/22.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct BTreeApp: App {
+struct BTreeMacApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

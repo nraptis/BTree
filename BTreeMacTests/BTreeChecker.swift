@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-@testable import BTree
+@testable import BTreeMac
 
 class BTreeChecker {
     
