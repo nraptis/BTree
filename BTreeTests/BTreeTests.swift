@@ -259,8 +259,6 @@ final class BTreeTests: XCTestCase {
             
             if (loop % 100) == 0 {
                 print("test1000MediumTreesDeleteAll() [\(loop) / 1000]")
-                print("insert array: \(insertArray)")
-                print("delete array: \(deleteArray)")
             }
         }
     }

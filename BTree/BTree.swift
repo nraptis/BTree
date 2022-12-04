@@ -117,7 +117,7 @@ class BTree<Element: Comparable> {
                 
                 if root.isLeaf {
                     let holdTarget = target
-                    target = BTreeNode<Element>.createInternal(order: order)
+                    target = BTreeNode<Element>(order: order, isLeaf: false)
                     target.parent = holdTarget
                     target.set_child(i: 0, node: root)
                     self.root = target
@@ -125,7 +125,7 @@ class BTree<Element: Comparable> {
                 } else {
                     
                     let holdTarget = target
-                    target = BTreeNode<Element>.createInternal(order: order)
+                    target = BTreeNode<Element>(order: order, isLeaf: false)
                     target.parent = holdTarget
                     target.set_child(i: 0, node: target)
                     target.swap(node: root)
@@ -135,7 +135,7 @@ class BTree<Element: Comparable> {
             
             if node.isLeaf {
                 
-                let split_node = BTreeNode<Element>.createLeaf(order: order)
+                let split_node = BTreeNode<Element>(order: order, isLeaf: true)
                 split_node.parent = target
                 
                 node.split(dest: split_node, insertIndex: insertIndex)
@@ -151,7 +151,7 @@ class BTree<Element: Comparable> {
             } else {
                 
                 let holdTarget = target
-                let split_node = BTreeNode<Element>.createInternal(order: order)
+                let split_node = BTreeNode<Element>(order: order, isLeaf: false)
                 split_node.parent = holdTarget
                 
                 node.split(dest: split_node, insertIndex: insertIndex)
@@ -190,7 +190,7 @@ class BTree<Element: Comparable> {
     func insert(_ element: Element) {
         
         if isEmpty() {
-            let newRoot = BTreeNode<Element>.createLeaf(order: order)
+            let newRoot = BTreeNode<Element>(order: order, isLeaf: true)
             root = newRoot
             rightMost = root
             leftMost = root

@@ -18,22 +18,16 @@ class BTreeNode<Element: Comparable>: Hashable {
         hasher.combine(ObjectIdentifier(self).hashValue)
     }
     
-    required init(data: BTreeNodeData<Element>) {
-        self.order = data.order
-        self.index = data.index
-        self.count = data.count
-        self.isLeaf = data.isLeaf
-        self.parent = data.parent
-        self.values = data.values
-        self.children = data.children
-    }
-    
-    static func createLeaf(order: Int) -> BTreeNode<Element> {
-        BTreeNode(data: BTreeNodeData.createLeaf(order: order))
-    }
-    
-    static func createInternal(order: Int) -> BTreeNode<Element> {
-        BTreeNode(data: BTreeNodeData.createInternal(order: order))
+    required init(order: Int, isLeaf: Bool) {
+        self.order = order
+        self.isLeaf = isLeaf
+        self.parent = nil
+        self.values = [Element?](repeating: nil, count: order)
+        if isLeaf {
+            self.children = [BTreeNode<Element>?]()
+        } else {
+            self.children = [BTreeNode<Element>?](repeating: nil, count: order + 1)
+        }
     }
     
     var order: Int
@@ -74,8 +68,9 @@ class BTreeNode<Element: Comparable>: Hashable {
             fatalError("BTreeNode.swap() isLeaf (\(isLeaf)) != node.isLeaf (\(node.isLeaf))")
         }
 
+        /*
         let n = max(count, node.count)
-
+         
         var i = 0
         while i < n {
             value_swap(i: i, x: node, j: i)
@@ -93,8 +88,30 @@ class BTreeNode<Element: Comparable>: Hashable {
             value_destroy(i: i)
             i += 1
         }
+         */
+        
+        let holdValues = values
+        values = node.values
+        node.values = holdValues
         
         if !isLeaf {
+            let holdChildren = children
+            children = node.children
+            node.children = holdChildren
+            
+            for childO in children {
+                if let child = childO {
+                    child.parent = self
+                }
+            }
+            
+            for childO in node.children {
+                if let child = childO {
+                    child.parent = node
+                }
+            }
+            
+            /*
             i = 0
             while i <= n {
                 let hold = children[i]
@@ -114,11 +131,12 @@ class BTreeNode<Element: Comparable>: Hashable {
                 children[i]?.parent = self
                 i += 1
             }
+            */
         }
         
-        let hold = count
+        let holdCount = count
         count = node.count
-        node.count = hold
+        node.count = holdCount
     }
     
     func lowerBound(element: Element) -> Int {
