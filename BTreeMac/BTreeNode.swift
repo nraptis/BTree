@@ -333,8 +333,55 @@ class BTreeNode<Element: Comparable>: Hashable {
         src.count -= moveCount
     }
     
+    
     func rebalance_left_to_right(dest: BTreeNode<Element>, moveCount: Int) {
-        var i = dest.count - 1
+        
+        var front = [Element]()
+        front.reserveCapacity(moveCount)
+        for seek in (count - (moveCount) + 1)..<count {
+            front.append(values[seek])
+        }
+        if let parent = parent {
+            front.append(parent.values[index])
+            parent.values[index] = values[count - moveCount]
+        }
+        dest.values.insert(contentsOf: front, at: 0)
+        values.removeLast(moveCount)
+        
+        if !isLeaf {
+
+            var i = dest.count
+            while i >= 0 {
+                if let destChild = dest.child(index: i) {
+                    dest.set_child(i: i + moveCount, node: destChild)
+                    dest.children[i] = nil
+                }
+                i -= 1
+            }
+
+            i = 1
+            while i <= moveCount {
+                
+                if let selfChild = child(index: count - moveCount + i) {
+                    dest.set_child(i: i - 1, node: selfChild)
+                    children[count - moveCount + i] = nil
+                }
+                
+                i += 1
+            }
+        }
+        
+        count -= moveCount
+        dest.count += moveCount
+        
+        
+        
+    }
+    
+    
+    /*
+    func rebalance_left_to_right(dest: BTreeNode<Element>, moveCount: Int) {
+        var i = 99999999
         
         if let parent = parent {
             
@@ -344,13 +391,23 @@ class BTreeNode<Element: Comparable>: Hashable {
                 dest.values.append(mockValue)
             }
             
-            
+            //move values in "dest" right by "move count"
+            i = dest.count - 1
             while i >= 0 {
                 dest.value_swap(i: i, x: dest, j: i + moveCount)
                 i -= 1
             }
             
+            
+            //let hold = dest.values[moveCount - 1]
+            //dest.values[moveCount - 1] = parent.values[index]
+            //parent.values[index] = hold
             dest.value_swap(i: moveCount - 1, x: parent, j: index)
+            
+            //let hold = parent.values[index]
+            //parent.values[index] = values[count - moveCount]
+            //values[count - moveCount] = hold
+            
             parent.value_swap(i: index, x: self, j: count - moveCount)
         }
         
@@ -390,5 +447,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         values.removeLast(moveCount)
         
     }
+    */
     
 }

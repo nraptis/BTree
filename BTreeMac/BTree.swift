@@ -47,7 +47,6 @@ class BTree<Element: Comparable> {
             fatalError("BTree.rebalanceOrSplit() iterator.node is null")
         }
         
-        
         if var target = node.parent ?? leftMost {
             var insertIndex = iterator.index
             if node != root {
