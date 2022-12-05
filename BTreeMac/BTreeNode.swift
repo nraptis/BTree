@@ -291,23 +291,17 @@ class BTreeNode<Element: Comparable>: Hashable {
     func rebalance_right_to_left(src: BTreeNode<Element>, moveCount: Int) {
         
         guard let parent = parent else { return }
-
         values.append(parent.values[index])
         parent.values[index] = src.values[moveCount - 1]
-        
-        
-        let cap = (moveCount - 1)
-        var i = 0
-        while i < cap {
-            values.append(src.values[i])
-            i += 1
+        let ceiling = (moveCount - 1)
+        for seek in 0..<ceiling {
+            values.append(src.values[seek])
         }
-        
         src.values.removeFirst(moveCount)
 
         if !isLeaf {
 
-            i = 0
+            var i = 0
             while i < moveCount {
                 if let srcChild = src.child(index: i) {
                     set_child(i: 1 + count + i, node: srcChild)
