@@ -101,8 +101,8 @@
 			isa = PBXGroup;
 			children = (
 				0D0318CA293D5DF700A615A7 /* BTree.swift */,
-				0D0318CB293D5DF700A615A7 /* BTreeIterator.swift */,
 				0D0318CC293D5DF700A615A7 /* BTreeNode.swift */,
+				0D0318CB293D5DF700A615A7 /* BTreeIterator.swift */,
 				0D0318A1293D5DCA00A615A7 /* ContentView.swift */,
 				0D03189F293D5DCA00A615A7 /* BTreeMacApp.swift */,
 				0D0318A3293D5DCD00A615A7 /* Assets.xcassets */,
@@ -127,8 +127,8 @@
 				0D0318D0293D5F0500A615A7 /* Array+Subsets.swift */,
 				0D0318D1293D5F0500A615A7 /* BTreeChecker.swift */,
 				0D0318D3293D5F0500A615A7 /* BTreeTests.swift */,
-				0D0318D2293D5F0500A615A7 /* BTreeTestsOverNight.swift */,
 				0D0318D6293D5F0500A615A7 /* BTreeTestsRigorous.swift */,
+				0D0318D2293D5F0500A615A7 /* BTreeTestsOverNight.swift */,
 				0D0318D5293D5F0500A615A7 /* MockMultiSearchTree.swift */,
 				0D0318DE293D5FDE00A615A7 /* ArrayCapacityTest.swift */,
 				0D0318E0293D609500A615A7 /* MockMultiSearchTreeBoundsTests.swift */,

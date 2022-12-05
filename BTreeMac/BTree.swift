@@ -251,7 +251,13 @@ class BTree<Element: Comparable> {
                 let tmp_iter = BTreeIterator(iterator: iterator)
                 iterator.decrement()
                 if let nodeAfterDecrement = iterator.node {
-                    nodeAfterDecrement.value_swap(i: iterator.index, x: node, j: tmp_iter.index)
+                    
+                    swap(&nodeAfterDecrement.values[iterator.index], &node.values[tmp_iter.index])
+                    
+                    //var hold = nodeAfterDecrement.values[iterator.index]
+                    //nodeAfterDecrement.values[iterator.index] = node.values[tmp_iter.index]
+                    //node.values[tmp_iter.index] = hold
+                    
                     internal_delete = true
                     count -= 1
                 }

@@ -137,8 +137,8 @@ class BTreeNode<Element: Comparable>: Hashable {
     
     func split(dest: BTreeNode<Element>, insertIndex: Int) {
         
-        let parentMockValue = (count > 0) ? values[0] : dest.values[0]
-        
+        guard let parent = parent else { return }
+
         var newTargetCount = 0
         if insertIndex == 0 {
             newTargetCount = (count - 1)
@@ -150,31 +150,16 @@ class BTreeNode<Element: Comparable>: Hashable {
         
         var newCount = (count - newTargetCount)
         
-        var lewper = 0
-        while lewper < newTargetCount {
-            dest.values.append(parentMockValue)
-            lewper += 1
-        }
-
-        var i = 0
-        while i < newTargetCount {
-            value_swap(i: newCount + i, x: dest, j: i)
-            i += 1
+        
+        for seek in 0..<newTargetCount {
+            dest.values.append(values[newCount + seek])
         }
         
         newCount -= 1
         
-        guard let parent = parent else {
-            fatalError("BTreeNode.split() parent is null")
-        }
-        
-        parent.insert_value(index: index, element: parentMockValue)
-        
-        value_swap(i: newCount, x: parent, j: index)
-        
-        while values.count > newCount {
-            values.removeLast()
-        }
+        parent.insert_value(index: index, element: values[newCount])
+
+        values.removeLast(values.count - newCount)
         
         count = newCount
         dest.count = newTargetCount
@@ -186,11 +171,15 @@ class BTreeNode<Element: Comparable>: Hashable {
             fatalError("count mismatch 2")
         }
         
+        
+        
+        
+        
         parent.set_child(i: index + 1, node: dest)
         
         if !isLeaf {
             
-            i = 0
+            var i = 0
             while i <= dest.count {
             
                 guard let child = child(index: count + i + 1) else {
@@ -272,14 +261,12 @@ class BTreeNode<Element: Comparable>: Hashable {
         parent.remove_value(index: index)
     }
     
-    func value_swap(i: Int, x: BTreeNode<Element>, j: Int) {
-        let hold = values[i]
-        values[i] = x.values[j]
-        x.values[j] = hold
-    }
-    
     func destroy() {
-        
+        values.removeAll(keepingCapacity: true)
+        children.removeAll(keepingCapacity: true)
+        //isLeaf = true
+        parent = nil
+        count = 0
     }
     
     func set_child(i: Int, node: BTreeNode<Element>) {
@@ -372,75 +359,5 @@ class BTreeNode<Element: Comparable>: Hashable {
         
     }
     
-    
-    /*
-    func rebalance_left_to_right(dest: BTreeNode<Element>, moveCount: Int) {
-        var i = 99999999
-        
-        if let parent = parent {
-            
-            let mockValue = parent.values[index]
-            let ceil = dest.count + moveCount
-            while dest.values.count < ceil {
-                dest.values.append(mockValue)
-            }
-            
-            //move values in "dest" right by "move count"
-            i = dest.count - 1
-            while i >= 0 {
-                dest.value_swap(i: i, x: dest, j: i + moveCount)
-                i -= 1
-            }
-            
-            
-            //let hold = dest.values[moveCount - 1]
-            //dest.values[moveCount - 1] = parent.values[index]
-            //parent.values[index] = hold
-            dest.value_swap(i: moveCount - 1, x: parent, j: index)
-            
-            //let hold = parent.values[index]
-            //parent.values[index] = values[count - moveCount]
-            //values[count - moveCount] = hold
-            
-            parent.value_swap(i: index, x: self, j: count - moveCount)
-        }
-        
-        i = 1
-        while i < moveCount {
-            value_swap(i: count - moveCount + i, x: dest, j: i - 1)
-            
-            i += 1
-        }
-
-        if !isLeaf {
-
-            i = dest.count
-            while i >= 0 {
-                if let destChild = dest.child(index: i) {
-                    dest.set_child(i: i + moveCount, node: destChild)
-                    dest.children[i] = nil
-                }
-                i -= 1
-            }
-
-            i = 1
-            while i <= moveCount {
-                
-                if let selfChild = child(index: count - moveCount + i) {
-                    dest.set_child(i: i - 1, node: selfChild)
-                    children[count - moveCount + i] = nil
-                }
-                
-                i += 1
-            }
-        }
-        
-        count -= moveCount
-        dest.count += moveCount
-        
-        values.removeLast(moveCount)
-        
-    }
-    */
     
 }
