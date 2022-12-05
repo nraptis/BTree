@@ -600,9 +600,7 @@ class BTree<Element: Comparable> {
         }
         var result = [Element]()
         for i in 0..<node.count {
-            if let value = node.values[i] {
-                result.append(value)
-            }
+            result.append(node.values[i])
         }
         return result
     }

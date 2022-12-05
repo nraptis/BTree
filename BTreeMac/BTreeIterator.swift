@@ -40,9 +40,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
     func value(index: Int) -> Element? {
         if let node = node {
             if index >= 0 && index < node.count {
-                if let result = node.values[index] {
-                    return result
-                }
+                return node.values[index]
             }
         }
         return nil
