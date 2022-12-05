@@ -69,28 +69,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         guard isLeaf == node.isLeaf else {
             fatalError("BTreeNode.swap() isLeaf (\(isLeaf)) != node.isLeaf (\(node.isLeaf))")
         }
-
-        /*
-        let n = max(count, node.count)
-         
-        var i = 0
-        while i < n {
-            value_swap(i: i, x: node, j: i)
-            i += 1
-        }
-
-        i = count
-        while i < node.count {
-            node.value_destroy(i: i)
-            i += 1
-        }
-
-        i = node.count
-        while i < count {
-            value_destroy(i: i)
-            i += 1
-        }
-         */
         
         let holdValues = values
         values = node.values
@@ -112,28 +90,6 @@ class BTreeNode<Element: Comparable>: Hashable {
                     child.parent = node
                 }
             }
-            
-            /*
-            i = 0
-            while i <= n {
-                let hold = children[i]
-                children[i] = node.children[i]
-                node.children[i] = hold
-                i += 1
-            }
-
-            i = 0
-            while i <= count {
-                node.children[i]?.parent = node
-                i += 1
-            }
-            
-            i = 0
-            while i <= node.count {
-                children[i]?.parent = self
-                i += 1
-            }
-            */
         }
         
         let holdCount = count
@@ -183,19 +139,14 @@ class BTreeNode<Element: Comparable>: Hashable {
         
         let parentMockValue = (count > 0) ? values[0] : dest.values[0]
         
-        
         var newTargetCount = 0
         if insertIndex == 0 {
-            //dest.count = count - 1
             newTargetCount = (count - 1)
-            
         } else if insertIndex == order {
             
         } else {
-            //dest.count = count >> 1
             newTargetCount = (count >> 1)
         }
-        
         
         var newCount = (count - newTargetCount)
         
@@ -211,17 +162,11 @@ class BTreeNode<Element: Comparable>: Hashable {
             i += 1
         }
         
-        
         newCount -= 1
-        
-        //count = count - newTargetCount
-        //count = count - 1
         
         guard let parent = parent else {
             fatalError("BTreeNode.split() parent is null")
         }
-        
-        
         
         parent.insert_value(index: index, element: parentMockValue)
         
@@ -240,7 +185,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         if !(dest.count == dest.values.count) {
             fatalError("count mismatch 2")
         }
-        
         
         parent.set_child(i: index + 1, node: dest)
         
@@ -262,17 +206,6 @@ class BTreeNode<Element: Comparable>: Hashable {
     }
     
     func insert_value(index: Int, element: Element) {
-        
-        /*
-        var j = count
-        while j > index {
-            values[j] = values[j - 1]
-            j -= 1
-        }
-        
-        values[index] = element
-        */
-        
         values.insert(element, at: index)
         
         count += 1
@@ -368,7 +301,7 @@ class BTreeNode<Element: Comparable>: Hashable {
     }
     
     func value_swap(i: Int, x: BTreeNode<Element>, j: Int) {
-        var hold = values[i]
+        let hold = values[i]
         values[i] = x.values[j]
         x.values[j] = hold
     }
@@ -385,29 +318,19 @@ class BTreeNode<Element: Comparable>: Hashable {
     
     func rebalance_right_to_left(src: BTreeNode<Element>, moveCount: Int) {
         
+        guard let parent = parent else { return }
         
-        if let parent = parent {
-            
-            
-            //count += moveCount
-            
-            var mockValue = parent.values[index]
-            let ceil = count + moveCount
-            while values.count < ceil {
-                values.append(mockValue)
-            }
-            
-            
-            
-            
-            value_swap(i: count, x: parent, j: index)
-            
-            //parent()->value_swap(position(), src, moveCount - 1);
-            parent.value_swap(i: index, x: src, j: moveCount - 1)
-            
-        } else {
-            fatalError("BTreeNode.rebalance_right_to_left moveCount parent is nil")
+        
+        var mockValue = parent.values[index]
+        let ceil = count + moveCount
+        while values.count < ceil {
+            values.append(mockValue)
         }
+        
+        value_swap(i: count, x: parent, j: index)
+        
+        parent.value_swap(i: index, x: src, j: moveCount - 1)
+
         
         
         var i = 1
@@ -458,7 +381,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         
         if let parent = parent {
             
-            var mockValue = parent.values[index]
+            let mockValue = parent.values[index]
             let ceil = dest.count + moveCount
             while dest.values.count < ceil {
                 dest.values.append(mockValue)
@@ -473,8 +396,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         
             dest.value_swap(i: moveCount - 1, x: parent, j: index)
             parent.value_swap(i: index, x: self, j: count - moveCount)
-        } else {
-            fatalError("looool")
         }
         
         i = 1
