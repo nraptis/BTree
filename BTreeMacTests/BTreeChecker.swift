@@ -22,6 +22,7 @@ class BTreeChecker {
         let maxNumber = mockTree.getMax() ?? 0
         
         for number in (minNumber - 1)...(maxNumber - 1) {
+            
             if realTree.contains(number) != mockTree.contains(number) {
                 XCTFail("BTree.contains(\(number)) (\(realTree.contains(number))) != MockMultiSearchTree.contains(\(number)) (\(mockTree.contains(number))")
                 return false
