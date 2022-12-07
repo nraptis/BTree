@@ -90,7 +90,7 @@ class BTree<Element: Comparable> {
                             }
                             
                             if (insertIndex <= (node.count - moveCount)) || ((right.count + moveCount) < right.order) {
-                                node.rebalance_left_to_right(dest: right, moveCount: moveCount)
+                                node.rebalanceLeftToRight(target: right, moveCount: moveCount)
                                 if insertIndex > node.count {
                                     insertIndex = insertIndex - node.count - 1
                                     node = right
@@ -442,29 +442,7 @@ class BTree<Element: Comparable> {
                             moveCount = (left.count - 1)
                         }
                         
-                        /*
-                        print("pre-left.rebalance_left_to_right, node")
-                        node.printNode()
-                        
-                        print("pre-left.rebalance_left_to_right, left")
-                        left.printNode()
-                        
-                        print("pre-left.rebalance_left_to_right, tree")
-                        printLevels()
-                        */
-                        
-                        left.rebalance_left_to_right(dest: node, moveCount: moveCount)
-                        
-                        /*
-                        print("post-left.rebalance_left_to_right, node")
-                        node.printNode()
-                        
-                        print("post-left.rebalance_left_to_right, left")
-                        left.printNode()
-                        
-                        print("post-left.rebalance_left_to_right, tree")
-                        printLevels()
-                        */
+                        left.rebalanceLeftToRight(target: node, moveCount: moveCount)
                         
                         iterator.index += moveCount
                         return false

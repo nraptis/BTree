@@ -381,21 +381,7 @@ class BTreeNode<Element: Comparable>: Hashable {
                 }
                 i += 1
             }
-
-            /*
-            i = 0
-            while i <= (src.count - moveCount) {
-                guard i + moveCount <= src.order else {
-                    fatalError("BTreeNode.rebalance_right_to_left i (\(i)) + moveCount (\(moveCount)) > src.order (\(src.order))")
-                }
-                guard let srcChild = src.child(index: i + moveCount) else {
-                    fatalError("BTreeNode.rebalance_right_to_left missing child i (\(i)) + moveCount (\(moveCount))")
-                }
-                src.set_child(i: i, node: srcChild)
-                src.children[i + moveCount] = nil
-                i += 1
-            }
-            */
+            
             src.children.removeFirst(moveCount)
             
             for (index, child) in src.children.enumerated() {
@@ -413,94 +399,40 @@ class BTreeNode<Element: Comparable>: Hashable {
     }
     
     
-    func rebalance_left_to_right(dest: BTreeNode<Element>, moveCount: Int) {
+    func rebalanceLeftToRight(target: BTreeNode<Element>, moveCount: Int) {
+        if !isLeaf {
+            var targetChildren = [BTreeNode<Element>]()
+            for seek in 0..<moveCount {
+                let child = children[count - moveCount + seek + 1]
+                child.index = seek
+                child.parent = target
+                targetChildren.append(child)
+            }
+            
+            for seek in 0...target.count {
+                let child = target.children[seek]
+                child.index = seek + moveCount
+                targetChildren.append(child)
+            }
+            
+            target.children = targetChildren
+            children.removeLast(moveCount)
+        }
         
-        var front = [Element]()
-        front.reserveCapacity(moveCount)
+        var targetFrontValues = [Element]()
+        targetFrontValues.reserveCapacity(order)
         for seek in (count - (moveCount) + 1)..<count {
-            front.append(values[seek])
+            targetFrontValues.append(values[seek])
         }
         if let parent = parent {
-            front.append(parent.values[index])
+            targetFrontValues.append(parent.values[index])
             parent.values[index] = values[count - moveCount]
         }
-        dest.values.insert(contentsOf: front, at: 0)
+        target.values.insert(contentsOf: targetFrontValues, at: 0)
         values.removeLast(moveCount)
         
-        if !isLeaf {
-            
-            //print("pre-dest:")
-            //dest.printNode()
-            //print("pre-node:")
-            //self.printNode()
-            
-            var front = [BTreeNode<Element>]()
-            
-            
-            var i = 1
-            while i <= moveCount {
-                if let selfChild = child(index: count - moveCount + i) {
-                    selfChild.index = (i + 1)
-                    front.append(selfChild)
-                }
-                
-                i += 1
-            }
-            
-            //for _ in 0..<moveCount {
-            //    dest.children.append(sentinel)
-            //}
-
-            i = 0
-            while i <= dest.count {
-                if let destChild = dest.child(index: i) {
-                    //dest.set_child(i: i + moveCount, node: destChild)
-                    destChild.index = i + moveCount
-                    front.append(destChild)
-                    //dest.children[i] = nil
-                }
-                i += 1
-            }
-
-            /*
-            i = 1
-            while i <= moveCount {
-                
-                if let selfChild = child(index: count - moveCount + i) {
-                    dest.set_child(i: i - 1, node: selfChild)
-                    //children[count - moveCount + i] = nil
-                }
-                
-                i += 1
-            }
-            */
-            
-            dest.children = front
-            //childrenchildren.removeFirst(moveCount)
-            children.removeLast(moveCount)
-            
-            //print("post-dest:")
-            //dest.printNode()
-            //print("post-node:")
-            //self.printNode()
-            
-            for (index, child) in children.enumerated() {
-                child.index = index
-                child.parent = self
-            }
-            for (index, child) in dest.children.enumerated() {
-                child.index = index
-                child.parent = dest
-            }
-            
-            
-        }
-        
         count -= moveCount
-        dest.count += moveCount
-        
-        
-        
+        target.count += moveCount
     }
     
     func printNode() {

@@ -10,115 +10,10 @@ import XCTest
 
 final class BTreeTests: XCTestCase {
     
-    func testJazz() {
-        
-        let realTree = BTree<Int>(order: 3)
-        let mockTree = MockMultiSearchTree<Int>()
-        
-        //let ins = [22, 21, 0, 12, 18, 16, 19, 0, 8, 9, 6, 12, 5, 6, 20, 21, 12, 19, 15, 6, 13, 5, 8]
-        let ins = [22, 21, 0, 12, 18, 16, 19, 0, 8, 9, 6, 12, 5, 6, 20, 21, 12, 19, 15]
-        
-        for val in ins {
-            print("ins \(val)")
-            realTree.insert(val)
-            mockTree.insert(val)
-            if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                XCTFail("Failed: testSchibby()")
-                return
-            }
-        }
-        
-        //delete array: [5, 24, 8]
-        
-        realTree.printLevels()
-        
-        realTree.insert(6)
-        mockTree.insert(6)
-        
-        realTree.printLevels()
-        
-        if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-            XCTFail("Failed: testSchibby()")
-            return
-        }
-    }
-    
-    func testHoodoo() {
-        
-        let realTree = BTree<Int>(order: 3)
-        realTree.insert(0)
-        realTree.insert(1)
-        realTree.insert(3)
-        realTree.insert(2)
-        realTree.printLevels()
-        
-        realTree.remove(0)
-        realTree.printLevels()
-    }
-    
-    func testGrubby() {
-        
-        let realTree = BTree<Int>(order: 3)
-        let mockTree = MockMultiSearchTree<Int>()
-        
-        let ins = [6, 2, 6, 2, 0, 1, 2, 2, 3, 5, 0, 5, 2, 1]
-        for val in ins {
-            realTree.insert(val)
-            mockTree.insert(val)
-            if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                XCTFail("Failed: testSchibby()")
-                return
-            }
-        }
-        
-        realTree.printLevels()
-        realTree.remove(6)
-        mockTree.remove(6)
-        realTree.printLevels()
-        
-        
-        if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-            XCTFail("Failed: testSchibby()")
-            return
-        }
-        
-        print("aaa")
-    }
-    
-    
-    func testSchibby() {
-        
-        let realTree = BTree<Int>(order: 3)
-        let mockTree = MockMultiSearchTree<Int>()
-        
-        let ins = [1, 0, 2, 4, 5, 2, 2, 2, 5, 5, 6, 6, 1, 4]
-        for val in ins {
-            realTree.insert(val)
-            mockTree.insert(val)
-            if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                XCTFail("Failed: testSchibby()")
-                return
-            }
-        }
-        
-        realTree.printLevels()
-        realTree.remove(0)
-        mockTree.remove(0)
-        realTree.printLevels()
-        
-        if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-            XCTFail("Failed: testSchibby()")
-            return
-        }
-        
-        print("aaa")
-    }
-    
     func testJustInsert() {
         let realTree = BTree<Int>(order: 3)
         let mockTree = MockMultiSearchTree<Int>()
         for i in 1...200 {
-            realTree.printLevels()
             realTree.insert(i)
             mockTree.insert(i)
             if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
@@ -194,53 +89,7 @@ final class BTreeTests: XCTestCase {
             }
         }
     }
-    
-    func test10000Harsh() {
-        for loop in 0...100000 {
-            let insertCount = Int.random(in: 0...14)
-            var insertArray = [Int]()
-            for _ in 0..<insertCount {
-                insertArray.append(Int.random(in: 0...6))
-            }
-            
-            let deleteCount = Int.random(in: 0...14)
-            var deleteArray = [Int]()
-            for _ in 0..<deleteCount {
-                deleteArray.append(Int.random(in: 0...6))
-            }
-            
-            let realTree = BTree<Int>(order: Int.random(in: 3...3))
-            let mockTree = MockMultiSearchTree<Int>()
-            for value in insertArray {
-                realTree.insert(value)
-                mockTree.insert(value)
-            }
-            
-            if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                XCTFail("Failed: test10000SmallTrees()")
-                print("insert array: \(insertArray)")
-                print("delete array: \(deleteArray)")
-                return
-            }
-            
-            for value in deleteArray {
-                realTree.remove(value)
-                mockTree.remove(value)
-            }
-            
-            if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                XCTFail("Failed: test10000SmallTrees()")
-                print("insert array: \(insertArray)")
-                print("delete array: \(deleteArray)")
-                return
-            }
-            
-            if (loop % 1000) == 0 {
-                print("test10000SmallTrees() [\(loop) / 10000]")
-            }
-        }
-    }
-    
+
     func test10000SmallTrees() {
         for loop in 0...10000 {
             let insertCount = Int.random(in: 0...24)
