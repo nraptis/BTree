@@ -62,7 +62,7 @@ class BTree<Element: Comparable> {
                                 moveCount = 1
                             }
                             if ((insertIndex - moveCount) >= 0) || ((left.count + moveCount) < left.order) {
-                                left.rebalance_right_to_left(src: node, moveCount: moveCount)
+                                left.rebalanceRightToLeft(target: node, moveCount: moveCount)
                                 insertIndex -= moveCount
                                 if insertIndex < 0 {
                                     insertIndex = insertIndex + left.count + 1
@@ -426,7 +426,7 @@ class BTree<Element: Comparable> {
                         if moveCount > (right.count - 1) {
                             moveCount = (right.count - 1)
                         }
-                        node.rebalance_right_to_left(src: right, moveCount: moveCount)
+                        node.rebalanceRightToLeft(target: right, moveCount: moveCount)
                         return false
                     }
                 }

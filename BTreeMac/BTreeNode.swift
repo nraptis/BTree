@@ -353,51 +353,32 @@ class BTreeNode<Element: Comparable>: Hashable {
         node.index = i
     }
     
-    func rebalance_right_to_left(src: BTreeNode<Element>, moveCount: Int) {
+    func rebalanceRightToLeft(target: BTreeNode<Element>, moveCount: Int) {
+        if !isLeaf {
+            for seek in 0..<moveCount {
+                let child = target.children[seek]
+                child.index = seek + count + 1
+                child.parent = self
+                children.append(child)
+            }
+            target.children.removeFirst(moveCount)
+            for seek in 0..<target.children.count {
+                target.children[seek].index = seek
+            }
+        }
         
-        guard let parent = parent else { return }
-        values.append(parent.values[index])
-        parent.values[index] = src.values[moveCount - 1]
+        if let parent = parent {
+            values.append(parent.values[index])
+            parent.values[index] = target.values[moveCount - 1]
+        }
         let ceiling = (moveCount - 1)
         for seek in 0..<ceiling {
-            values.append(src.values[seek])
+            values.append(target.values[seek])
         }
-        src.values.removeFirst(moveCount)
-
-        if !isLeaf {
-
-            var i = 0
-            
-            while i < moveCount {
-                children.append(sentinel)
-                i += 1
-            }
-            
-            
-            i = 0
-            while i < moveCount {
-                if let srcChild = src.child(index: i) {
-                    set_child(i: 1 + count + i, node: srcChild)
-                }
-                i += 1
-            }
-            
-            src.children.removeFirst(moveCount)
-            
-            for (index, child) in src.children.enumerated() {
-                child.index = index
-            }
-            for (index, child) in children.enumerated() {
-                child.index = index
-            }
-            
-            
-        }
-        
+        target.values.removeFirst(moveCount)
         count += moveCount
-        src.count -= moveCount
+        target.count -= moveCount
     }
-    
     
     func rebalanceLeftToRight(target: BTreeNode<Element>, moveCount: Int) {
         if !isLeaf {
