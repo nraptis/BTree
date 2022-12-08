@@ -29,19 +29,34 @@ class BTreeNode<Element: Comparable> {
     var parent: BTreeNode<Element>?
     var values: [Element]
     var children: [BTreeNode<Element>]
-        
-    func swap(node: BTreeNode<Element>) {
-        Swift.swap(&values, &node.values)
+    
+    func insertValueLeaf(index: Int, element: Element) {
+        values.insert(element, at: index)
+        count += 1
+    }
+    
+    func insertValueInternal(index: Int, element: Element, node: BTreeNode<Element>) {
         if !isLeaf {
-            Swift.swap(&children, &node.children)
-            for child in children {
-                child.parent = self
-            }
-            for child in node.children {
-                child.parent = node
+            let index = index + 1
+            children.insert(node, at: index)
+            node.parent = self
+            for seek in index..<children.count {
+                children[seek].index = seek
             }
         }
-        Swift.swap(&count, &node.count)
+        values.insert(element, at: index)
+        count += 1
+    }
+    
+    func remove(index: Int) {
+        if !isLeaf {
+            children.remove(at: index + 1)
+            for seek in (index + 1)..<children.count {
+                children[seek].index = seek
+            }
+        }
+        count -= 1
+        values.remove(at: index)
     }
     
     func lowerBound(element: Element) -> Int {
@@ -72,26 +87,36 @@ class BTreeNode<Element: Comparable> {
         return start
     }
     
+    func swap(node: BTreeNode<Element>) {
+        Swift.swap(&values, &node.values)
+        if !isLeaf {
+            Swift.swap(&children, &node.children)
+            for child in children {
+                child.parent = self
+            }
+            for child in node.children {
+                child.parent = node
+            }
+        }
+        Swift.swap(&count, &node.count)
+    }
+    
     func split(target: BTreeNode<Element>, insertIndex: Int) {
-        
-        guard let parent = parent else { return }
-
+        guard let parent = parent else {
+            return
+        }
         var newTargetCount = 0
         if insertIndex == 0 {
             newTargetCount = (count - 1)
         } else if insertIndex != order {
             newTargetCount = (count >> 1)
         }
-        
         var newCount = (count - newTargetCount)
         for seek in 0..<newTargetCount {
             target.values.append(values[newCount + seek])
         }
-        
         newCount -= 1
-        
         parent.insertValueInternal(index: index, element: values[newCount], node: target)
-
         values.removeLast(values.count - newCount)
         count = newCount
         target.count = newTargetCount
@@ -108,37 +133,6 @@ class BTreeNode<Element: Comparable> {
         }
     }
     
-    func insertValueInternal(index: Int, element: Element, node: BTreeNode<Element>) {
-        if !isLeaf {
-            let index = index + 1
-            children.insert(node, at: index)
-            node.parent = self
-            for seek in index..<children.count {
-                children[seek].index = seek
-            }
-        }
-        
-        values.insert(element, at: index)
-        count += 1
-    }
-    
-    func insertValueLeaf(index: Int, element: Element) {
-        values.insert(element, at: index)
-        count += 1
-    }
-    
-    func remove(index: Int) {
-        if !isLeaf {
-            children.remove(at: index + 1)
-            for seek in (index + 1)..<children.count {
-                children[seek].index = seek
-            }
-        }
-        
-        count -= 1
-        values.remove(at: index)
-    }
-    
     func merge(source: BTreeNode<Element>) {
         if !isLeaf {
             for seek in 0...source.count {
@@ -147,10 +141,8 @@ class BTreeNode<Element: Comparable> {
                 child.parent = self
                 children.append(child)
             }
-            
             source.children.removeAll(keepingCapacity: true)
         }
-        
         if let parent = parent {
             values.append(parent.values[index])
             values.append(contentsOf: source.values)
@@ -198,13 +190,11 @@ class BTreeNode<Element: Comparable> {
                 child.parent = target
                 targetChildren.append(child)
             }
-            
             for seek in 0...target.count {
                 let child = target.children[seek]
                 child.index = seek + moveCount
                 targetChildren.append(child)
             }
-            
             target.children = targetChildren
             children.removeLast(moveCount)
         }
