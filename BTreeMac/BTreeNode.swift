@@ -158,25 +158,11 @@ class BTreeNode<Element: Comparable>: Hashable {
         
         newCount -= 1
         
-        parent.insert_value(index: index, element: values[newCount])
+        parent.insertValueInternal(index: index, element: values[newCount], node: dest)
 
         values.removeLast(values.count - newCount)
-        
         count = newCount
         dest.count = newTargetCount
-        
-        if !(count == values.count) {
-            fatalError("count mismatch 1")
-        }
-        if !(dest.count == dest.values.count) {
-            fatalError("count mismatch 2")
-        }
-        
-        
-        
-        
-        
-        parent.set_child(i: index + 1, node: dest)
         
         if !isLeaf {
             
@@ -217,30 +203,29 @@ class BTreeNode<Element: Comparable>: Hashable {
         }
     }
     
-    func insert_value(index: Int, element: Element) {
-        values.insert(element, at: index)
-        
-        count += 1
+    func insertValueInternal(index: Int, element: Element, node: BTreeNode<Element>) {
         
         if !isLeaf {
             
             let index = index + 1
             
-            children.insert(sentinel, at: index)
+            children.insert(node, at: index)
+            node.parent = self
             
-            /*
-            var j = count
-            while j > index {
-                //children[j] = children[j - 1]
-                children[j].index = j
-                
-                j -= 1
-            }
-            */
-            for (index, child) in children.enumerated() {
-                child.index = index
+            for seek in index..<children.count {
+                children[seek].index = seek
             }
         }
+        
+        values.insert(element, at: index)
+        
+        count += 1
+        
+    }
+    
+    func insertValueLeaf(index: Int, element: Element) {
+        values.insert(element, at: index)
+        count += 1
     }
     
     func remove_value(index: Int) {
@@ -254,21 +239,9 @@ class BTreeNode<Element: Comparable>: Hashable {
             
             children.remove(at: index + 1) // or index?
             
-            /*
-            while j < count {
-                
-                children[j].index = j
-                
-                j += 1
+            for seek in (index + 1)..<children.count {
+                children[seek].index = seek
             }
-            */
-            
-            for (index, child) in children.enumerated() {
-                child.index = index
-            }
-            
-            //children[count] = nil
-            
         }
         
         count -= 1
@@ -280,51 +253,31 @@ class BTreeNode<Element: Comparable>: Hashable {
     }
     
     func merge(source: BTreeNode<Element>) {
-        guard let parent = parent else {
-            return
-        }
-        
-        values.append(parent.values[index])
-        values.append(contentsOf: source.values)
         
         if !isLeaf {
-            var i = 0
             
-            while i <= source.count {
-                children.append(sentinel)
-                i += 1
-            }
-            
-            i = 0
-            while i <= source.count {
-                guard let sourceChild = source.child(index: i) else {
-                    fatalError("BTreeNode.merge() source.child(index: i (\(i))) is null")
-                }
-                set_child(i: 1 + count + i, node: sourceChild)
-                //source.children[i] = nil
-                i += 1
+            for seek in 0...source.count {
+                let child = source.children[seek]
+                child.index = count + seek + 1
+                child.parent = self
+                children.append(child)
             }
             
-            i = 0
-            while i <= source.count {
-                source.children.removeLast()
-                i += 1
-            }
-            
-            for (index, child) in children.enumerated() {
-                child.index = index
-            }
-            for (index, child) in source.children.enumerated() {
-                child.index = index
-            }
+            source.children.removeAll(keepingCapacity: true)
         }
         
-        count = ((1 + count) + source.count)
-        source.count = 0
-        
-        source.values.removeAll(keepingCapacity: true)
-        source.children.removeAll(keepingCapacity: true)
-        parent.remove_value(index: index)
+        if let parent = parent {
+            values.append(parent.values[index])
+            
+            values.append(contentsOf: source.values)
+            
+            count = ((1 + count) + source.count)
+            source.count = 0
+            
+            source.values.removeAll(keepingCapacity: true)
+            source.children.removeAll(keepingCapacity: true)
+            parent.remove_value(index: index)
+        }
     }
     
     func destroy() {

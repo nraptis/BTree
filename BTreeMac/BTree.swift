@@ -228,7 +228,7 @@ class BTree<Element: Comparable> {
         }
         
         if let node = iterator.node {
-            node.insert_value(index: iterator.index, element: element)
+            node.insertValueLeaf(index: iterator.index, element: element)
         }
     }
     
