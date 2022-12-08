@@ -1,9 +1,5 @@
 BTree is thoroughly unit tested. This can be used with iOS, MacOS, WatchOS, or Server Side Swift.
 
-
-Open the readme file, you cannot see the angle brackets on the GitHub website. There are angle brackets in the examples.
-
-
 You need three files.
 
 
@@ -24,11 +20,8 @@ Example Use 1:
 ```
 
 let tree = BTree<Int>(order: 3)
-
 tree.insert(1)
-
 tree.insert(1)
-
 tree.insert(2)
 
 let countOf1 = tree.countElement(1)
