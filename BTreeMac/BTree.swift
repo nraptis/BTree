@@ -26,18 +26,6 @@ class BTree<Element: Comparable> {
         return root === nil
     }
     
-    func startIterator() -> BTreeIterator<Element> {
-        BTreeIterator<Element>(tree: self, node: leftMost, index: 0)
-    }
-    
-    func endIterator() -> BTreeIterator<Element> {
-        if let node = rightMost {
-            return BTreeIterator<Element>(tree: self, node: node, index: node.count)
-        } else {
-            return BTreeIterator<Element>(tree: self, node: nil, index: 0)
-        }
-    }
-    
     func contains(_ element: Element) -> Bool {
         let rootIterator = BTreeIterator(tree: self, node: root, index: 0)
         let iterator = search(iterator: rootIterator, element: element)
@@ -88,6 +76,18 @@ class BTree<Element: Comparable> {
         }
     }
     
+    func startIterator() -> BTreeIterator<Element> {
+        BTreeIterator<Element>(tree: self, node: leftMost, index: 0)
+    }
+    
+    func endIterator() -> BTreeIterator<Element> {
+        if let node = rightMost {
+            return BTreeIterator<Element>(tree: self, node: node, index: node.count)
+        } else {
+            return BTreeIterator<Element>(tree: self, node: nil, index: 0)
+        }
+    }
+    
     func lowerBound(element: Element) -> BTreeIterator<Element> {
         let rootIterator = BTreeIterator(tree: self, node: root, index: 0)
         let lowerBoundIterator = lowerBound(iterator: rootIterator, element: element)
@@ -102,16 +102,7 @@ class BTree<Element: Comparable> {
         return result
     }
     
-    private func merge(left: BTreeNode<Element>, right: BTreeNode<Element>) {
-        left.merge(source: right)
-        if right.isLeaf {
-            if rightMost === right {
-                rightMost = left
-            }
-        }
-    }
-    
-    private func distance(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) -> Int {
+    func distance(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) -> Int {
         if startIterator == endIterator {
             return 0
         } else {
@@ -124,7 +115,16 @@ class BTree<Element: Comparable> {
             return result
         }
     }
-
+    
+    private func merge(left: BTreeNode<Element>, right: BTreeNode<Element>) {
+        left.merge(source: right)
+        if right.isLeaf {
+            if rightMost === right {
+                rightMost = left
+            }
+        }
+    }
+    
     private func search(iterator: BTreeIterator<Element>, element: Element) -> BTreeIterator<Element> {
         var iterator = iterator
         if iterator.node != nil {
