@@ -21,7 +21,7 @@ You need three files.
 
 Example Use 1:
 
-“““
+```
 
 let tree = BTree<Int>(order: 3)
 
@@ -41,7 +41,7 @@ print("1 appears \(countOf1) times in the tree")
 
 print("2 appears \(countOf2) times in the tree")
 
-“““
+```
 
 =================================
 
@@ -50,7 +50,7 @@ print("2 appears \(countOf2) times in the tree")
 
 Example Use 2:
 
-“““
+```
 
 let tree = BTree<String>(order: 4)
 
@@ -98,7 +98,7 @@ print("contains britain \t[before: \(containsBritain1) after: \(containsBritain2
 
 print("contains mexico \t[before: \(containsMexico1) after: \(containsMexico2)]")
 
-“““
+```
 
 =================================
 
