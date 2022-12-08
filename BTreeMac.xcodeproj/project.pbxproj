@@ -12,8 +12,6 @@
 		0D0318A4293D5DCD00A615A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D0318A3293D5DCD00A615A7 /* Assets.xcassets */; };
 		0D0318A7293D5DCD00A615A7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D0318A6293D5DCD00A615A7 /* Preview Assets.xcassets */; };
 		0D0318CD293D5DF700A615A7 /* BTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318CA293D5DF700A615A7 /* BTree.swift */; };
-		0D0318CE293D5DF700A615A7 /* BTreeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318CB293D5DF700A615A7 /* BTreeIterator.swift */; };
-		0D0318CF293D5DF700A615A7 /* BTreeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318CC293D5DF700A615A7 /* BTreeNode.swift */; };
 		0D0318D7293D5F0500A615A7 /* Array+Subsets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318D0293D5F0500A615A7 /* Array+Subsets.swift */; };
 		0D0318D8293D5F0500A615A7 /* BTreeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318D1293D5F0500A615A7 /* BTreeChecker.swift */; };
 		0D0318D9293D5F0500A615A7 /* BTreeTestsOverNight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318D2293D5F0500A615A7 /* BTreeTestsOverNight.swift */; };
@@ -45,8 +43,6 @@
 		0D0318A8293D5DCD00A615A7 /* BTreeMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BTreeMac.entitlements; sourceTree = "<group>"; };
 		0D0318AD293D5DCD00A615A7 /* BTreeMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BTreeMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D0318CA293D5DF700A615A7 /* BTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTree.swift; sourceTree = "<group>"; };
-		0D0318CB293D5DF700A615A7 /* BTreeIterator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTreeIterator.swift; sourceTree = "<group>"; };
-		0D0318CC293D5DF700A615A7 /* BTreeNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTreeNode.swift; sourceTree = "<group>"; };
 		0D0318D0293D5F0500A615A7 /* Array+Subsets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Subsets.swift"; sourceTree = "<group>"; };
 		0D0318D1293D5F0500A615A7 /* BTreeChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTreeChecker.swift; sourceTree = "<group>"; };
 		0D0318D2293D5F0500A615A7 /* BTreeTestsOverNight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTreeTestsOverNight.swift; sourceTree = "<group>"; };
@@ -99,8 +95,6 @@
 			isa = PBXGroup;
 			children = (
 				0D0318CA293D5DF700A615A7 /* BTree.swift */,
-				0D0318CC293D5DF700A615A7 /* BTreeNode.swift */,
-				0D0318CB293D5DF700A615A7 /* BTreeIterator.swift */,
 				0D0318A1293D5DCA00A615A7 /* ContentView.swift */,
 				0D03189F293D5DCA00A615A7 /* BTreeMacApp.swift */,
 				0D0318A3293D5DCD00A615A7 /* Assets.xcassets */,
@@ -237,8 +231,6 @@
 			files = (
 				0D0318A2293D5DCA00A615A7 /* ContentView.swift in Sources */,
 				0D0318A0293D5DCA00A615A7 /* BTreeMacApp.swift in Sources */,
-				0D0318CF293D5DF700A615A7 /* BTreeNode.swift in Sources */,
-				0D0318CE293D5DF700A615A7 /* BTreeIterator.swift in Sources */,
 				0D0318CD293D5DF700A615A7 /* BTree.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

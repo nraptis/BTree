@@ -2,12 +2,10 @@ BTree is thoroughly unit tested. This can be used with iOS, MacOS, WatchOS, or S
 
 For storing billions and billions of items, you should use a larger value for order, such as 1024.
 
-You need three files:
+The BTree code is all in this file:
 
 ```
-1.) BTree.swift
-2.) BTreeNode.swift
-3.) BTreeIterator.swift
+BTree.swift
 ```
 
 =================================

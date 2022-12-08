@@ -11,7 +11,7 @@ class BTree<Element: Comparable> {
     private let order: Int
     private let minOrder: Int
     
-    private(set) var root: BTreeNode<Element>? = nil
+    private var root: BTreeNode<Element>? = nil
     private(set) var count = 0
     
     private var rightMost: BTreeNode<Element>? = nil
@@ -64,11 +64,9 @@ class BTree<Element: Comparable> {
         
         let rootIterator = BTreeIterator(tree: self, node: root, index: 0)
         var iterator = upperBound(iterator: rootIterator, element: element)
-        
         if iterator.node == nil {
             iterator = endIterator()
         }
-        
         insert(iterator: iterator, element: element)
     }
     
@@ -79,16 +77,15 @@ class BTree<Element: Comparable> {
         }
         let upperBoundIterator = upperBound(iterator: BTreeIterator(tree: self, node: root, index: 0), element: element)
         let endIterator = endIterator(iterator: upperBoundIterator)
-        _ = remove(startIterator: begin, endIterator: endIterator)
+        remove(startIterator: begin, endIterator: endIterator)
     }
     
-    func remove(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) -> Int {
+    func remove(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) {
         var iterator = BTreeIterator<Element>(iterator: startIterator)
         let count = distance(startIterator: startIterator, endIterator: endIterator)
         for _ in 0..<count {
             iterator = remove(iterator: iterator)
         }
-        return count
     }
     
     func lowerBound(element: Element) -> BTreeIterator<Element> {
@@ -444,18 +441,330 @@ class BTree<Element: Comparable> {
         }
     }
     
+    fileprivate class BTreeNode<Element: Comparable> {
+        
+        required init(order: Int, isLeaf: Bool) {
+            self.order = order
+            self.isLeaf = isLeaf
+            parent = nil
+            values = [Element]()
+            values.reserveCapacity(order)
+            if isLeaf {
+                children = [BTreeNode<Element>]()
+            } else {
+                children = [BTreeNode<Element>]()
+                children.reserveCapacity(order + 1)
+            }
+        }
+        
+        var order: Int
+        var index: Int = 0
+        var count: Int = 0
+        var isLeaf: Bool
+        var parent: BTreeNode<Element>?
+        var values: [Element]
+        var children: [BTreeNode<Element>]
+        
+        func insertValueLeaf(index: Int, element: Element) {
+            values.insert(element, at: index)
+            count += 1
+        }
+        
+        func insertValueInternal(index: Int, element: Element, node: BTreeNode<Element>) {
+            if !isLeaf {
+                let index = index + 1
+                children.insert(node, at: index)
+                node.parent = self
+                for seek in index..<children.count {
+                    children[seek].index = seek
+                }
+            }
+            values.insert(element, at: index)
+            count += 1
+        }
+        
+        func remove(index: Int) {
+            if !isLeaf {
+                children.remove(at: index + 1)
+                for seek in (index + 1)..<children.count {
+                    children[seek].index = seek
+                }
+            }
+            count -= 1
+            values.remove(at: index)
+        }
+        
+        func lowerBound(element: Element) -> Int {
+            var start = 0
+            var end = count
+            while start != end {
+                let mid = (start + end) >> 1
+                if element > values[mid] {
+                    start = mid + 1
+                } else {
+                    end = mid
+                }
+            }
+            return start
+        }
+        
+        func upperBound(element: Element) -> Int {
+            var start = 0
+            var end = count
+            while start != end {
+                let mid = (start + end) >> 1
+                if element >= values[mid] {
+                    start = mid + 1
+                } else {
+                    end = mid
+                }
+            }
+            return start
+        }
+        
+        func swap(node: BTreeNode<Element>) {
+            Swift.swap(&values, &node.values)
+            if !isLeaf {
+                Swift.swap(&children, &node.children)
+                for child in children {
+                    child.parent = self
+                }
+                for child in node.children {
+                    child.parent = node
+                }
+            }
+            Swift.swap(&count, &node.count)
+        }
+        
+        func split(target: BTreeNode<Element>, insertIndex: Int) {
+            guard let parent = parent else {
+                return
+            }
+            var newTargetCount = 0
+            if insertIndex == 0 {
+                newTargetCount = (count - 1)
+            } else if insertIndex != order {
+                newTargetCount = (count >> 1)
+            }
+            var newCount = (count - newTargetCount)
+            for seek in 0..<newTargetCount {
+                target.values.append(values[newCount + seek])
+            }
+            newCount -= 1
+            parent.insertValueInternal(index: index, element: values[newCount], node: target)
+            values.removeLast(values.count - newCount)
+            count = newCount
+            target.count = newTargetCount
+            
+            if !isLeaf {
+                let countPlus1 = count + 1
+                for seek in 0...target.count {
+                    let child = children[countPlus1 + seek]
+                    child.parent = target
+                    child.index = seek
+                    target.children.append(child)
+                }
+                children.removeLast(target.count + 1)
+            }
+        }
+        
+        func merge(source: BTreeNode<Element>) {
+            if !isLeaf {
+                for seek in 0...source.count {
+                    let child = source.children[seek]
+                    child.index = count + seek + 1
+                    child.parent = self
+                    children.append(child)
+                }
+                source.children.removeAll(keepingCapacity: true)
+            }
+            if let parent = parent {
+                values.append(parent.values[index])
+                values.append(contentsOf: source.values)
+                count = ((1 + count) + source.count)
+                source.count = 0
+                source.values.removeAll(keepingCapacity: true)
+                source.children.removeAll(keepingCapacity: true)
+                parent.remove(index: index)
+            }
+        }
+        
+        func rebalanceRightToLeft(target: BTreeNode<Element>, moveCount: Int) {
+            if !isLeaf {
+                for seek in 0..<moveCount {
+                    let child = target.children[seek]
+                    child.index = seek + count + 1
+                    child.parent = self
+                    children.append(child)
+                }
+                target.children.removeFirst(moveCount)
+                for seek in 0..<target.children.count {
+                    target.children[seek].index = seek
+                }
+            }
+            
+            if let parent = parent {
+                values.append(parent.values[index])
+                parent.values[index] = target.values[moveCount - 1]
+            }
+            let ceiling = (moveCount - 1)
+            for seek in 0..<ceiling {
+                values.append(target.values[seek])
+            }
+            target.values.removeFirst(moveCount)
+            count += moveCount
+            target.count -= moveCount
+        }
+        
+        func rebalanceLeftToRight(target: BTreeNode<Element>, moveCount: Int) {
+            if !isLeaf {
+                var targetChildren = [BTreeNode<Element>]()
+                for seek in 0..<moveCount {
+                    let child = children[count - moveCount + seek + 1]
+                    child.index = seek
+                    child.parent = target
+                    targetChildren.append(child)
+                }
+                for seek in 0...target.count {
+                    let child = target.children[seek]
+                    child.index = seek + moveCount
+                    targetChildren.append(child)
+                }
+                target.children = targetChildren
+                children.removeLast(moveCount)
+            }
+            
+            var targetFrontValues = [Element]()
+            targetFrontValues.reserveCapacity(order)
+            for seek in (count - (moveCount) + 1)..<count {
+                targetFrontValues.append(values[seek])
+            }
+            if let parent = parent {
+                targetFrontValues.append(parent.values[index])
+                parent.values[index] = values[count - moveCount]
+            }
+            target.values.insert(contentsOf: targetFrontValues, at: 0)
+            values.removeLast(moveCount)
+            
+            count -= moveCount
+            target.count += moveCount
+        }
+    }
+    
+    struct BTreeIterator<Element: Comparable>: Equatable {
+        
+        static func == (lhs: BTreeIterator<Element>, rhs: BTreeIterator<Element>) -> Bool {
+            (lhs.node === rhs.node) && (lhs.index == rhs.index)
+        }
+        
+        var tree: BTree<Element>
+        fileprivate var node: BTreeNode<Element>?
+        var index: Int
+        
+        fileprivate init(tree: BTree<Element>, node: BTreeNode<Element>?, index: Int) {
+            self.tree = tree
+            self.node = node
+            self.index = index
+        }
+        
+        init(iterator: BTreeIterator<Element>) {
+            self.tree = iterator.tree
+            self.node = iterator.node
+            self.index = iterator.index
+        }
+        
+        mutating func set(iterator: BTreeIterator<Element>) {
+            self.tree = iterator.tree
+            self.node = iterator.node
+            self.index = iterator.index
+        }
+        
+        func value() -> Element? {
+            return value(index: index)
+        }
+        
+        func value(index: Int) -> Element? {
+            if let node = node {
+                return node.values[index]
+            }
+            return nil
+        }
+        
+        mutating func increment() {
+            if var node = node {
+                if node.isLeaf {
+                    index += 1
+                    if index < node.count {
+                        return
+                    }
+                }
+                
+                if node.isLeaf {
+                    let holdNode = node
+                    let holdIndex = index
+                    while (index >= node.count) && (node !== tree.root), let parent = node.parent {
+                        index = node.index
+                        node = parent
+                    }
+                    if index >= node.count {
+                        node = holdNode
+                        index = holdIndex
+                    }
+                } else {
+                    let child = node.children[index + 1]
+                    node = child
+                    while !node.isLeaf {
+                        node = node.children[0]
+                    }
+                    index = 0
+                }
+                self.node = node
+            }
+        }
+        
+        mutating func decrement() {
+            if var node = node {
+                if node.isLeaf {
+                    index -= 1
+                    if index >= 0 {
+                        return
+                    }
+                }
+                
+                if node.isLeaf {
+                    let holdNode = node
+                    let holdIndex = index
+                    
+                    while (index < 0) && (node !== tree.root), let parent = node.parent {
+                        index = node.index - 1
+                        node = parent
+                    }
+                    if index < 0 {
+                        node = holdNode
+                        index = holdIndex
+                    }
+                } else {
+                    let child = node.children[index]
+                    node = child
+                    while !node.isLeaf {
+                        node = node.children[node.count]
+                    }
+                    index = node.count - 1
+                }
+                self.node = node
+            }
+        }
+    }
+    
     struct BTreeSequenceIterator<Element: Comparable>: IteratorProtocol {
-        
-        let startIterator: BTreeIterator<Element>
-        let endIterator: BTreeIterator<Element>
-        var iterator: BTreeIterator<Element>
-        
-        init(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) {
+        fileprivate let startIterator: BTreeIterator<Element>
+        fileprivate let endIterator: BTreeIterator<Element>
+        fileprivate var iterator: BTreeIterator<Element>
+        fileprivate init(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) {
             self.startIterator = startIterator
             self.endIterator = endIterator
             self.iterator = startIterator
         }
-        
         mutating func next() -> Element? {
             if iterator != endIterator {
                 let result = iterator.value()
