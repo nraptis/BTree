@@ -443,4 +443,34 @@ class BTree<Element: Comparable> {
             iterator.index = insertIndex
         }
     }
+    
+    struct BTreeSequenceIterator<Element: Comparable>: IteratorProtocol {
+        
+        let startIterator: BTreeIterator<Element>
+        let endIterator: BTreeIterator<Element>
+        var iterator: BTreeIterator<Element>
+        
+        init(startIterator: BTreeIterator<Element>, endIterator: BTreeIterator<Element>) {
+            self.startIterator = startIterator
+            self.endIterator = endIterator
+            self.iterator = startIterator
+        }
+        
+        mutating func next() -> Element? {
+            if iterator != endIterator {
+                let result = iterator.value()
+                iterator.increment()
+                return result
+            }
+            return nil
+        }
+    }
+}
+
+extension BTree: Sequence {
+    func makeIterator() -> BTree.BTreeSequenceIterator<Element> {
+        let startIterator = startIterator()
+        let endIterator = endIterator()
+        return BTree.BTreeSequenceIterator(startIterator: startIterator, endIterator: endIterator)
+    }
 }

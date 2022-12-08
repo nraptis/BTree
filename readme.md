@@ -32,7 +32,6 @@ print("2 appears \(countOf2) times in the tree")
 
 =================================
 
-
 Example Use 2:
 
 ```
@@ -69,6 +68,34 @@ print("contains mexico \t[before: \(containsMexico1) after: \(containsMexico2)]"
 
 =================================
 
+Example Use 3:
+
+```
+let tree = BTree<Float>(order: 3)
+
+tree.insert(0.5)
+tree.insert(0.0)
+tree.insert(1.5)
+tree.insert(1.0)
+tree.insert(0.5)
+tree.insert(2.0)
+tree.insert(2.5)
+tree.insert(1.0)
+
+print("=====")
+
+for value in tree {
+    print("\(value)")
+}
+
+print("=====")
+
+for (index, value) in tree.enumerated() {
+    print("value[\(index)] = \(value)")
+}
+
+print("=====")
+```
 
 Unit tests are available.
 
@@ -77,5 +104,3 @@ BTreeTests.swift (~30 seconds)
 BTreeTestsRigorous.swift (~30 Minutes)
 
 BTreeTestsOverNight.swift (~ 6 Hours)
-
-
