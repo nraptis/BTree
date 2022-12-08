@@ -164,6 +164,30 @@ class BTreeNode<Element: Comparable>: Hashable {
         count = newCount
         dest.count = newTargetCount
         
+        
+        if !isLeaf {
+            
+            for seek in 0...dest.count {
+                
+                let child = children[count + seek + 1]
+                child.parent = dest
+                child.index = seek
+                dest.children.append(child)
+            }
+            
+            children.removeLast(dest.count + 1)
+            
+            /*
+            for (index, child) in dest.children.enumerated() {
+                child.index = index
+            }
+            for (index, child) in children.enumerated() {
+                child.index = index
+            }
+            */
+        }
+        
+        /*
         if !isLeaf {
             
             var i = 0
@@ -201,6 +225,7 @@ class BTreeNode<Element: Comparable>: Hashable {
             }
             
         }
+        */
     }
     
     func insertValueInternal(index: Int, element: Element, node: BTreeNode<Element>) {

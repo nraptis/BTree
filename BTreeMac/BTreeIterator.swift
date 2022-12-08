@@ -69,13 +69,11 @@ class BTreeIterator<Element: Comparable>: Equatable {
                         node = parent
                     }
                 }
-                
                 if index >= node.count {
                     node = holdNode
                     index = holdIndex
                 }
             } else {
-                
                 if let child = node.child(index: index + 1) {
                     node = child
                     while !node.isLeaf {
@@ -109,12 +107,9 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 let holdNode = node
                 let holdIndex = index
                 
-                while (index < 0) && (node != tree.root) {
-                    
-                    if let parent = node.parent {
-                        index = node.index - 1
-                        node = parent
-                    }
+                while (index < 0) && (node != tree.root), let parent = node.parent {
+                    index = node.index - 1
+                    node = parent
                 }
                 
                 if index < 0 {
@@ -125,9 +120,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 if let child = node.child(index: index) {
                     node = child
                     while !node.isLeaf {
-                        if let child = node.child(index: node.count) {
-                            node = child
-                        }
+                        node = node.children[node.count]
                     }
                     index = node.count - 1
                 }
