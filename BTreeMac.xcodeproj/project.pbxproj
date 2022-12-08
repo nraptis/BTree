@@ -21,7 +21,6 @@
 		0D0318DB293D5F0500A615A7 /* Array+Permutations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318D4293D5F0500A615A7 /* Array+Permutations.swift */; };
 		0D0318DC293D5F0500A615A7 /* MockMultiSearchTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318D5293D5F0500A615A7 /* MockMultiSearchTree.swift */; };
 		0D0318DD293D5F0500A615A7 /* BTreeTestsRigorous.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318D6293D5F0500A615A7 /* BTreeTestsRigorous.swift */; };
-		0D0318DF293D5FDE00A615A7 /* ArrayCapacityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318DE293D5FDE00A615A7 /* ArrayCapacityTest.swift */; };
 		0D0318E3293D609500A615A7 /* MockMultiSearchTreeBoundsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318E0293D609500A615A7 /* MockMultiSearchTreeBoundsTests.swift */; };
 		0D0318E4293D609500A615A7 /* MockMultiSearchTreeSimpleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318E1293D609500A615A7 /* MockMultiSearchTreeSimpleTests.swift */; };
 		0D0318E5293D609500A615A7 /* MockMultiSearchTreeStressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0318E2293D609500A615A7 /* MockMultiSearchTreeStressTests.swift */; };
@@ -55,7 +54,6 @@
 		0D0318D4293D5F0500A615A7 /* Array+Permutations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Permutations.swift"; sourceTree = "<group>"; };
 		0D0318D5293D5F0500A615A7 /* MockMultiSearchTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMultiSearchTree.swift; sourceTree = "<group>"; };
 		0D0318D6293D5F0500A615A7 /* BTreeTestsRigorous.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BTreeTestsRigorous.swift; sourceTree = "<group>"; };
-		0D0318DE293D5FDE00A615A7 /* ArrayCapacityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayCapacityTest.swift; sourceTree = "<group>"; };
 		0D0318E0293D609500A615A7 /* MockMultiSearchTreeBoundsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMultiSearchTreeBoundsTests.swift; sourceTree = "<group>"; };
 		0D0318E1293D609500A615A7 /* MockMultiSearchTreeSimpleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMultiSearchTreeSimpleTests.swift; sourceTree = "<group>"; };
 		0D0318E2293D609500A615A7 /* MockMultiSearchTreeStressTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMultiSearchTreeStressTests.swift; sourceTree = "<group>"; };
@@ -130,7 +128,6 @@
 				0D0318D6293D5F0500A615A7 /* BTreeTestsRigorous.swift */,
 				0D0318D2293D5F0500A615A7 /* BTreeTestsOverNight.swift */,
 				0D0318D5293D5F0500A615A7 /* MockMultiSearchTree.swift */,
-				0D0318DE293D5FDE00A615A7 /* ArrayCapacityTest.swift */,
 				0D0318E0293D609500A615A7 /* MockMultiSearchTreeBoundsTests.swift */,
 				0D0318E1293D609500A615A7 /* MockMultiSearchTreeSimpleTests.swift */,
 				0D0318E2293D609500A615A7 /* MockMultiSearchTreeStressTests.swift */,
@@ -260,7 +257,6 @@
 				0D0318E3293D609500A615A7 /* MockMultiSearchTreeBoundsTests.swift in Sources */,
 				0D0318D7293D5F0500A615A7 /* Array+Subsets.swift in Sources */,
 				0D0318D9293D5F0500A615A7 /* BTreeTestsOverNight.swift in Sources */,
-				0D0318DF293D5FDE00A615A7 /* ArrayCapacityTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

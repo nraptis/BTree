@@ -6,17 +6,7 @@
 
 import Foundation
 
-class BTreeNode<Element: Comparable>: Hashable {
-    
-    var name = "unknown"
-    
-    static func == (lhs: BTreeNode<Element>, rhs: BTreeNode<Element>) -> Bool {
-        lhs === rhs
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self).hashValue)
-    }
+class BTreeNode<Element: Comparable> {
     
     required init(order: Int, isLeaf: Bool) {
         self.order = order
@@ -24,7 +14,6 @@ class BTreeNode<Element: Comparable>: Hashable {
         parent = nil
         values = [Element]()
         values.reserveCapacity(order)
-        
         if isLeaf {
             children = [BTreeNode<Element>]()
         } else {
@@ -40,62 +29,19 @@ class BTreeNode<Element: Comparable>: Hashable {
     var parent: BTreeNode<Element>?
     var values: [Element]
     var children: [BTreeNode<Element>]
-    
-    lazy var sentinel: BTreeNode<Element> = {
-        BTreeNode(order: 0, isLeaf: true)
-    }()
-    
-    func value(index: Int) -> Element? {
-        guard index >= 0 && index < values.count else {
-            fatalError("BTreeNode.value(index: Int) 2 index (\(index)) out of range [0..<\(values.count)]")
-        }
         
-        return values[index]
-    }
-    
-    func child(index: Int) -> BTreeNode<Element>? {
-        guard index >= 0 && index < children.count else {
-            fatalError("BTreeNode.child(index: Int) index (\(index)) out of range [0..<\(children.count)]")
-        }
-        return children[index]
-    }
-    
-    func setChildren(array: [BTreeNode]) {
-        if order > 0 {
-            let ceiling = min(order + 1, array.count)
-            for index in 0..<ceiling {
-                set_child(i: index, node: array[index])
-            }
-        }
-    }
-    
     func swap(node: BTreeNode<Element>) {
-        
-        guard isLeaf == node.isLeaf else {
-            fatalError("BTreeNode.swap() isLeaf (\(isLeaf)) != node.isLeaf (\(node.isLeaf))")
-        }
-        
-        let holdValues = values
-        values = node.values
-        node.values = holdValues
-        
+        Swift.swap(&values, &node.values)
         if !isLeaf {
-            let holdChildren = children
-            children = node.children
-            node.children = holdChildren
-            
+            Swift.swap(&children, &node.children)
             for child in children {
                 child.parent = self
             }
-            
             for child in node.children {
                 child.parent = node
             }
         }
-        
-        let holdCount = count
-        count = node.count
-        node.count = holdCount
+        Swift.swap(&count, &node.count)
     }
     
     func lowerBound(element: Element) -> Int {
@@ -103,12 +49,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         var end = count
         while start != end {
             let mid = (start + end) >> 1
-            
-            guard let value = value(index: mid) else {
-                fatalError("BTreeNode.lowerBound() value missing index: \(mid) count: \(count)")
-            }
-            
-            if element > value {
+            if element > values[mid] {
                 start = mid + 1
             } else {
                 end = mid
@@ -122,12 +63,7 @@ class BTreeNode<Element: Comparable>: Hashable {
         var end = count
         while start != end {
             let mid = (start + end) >> 1
-            
-            guard let value = value(index: mid) else {
-                fatalError("BTreeNode.upperBound() value missing index: \(mid) count: \(count)")
-            }
-            
-            if element >= value {
+            if element >= values[mid] {
                 start = mid + 1
             } else {
                 end = mid
@@ -136,116 +72,54 @@ class BTreeNode<Element: Comparable>: Hashable {
         return start
     }
     
-    func split(dest: BTreeNode<Element>, insertIndex: Int) {
+    func split(target: BTreeNode<Element>, insertIndex: Int) {
         
         guard let parent = parent else { return }
 
         var newTargetCount = 0
         if insertIndex == 0 {
             newTargetCount = (count - 1)
-        } else if insertIndex == order {
-            
-        } else {
+        } else if insertIndex != order {
             newTargetCount = (count >> 1)
         }
         
         var newCount = (count - newTargetCount)
-        
-        
         for seek in 0..<newTargetCount {
-            dest.values.append(values[newCount + seek])
+            target.values.append(values[newCount + seek])
         }
         
         newCount -= 1
         
-        parent.insertValueInternal(index: index, element: values[newCount], node: dest)
+        parent.insertValueInternal(index: index, element: values[newCount], node: target)
 
         values.removeLast(values.count - newCount)
         count = newCount
-        dest.count = newTargetCount
-        
+        target.count = newTargetCount
         
         if !isLeaf {
-            
-            for seek in 0...dest.count {
-                
-                let child = children[count + seek + 1]
-                child.parent = dest
+            let countPlus1 = count + 1
+            for seek in 0...target.count {
+                let child = children[countPlus1 + seek]
+                child.parent = target
                 child.index = seek
-                dest.children.append(child)
+                target.children.append(child)
             }
-            
-            children.removeLast(dest.count + 1)
-            
-            /*
-            for (index, child) in dest.children.enumerated() {
-                child.index = index
-            }
-            for (index, child) in children.enumerated() {
-                child.index = index
-            }
-            */
+            children.removeLast(target.count + 1)
         }
-        
-        /*
-        if !isLeaf {
-            
-            var i = 0
-            while i <= dest.count {
-                
-                dest.children.append(sentinel)
-                i += 1
-            }
-            
-            
-            i = 0
-            while i <= dest.count {
-            
-                guard let child = child(index: count + i + 1) else {
-                    fatalError("BTreeNode.split() child missing count (\(count)) + i (\(i)) + 1")
-                }
-                
-                dest.set_child(i: i, node: child)
-                
-                i += 1
-            }
-            
-            i = 0
-            while i <= dest.count {
-                children.removeLast()
-                i += 1
-            }
-            
-            
-            for (index, child) in dest.children.enumerated() {
-                child.index = index
-            }
-            for (index, child) in children.enumerated() {
-                child.index = index
-            }
-            
-        }
-        */
     }
     
     func insertValueInternal(index: Int, element: Element, node: BTreeNode<Element>) {
-        
         if !isLeaf {
-            
             let index = index + 1
-            
             children.insert(node, at: index)
             node.parent = self
-            
             for seek in index..<children.count {
                 children[seek].index = seek
             }
         }
         
         values.insert(element, at: index)
-        
         count += 1
-        
     }
     
     func insertValueLeaf(index: Int, element: Element) {
@@ -253,34 +127,20 @@ class BTreeNode<Element: Comparable>: Hashable {
         count += 1
     }
     
-    func remove_value(index: Int) {
-        
-        //print("pre-remove_value, self")
-        //printNode()
-        
+    func remove(index: Int) {
         if !isLeaf {
-            
-            //var j = index + 1
-            
-            children.remove(at: index + 1) // or index?
-            
+            children.remove(at: index + 1)
             for seek in (index + 1)..<children.count {
                 children[seek].index = seek
             }
         }
         
         count -= 1
-        
         values.remove(at: index)
-        
-        //print("post-remove_value, self")
-        //printNode()
     }
     
     func merge(source: BTreeNode<Element>) {
-        
         if !isLeaf {
-            
             for seek in 0...source.count {
                 let child = source.children[seek]
                 child.index = count + seek + 1
@@ -293,42 +153,13 @@ class BTreeNode<Element: Comparable>: Hashable {
         
         if let parent = parent {
             values.append(parent.values[index])
-            
             values.append(contentsOf: source.values)
-            
             count = ((1 + count) + source.count)
             source.count = 0
-            
             source.values.removeAll(keepingCapacity: true)
             source.children.removeAll(keepingCapacity: true)
-            parent.remove_value(index: index)
+            parent.remove(index: index)
         }
-    }
-    
-    func destroy() {
-        values.removeAll(keepingCapacity: true)
-        children.removeAll(keepingCapacity: true)
-        //isLeaf = true
-        parent = nil
-        count = 0
-    }
-    
-    func set_child(i: Int, node: BTreeNode<Element>) {
-        if i == children.count {
-            inject_child(i: i, node: node)
-        } else if i < children.count {
-            children[i] = node
-            node.parent = self
-            node.index = i
-        } else {
-            print("??? odd usage")
-        }
-    }
-    
-    func inject_child(i: Int, node: BTreeNode<Element>) {
-        children.insert(node, at: i)
-        node.parent = self
-        node.index = i
     }
     
     func rebalanceRightToLeft(target: BTreeNode<Element>, moveCount: Int) {
@@ -393,39 +224,4 @@ class BTreeNode<Element: Comparable>: Hashable {
         count -= moveCount
         target.count += moveCount
     }
-    
-    func printNode() {
-        
-        print("------------")
-        print("name: \(name)")
-        print("count: \(count)")
-        print("values.count: \(values.count)")
-        print("values: \(values)")
-        print("children.count: \(children.count)")
-        
-        //var childNameArray = [String]()
-        for (index, child) in children.enumerated() {
-            print("child[\(index)] = \(child.name)")
-        }
-        print("PARENT:")
-        printParent()
-    }
-    
-    func printParent() {
-        
-        if let parent = parent {
-            
-            print("parent_name: \(parent.name)")
-            print("parent_count: \(parent.count)")
-            print("parent_values.count: \(parent.values.count)")
-            print("parent_values: \(parent.values)")
-            print("parent_children.count: \(parent.children.count)")
-            //var childNameArray = [String]()
-            for (index, child) in parent.children.enumerated() {
-                print("parent_child[\(index)] = \(child.name)")
-            }
-        }
-        print("------------")
-    }
-    
 }

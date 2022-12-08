@@ -13,27 +13,27 @@ struct ContentView: View {
             VStack {
                 HStack {
                     Image(systemName: "xmark")
-                        .font(.system(size: 120).bold())
+                        .font(.system(size: 150).bold())
                         .foregroundColor(.red)
                     Image(systemName: "xmark")
-                        .font(.system(size: 120).bold())
+                        .font(.system(size: 150).bold())
                         .foregroundColor(.red)
                     Image(systemName: "xmark")
-                        .font(.system(size: 120).bold())
+                        .font(.system(size: 150).bold())
                         .foregroundColor(.red)
                 }
-                Text("Run Unit Tests")
+                Text("Nobody Likes You")
                     .font(.system(size: 56).bold())
                     .foregroundColor(.red)
                 HStack {
                     Image(systemName: "xmark")
-                        .font(.system(size: 120).bold())
+                        .font(.system(size: 150).bold())
                         .foregroundColor(.red)
                     Image(systemName: "xmark")
-                        .font(.system(size: 120).bold())
+                        .font(.system(size: 150).bold())
                         .foregroundColor(.red)
                     Image(systemName: "xmark")
-                        .font(.system(size: 120).bold())
+                        .font(.system(size: 150).bold())
                         .foregroundColor(.red)
                 }
             }

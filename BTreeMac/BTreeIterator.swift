@@ -9,7 +9,7 @@ import Foundation
 struct BTreeIterator<Element: Comparable>: Equatable {
     
     static func == (lhs: BTreeIterator<Element>, rhs: BTreeIterator<Element>) -> Bool {
-        lhs.node === rhs.node && lhs.index == rhs.index
+        (lhs.node === rhs.node) && (lhs.index == rhs.index)
     }
     
     var tree: BTree<Element>
@@ -40,9 +40,7 @@ struct BTreeIterator<Element: Comparable>: Equatable {
     
     func value(index: Int) -> Element? {
         if let node = node {
-            if index >= 0 && index < node.count {
-                return node.values[index]
-            }
+            return node.values[index]
         }
         return nil
     }
@@ -59,7 +57,7 @@ struct BTreeIterator<Element: Comparable>: Equatable {
             if node.isLeaf {
                 let holdNode = node
                 let holdIndex = index
-                while (index >= node.count) && (node != tree.root), let parent = node.parent {
+                while (index >= node.count) && (node !== tree.root), let parent = node.parent {
                     index = node.index
                     node = parent
                 }
@@ -68,13 +66,12 @@ struct BTreeIterator<Element: Comparable>: Equatable {
                     index = holdIndex
                 }
             } else {
-                if let child = node.child(index: index + 1) {
-                    node = child
-                    while !node.isLeaf {
-                        node = node.children[0]
-                    }
-                    index = 0
+                let child = node.children[index + 1]
+                node = child
+                while !node.isLeaf {
+                    node = node.children[0]
                 }
+                index = 0
             }
             self.node = node
         }
@@ -93,23 +90,21 @@ struct BTreeIterator<Element: Comparable>: Equatable {
                 let holdNode = node
                 let holdIndex = index
                 
-                while (index < 0) && (node != tree.root), let parent = node.parent {
+                while (index < 0) && (node !== tree.root), let parent = node.parent {
                     index = node.index - 1
                     node = parent
                 }
-                
                 if index < 0 {
                     node = holdNode
                     index = holdIndex
                 }
             } else {
-                if let child = node.child(index: index) {
-                    node = child
-                    while !node.isLeaf {
-                        node = node.children[node.count]
-                    }
-                    index = node.count - 1
+                let child = node.children[index]
+                node = child
+                while !node.isLeaf {
+                    node = node.children[node.count]
                 }
+                index = node.count - 1
             }
             self.node = node
         }

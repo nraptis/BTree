@@ -10,19 +10,6 @@ import XCTest
 
 final class BTreeTests: XCTestCase {
     
-    func testJustInsert() {
-        let realTree = BTree<Int>(order: 3)
-        let mockTree = MockMultiSearchTree<Int>()
-        for i in 1...200 {
-            realTree.insert(i)
-            mockTree.insert(i)
-            if !BTreeChecker.compare(realTree: realTree, mockTree: mockTree) {
-                XCTFail("Failed: testSimpleOperations()")
-                return
-            }
-        }
-    }
-    
     func testSimpleOperations() {
         let realTree = BTree<Int>(order: 3)
         let mockTree = MockMultiSearchTree<Int>()
