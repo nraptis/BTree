@@ -36,7 +36,7 @@ class BTreeChecker {
         let startIterator = realTree.startIterator()
         let endIterator = realTree.endIterator()
         
-        let forwardIterator = realTree.startIterator()
+        var forwardIterator = realTree.startIterator()
         var index = 0
         while (forwardIterator != endIterator) && index < mockTree.count {
             guard let value = forwardIterator.value() else {
@@ -63,7 +63,7 @@ class BTreeChecker {
         }
         
         index = mockTree.count
-        let backwardIterator = realTree.endIterator()
+        var backwardIterator = realTree.endIterator()
         while (backwardIterator != startIterator) && index > 0 {
             backwardIterator.decrement()
             index -= 1

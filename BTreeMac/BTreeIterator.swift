@@ -6,13 +6,13 @@
 
 import Foundation
 
-class BTreeIterator<Element: Comparable>: Equatable {
+struct BTreeIterator<Element: Comparable>: Equatable {
     
     static func == (lhs: BTreeIterator<Element>, rhs: BTreeIterator<Element>) -> Bool {
         lhs.node === rhs.node && lhs.index == rhs.index
     }
     
-    let tree: BTree<Element>
+    var tree: BTree<Element>
     var node: BTreeNode<Element>?
     var index: Int
     
@@ -28,7 +28,8 @@ class BTreeIterator<Element: Comparable>: Equatable {
         self.index = iterator.index
     }
     
-    func set(iterator: BTreeIterator<Element>) {
+    mutating func set(iterator: BTreeIterator<Element>) {
+        self.tree = iterator.tree
         self.node = iterator.node
         self.index = iterator.index
     }
@@ -46,7 +47,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
         return nil
     }
     
-    func increment() {
+    mutating func increment() {
         if var node = node {
             if node.isLeaf {
                 index += 1
@@ -79,7 +80,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
         }
     }
     
-    func decrement() {
+    mutating func decrement() {
         if var node = node {
             if node.isLeaf {
                 index -= 1
@@ -113,5 +114,4 @@ class BTreeIterator<Element: Comparable>: Equatable {
             self.node = node
         }
     }
-    
 }
