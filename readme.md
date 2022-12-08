@@ -1,5 +1,7 @@
 BTree is thoroughly unit tested. This can be used with iOS, MacOS, WatchOS, or Server Side Swift.
 
+For storing billions and billions of items, you should use a larger value for order, such as 1024.
+
 You need three files:
 
 ```
