@@ -47,27 +47,20 @@ class BTreeIterator<Element: Comparable>: Equatable {
     }
     
     func increment() {
-        if let node = node {
+        if var node = node {
             if node.isLeaf {
                 index += 1
                 if index < node.count {
                     return
                 }
             }
-            incrementSlow()
-        }
-    }
-    
-    func incrementSlow() {
-        if var node = node {
+            
             if node.isLeaf {
                 let holdNode = node
                 let holdIndex = index
-                while (index >= node.count) && (node != tree.root) {
-                    if let parent = node.parent {
-                        index = node.index
-                        node = parent
-                    }
+                while (index >= node.count) && (node != tree.root), let parent = node.parent {
+                    index = node.index
+                    node = parent
                 }
                 if index >= node.count {
                     node = holdNode
@@ -77,10 +70,7 @@ class BTreeIterator<Element: Comparable>: Equatable {
                 if let child = node.child(index: index + 1) {
                     node = child
                     while !node.isLeaf {
-                        guard let innerChild = node.child(index: 0) else {
-                            return
-                        }
-                        node = innerChild
+                        node = node.children[0]
                     }
                     index = 0
                 }
@@ -90,19 +80,14 @@ class BTreeIterator<Element: Comparable>: Equatable {
     }
     
     func decrement() {
-        if let node = node {
+        if var node = node {
             if node.isLeaf {
                 index -= 1
                 if index >= 0 {
                     return
                 }
             }
-            decrementSlow()
-        }
-    }
-    
-    func decrementSlow() {
-        if var node = node {
+            
             if node.isLeaf {
                 let holdNode = node
                 let holdIndex = index
@@ -128,4 +113,5 @@ class BTreeIterator<Element: Comparable>: Equatable {
             self.node = node
         }
     }
+    
 }
