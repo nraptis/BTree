@@ -637,7 +637,7 @@ class BTree<Element: Comparable> {
                 parent.values[index] = values[count - moveCount]
             }
             
-            rotateElements(&target.values, moveCount)
+            rotateValues(&target.values, moveCount)
             values.removeLast(moveCount)
             
             count -= moveCount
@@ -645,7 +645,6 @@ class BTree<Element: Comparable> {
         }
         
         private func rotateChildren(_ children: inout [BTreeNode<Element>], _ shift: Int) {
-            //if children.count <= 0 { return }
             reverseChildren(&children, 0, children.count - 1)
             reverseChildren(&children, 0, shift - 1)
             reverseChildren(&children, shift, children.count - 1)
@@ -661,14 +660,13 @@ class BTree<Element: Comparable> {
             }
         }
         
-        private func rotateElements(_ values: inout [Element], _ shift: Int) {
-            //if values.count <= 0 { return }
-            reverseElements(&values, 0, values.count-1)
-            reverseElements(&values, 0, shift - 1)
-            reverseElements(&values, shift, values.count-1)
+        private func rotateValues(_ values: inout [Element], _ shift: Int) {
+            reverseValues(&values, 0, values.count-1)
+            reverseValues(&values, 0, shift - 1)
+            reverseValues(&values, shift, values.count-1)
         }
         
-        private func reverseElements(_ values: inout [Element], _ start: Int, _ end: Int) {
+        private func reverseValues(_ values: inout [Element], _ start: Int, _ end: Int) {
             var start = start
             var end = end
             while start < end {
