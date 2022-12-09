@@ -395,20 +395,16 @@ class BTree<Element: Comparable> {
                 }
             } else {
                 if let root = root {
+                    let holdTarget = target
+                    target = BTreeNode<Element>(order: order, isLeaf: false)
+                    target.parent = holdTarget
+                    target.index = 0
                     if root.isLeaf {
-                        let holdTarget = target
-                        target = BTreeNode<Element>(order: order, isLeaf: false)
-                        target.parent = holdTarget
                         target.children.append(root)
                         root.parent = target
-                        target.index = 0
                         self.root = target
                     } else {
-                        let holdTarget = target
-                        target = BTreeNode<Element>(order: order, isLeaf: false)
-                        target.parent = holdTarget
                         target.children.append(target)
-                        target.index = 0
                         target.swap(node: root)
                         node = target
                     }
@@ -618,45 +614,75 @@ class BTree<Element: Comparable> {
         
         func rebalanceLeftToRight(target: BTreeNode<Element>, moveCount: Int) {
             if !isLeaf {
-                var targetChildren = [BTreeNode<Element>]()
                 for seek in 0..<moveCount {
                     let child = children[count - moveCount + seek + 1]
                     child.index = seek
                     child.parent = target
-                    targetChildren.append(child)
+                    target.children.append(child)
                 }
                 for seek in 0...target.count {
                     let child = target.children[seek]
                     child.index = seek + moveCount
-                    targetChildren.append(child)
                 }
-                target.children = targetChildren
+                
+                rotateChildren(&target.children, moveCount)
                 children.removeLast(moveCount)
             }
             
-            var targetFrontValues = [Element]()
-            targetFrontValues.reserveCapacity(order)
             for seek in (count - (moveCount) + 1)..<count {
-                targetFrontValues.append(values[seek])
+                target.values.append(values[seek])
             }
             if let parent = parent {
-                targetFrontValues.append(parent.values[index])
+                target.values.append(parent.values[index])
                 parent.values[index] = values[count - moveCount]
             }
-            target.values.insert(contentsOf: targetFrontValues, at: 0)
+            
+            rotateElements(&target.values, moveCount)
             values.removeLast(moveCount)
             
             count -= moveCount
             target.count += moveCount
         }
+        
+        private func rotateChildren(_ children: inout [BTreeNode<Element>], _ shift: Int) {
+            //if children.count <= 0 { return }
+            reverseChildren(&children, 0, children.count - 1)
+            reverseChildren(&children, 0, shift - 1)
+            reverseChildren(&children, shift, children.count - 1)
+        }
+        
+        private func reverseChildren(_ children: inout [BTreeNode<Element>], _ start: Int, _ end: Int) {
+            var start = start
+            var end = end
+            while start < end {
+                children.swapAt(start, end)
+                start += 1
+                end -= 1
+            }
+        }
+        
+        private func rotateElements(_ values: inout [Element], _ shift: Int) {
+            //if values.count <= 0 { return }
+            reverseElements(&values, 0, values.count-1)
+            reverseElements(&values, 0, shift - 1)
+            reverseElements(&values, shift, values.count-1)
+        }
+        
+        private func reverseElements(_ values: inout [Element], _ start: Int, _ end: Int) {
+            var start = start
+            var end = end
+            while start < end {
+                values.swapAt(start, end)
+                start += 1
+                end -= 1
+            }
+        }
     }
     
     struct BTreeIterator<Element: Comparable>: Equatable {
-        
         static func == (lhs: BTreeIterator<Element>, rhs: BTreeIterator<Element>) -> Bool {
             (lhs.node === rhs.node) && (lhs.index == rhs.index)
         }
-        
         var tree: BTree<Element>
         fileprivate var node: BTreeNode<Element>?
         var index: Int
