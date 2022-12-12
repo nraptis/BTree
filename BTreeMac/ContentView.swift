@@ -12,29 +12,30 @@ struct ContentView: View {
         ZStack {
             VStack {
                 HStack {
-                    Image(systemName: "xmark")
+                    Image(systemName: "paperplane.circle.fill")
+                        .font(.system(size: 150).bold())
+                        .foregroundColor(.blue)
+                    Image(systemName: "paperplane.circle.fill")
                         .font(.system(size: 150).bold())
                         .foregroundColor(.red)
-                    Image(systemName: "xmark")
+                    Image(systemName: "paperplane.circle.fill")
                         .font(.system(size: 150).bold())
-                        .foregroundColor(.red)
-                    Image(systemName: "xmark")
-                        .font(.system(size: 150).bold())
-                        .foregroundColor(.red)
+                        .foregroundColor(.green)
                 }
-                Text("Nobody Likes You")
-                    .font(.system(size: 56).bold())
-                    .foregroundColor(.red)
+                Text("BTree Unit Test Suite")
+                    .font(.system(size: 54).bold())
+                    .foregroundColor(.white)
+                    .padding(.all, 0)
                 HStack {
-                    Image(systemName: "xmark")
+                    Image(systemName: "paperplane.circle.fill")
                         .font(.system(size: 150).bold())
                         .foregroundColor(.red)
-                    Image(systemName: "xmark")
+                    Image(systemName: "paperplane.circle.fill")
                         .font(.system(size: 150).bold())
-                        .foregroundColor(.red)
-                    Image(systemName: "xmark")
+                        .foregroundColor(.green)
+                    Image(systemName: "paperplane.circle.fill")
                         .font(.system(size: 150).bold())
-                        .foregroundColor(.red)
+                        .foregroundColor(.blue)
                 }
             }
         }
